@@ -174,11 +174,11 @@ export default function Sidebar({
   return (
     <aside
       className={`h-full bg-[#0d0f17] border-r border-[#222736] flex flex-col shrink-0 transition-all duration-200 select-none z-20 ${
-        collapsed ? "w-14" : "w-64"
+        collapsed ? "w-14" : "w-72"
       }`}
     >
       {/* Sidebar Header */}
-      <div className="h-11 px-3.5 flex items-center justify-between border-b border-[#202535] shrink-0 bg-[#0a0c13]/40">
+      <div className="h-11 px-4 flex items-center justify-between border-b border-[#202535] shrink-0 bg-[#0a0c13]/40">
         {!collapsed ? (
           <div className="flex items-center gap-2">
             <span className="text-[11px] font-semibold tracking-wider text-zinc-400 uppercase font-sans">
@@ -188,7 +188,7 @@ export default function Sidebar({
         ) : null}
         <button
           onClick={onToggleCollapse}
-          title={collapsed ? "Expand Sidebar (256px)" : "Collapse Sidebar (56px)"}
+          title={collapsed ? "Expand Sidebar (288px)" : "Collapse Sidebar (56px)"}
           className="p-1 rounded-md text-zinc-400 hover:text-zinc-200 hover:bg-white/5 transition-colors cursor-pointer ml-auto"
         >
           {collapsed ? <PanelLeft className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
@@ -196,7 +196,7 @@ export default function Sidebar({
       </div>
 
       {/* Nav Groups Container */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden py-3 px-2 space-y-3">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden py-3.5 px-3 space-y-3.5">
         {navGroups.map((group) => {
           const expanded = isGroupExpanded(group.key, group.items);
 
@@ -207,10 +207,10 @@ export default function Sidebar({
                 <button
                   type="button"
                   onClick={() => toggleGroup(group.key)}
-                  className="w-full flex items-center justify-between px-3 py-1.5 text-[11px] font-semibold text-zinc-400 tracking-wider hover:text-zinc-200 rounded group cursor-pointer transition-colors"
+                  className="w-full flex items-center justify-between px-3 py-1.5 text-[11px] font-semibold text-zinc-400 tracking-wider hover:text-zinc-200 rounded-md group cursor-pointer transition-colors"
                 >
                   <span className="font-sans uppercase">{group.label}</span>
-                  <span className="text-zinc-500 group-hover:text-zinc-400">
+                  <span className="text-zinc-500 group-hover:text-zinc-400 mr-1">
                     {!expanded ? (
                       <ChevronRight className="w-3.5 h-3.5" />
                     ) : (
@@ -235,7 +235,7 @@ export default function Sidebar({
                         type="button"
                         onClick={() => handleSelect(item.id)}
                         title={collapsed ? item.label : undefined}
-                        className={`w-full flex items-center px-3 py-2 rounded-lg text-[13px] font-medium transition-colors cursor-pointer ${
+                        className={`w-full flex items-center px-3.5 py-2.5 rounded-lg text-[13px] font-medium transition-colors cursor-pointer ${
                           isActive
                             ? "bg-[#202538] text-white font-semibold border-l-2 border-violet-500 shadow-sm"
                             : "text-zinc-300 hover:text-white hover:bg-white/[0.04] border-l-2 border-transparent"
@@ -247,7 +247,7 @@ export default function Sidebar({
                           }`}
                         />
                         {!collapsed && (
-                          <div className="flex items-center justify-between flex-1 min-w-0 gap-2">
+                          <div className="flex items-center justify-between flex-1 min-w-0 gap-3">
                             <span className="truncate text-left font-sans leading-tight">
                               {item.label}
                             </span>
@@ -256,7 +256,7 @@ export default function Sidebar({
                                 category={item.badgeType || "type"}
                                 status={item.statusDot ? "active" : undefined}
                                 dot={item.statusDot}
-                                className="ml-auto shrink-0"
+                                className="ml-auto shrink-0 mr-1"
                               >
                                 {item.badge}
                               </Badge>

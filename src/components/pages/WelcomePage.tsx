@@ -304,7 +304,7 @@ export default function WelcomePage({
                 <span className="text-xs text-zinc-400 font-sans">Scaffold</span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 {templates.map((tpl) => {
                   const Icon = tpl.icon;
                   return (
@@ -314,18 +314,18 @@ export default function WelcomePage({
                         setSelectedTemplate(tpl.id);
                         setShowModal(true);
                       }}
-                      className="p-4 rounded-xl bg-[#141724] hover:bg-[#181c2c] border border-[#232a3e] hover:border-violet-500/50 shadow-md ring-1 ring-white/5 transition-all cursor-pointer group space-y-2"
+                      className="p-5 rounded-xl bg-[#141724] hover:bg-[#181c2c] border border-[#232a3e] hover:border-violet-500/50 shadow-md ring-1 ring-white/5 transition-all cursor-pointer group space-y-3"
                     >
-                      <div className="flex items-center justify-between">
-                        <div className="w-7 h-7 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-violet-400 group-hover:bg-violet-600/20 transition-colors">
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-violet-400 group-hover:bg-violet-600/20 transition-colors">
                           <Icon className="w-4 h-4" />
                         </div>
-                        <span className="text-[10px] font-sans font-medium text-zinc-300 bg-white/10 px-2 py-0.5 rounded border border-white/10">
+                        <span className="text-[10.5px] font-sans font-semibold text-zinc-300 bg-white/10 px-2.5 py-1 rounded-md border border-white/15 tracking-wide leading-tight">
                           {tpl.badge}
                         </span>
                       </div>
                       <div>
-                        <div className="text-[13px] font-semibold text-zinc-200 group-hover:text-white transition-colors truncate font-sans">
+                        <div className="text-sm font-semibold text-zinc-200 group-hover:text-white transition-colors truncate font-sans">
                           {tpl.name}
                         </div>
                         <div className="text-xs text-zinc-400 mt-1 line-clamp-1 font-sans leading-normal">
@@ -408,13 +408,13 @@ export default function WelcomePage({
                     Local Dev Daemons
                   </span>
                 </div>
-                <span className="text-[11px] font-sans font-medium text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded border border-emerald-500/20">
+                <span className="text-[10.5px] font-sans font-semibold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/20 leading-tight">
                   4 Active
                 </span>
               </div>
 
               <div className="space-y-2.5">
-                <div className="flex items-center justify-between p-3 rounded-lg bg-[#0e1019] border border-[#1d2335]">
+                <div className="flex items-center justify-between p-3.5 rounded-lg bg-[#0e1019] border border-[#1d2335]">
                   <div className="flex items-center gap-3">
                     <Database className="w-4 h-4 text-blue-400" />
                     <div>
@@ -422,12 +422,12 @@ export default function WelcomePage({
                       <span className="text-[11px] font-mono text-zinc-400">127.0.0.1:5432</span>
                     </div>
                   </div>
-                  <span className="text-[11px] font-sans font-medium text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                  <span className="text-[10.5px] font-sans font-semibold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/20 leading-tight">
                     Running (4 conn)
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between p-3 rounded-lg bg-[#0e1019] border border-[#1d2335]">
+                <div className="flex items-center justify-between p-3.5 rounded-lg bg-[#0e1019] border border-[#1d2335]">
                   <div className="flex items-center gap-3">
                     <HardDrive className="w-4 h-4 text-rose-400" />
                     <div>
@@ -435,12 +435,12 @@ export default function WelcomePage({
                       <span className="text-[11px] font-mono text-zinc-400">127.0.0.1:6379</span>
                     </div>
                   </div>
-                  <span className="text-[11px] font-sans font-medium text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                  <span className="text-[10.5px] font-sans font-semibold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/20 leading-tight">
                     Running (2.4MB)
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between p-3 rounded-lg bg-[#0e1019] border border-[#1d2335]">
+                <div className="flex items-center justify-between p-3.5 rounded-lg bg-[#0e1019] border border-[#1d2335]">
                   <div className="flex items-center gap-3">
                     <Wifi className="w-4 h-4 text-teal-400" />
                     <div>
@@ -448,12 +448,12 @@ export default function WelcomePage({
                       <span className="text-[11px] font-mono text-zinc-400">Ports 80 / 443</span>
                     </div>
                   </div>
-                  <span className="text-[11px] font-sans font-medium text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                  <span className="text-[10.5px] font-sans font-semibold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/20 leading-tight">
                     TLS 1.3 Active
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between p-3 rounded-lg bg-[#0e1019] border border-[#1d2335]">
+                <div className="flex items-center justify-between p-3.5 rounded-lg bg-[#0e1019] border border-[#1d2335]">
                   <div className="flex items-center gap-3">
                     <Shield className="w-4 h-4 text-amber-400" />
                     <div>
@@ -461,7 +461,7 @@ export default function WelcomePage({
                       <span className="text-[11px] font-mono text-zinc-400">*.botdigit.site</span>
                     </div>
                   </div>
-                  <span className="text-[11px] font-sans font-medium text-sky-400 bg-sky-500/10 px-2 py-0.5 rounded border border-sky-500/20">
+                  <span className="text-[10.5px] font-sans font-semibold text-sky-400 bg-sky-500/10 px-2.5 py-1 rounded-md border border-sky-500/20 leading-tight">
                     Edge Synced
                   </span>
                 </div>
@@ -646,7 +646,7 @@ export default function WelcomePage({
                     AI Model Gateway
                   </span>
                 </div>
-                <span className="text-[11px] font-sans text-violet-300 bg-violet-500/15 px-2.5 py-0.5 rounded border border-violet-500/30 font-medium">
+                <span className="text-[10.5px] font-sans text-violet-300 bg-violet-500/15 px-2.5 py-1 rounded-md border border-violet-500/30 font-semibold tracking-wide leading-tight">
                   BYOK
                 </span>
               </div>
@@ -837,7 +837,7 @@ export default function WelcomePage({
                             isSelected ? "text-violet-400" : "text-zinc-400"
                           }`}
                         />
-                        <span className="text-[10px] font-mono text-zinc-400 bg-white/5 px-2 py-0.5 rounded border border-white/8">
+                        <span className="text-[10.5px] font-mono text-zinc-400 bg-white/5 px-2.5 py-1 rounded-md border border-white/10 leading-tight">
                           {tpl.badge}
                         </span>
                       </div>

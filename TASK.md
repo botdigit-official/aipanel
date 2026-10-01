@@ -48,14 +48,13 @@
   - [x] Stripped out monospace font from labels, cards, and titles (confined font-mono strictly to ports, paths, and code)
   - [x] Relaxed card padding (`p-5`, `p-6`) and list item gaps (`gap-3.5`, `space-y-3`) for breathable IDE layout
   - [x] Upgraded TopBar (`h-12`) and Sidebar (`w-60`) heights, widths, and row padding (`h-9 px-3 py-2`)
-- [x] Spacing & Badge Collision Resolution ("Kissing" Bug):
-  - [x] Expanded Sidebar width to standard 256px (`w-64`)
-  - [x] Docked sidebar badges to the far right with `ml-auto shrink-0` and `gap-2`, ending badge collisions with labels (e.g. `Domains & SSL SSL`, `AI Agent PRO`)
-  - [x] Shortened sidebar header to `EXPLORER` with `px-3.5` to eliminate crowding against collapse icon
-  - [x] Redesigned `ServicesPanel.tsx` header badge, tabs height (`h-10 px-5 gap-3`), and service cards
-  - [x] Fixed double colon typo (`Port: :5432` -> `Port: 5432`)
-  - [x] Audited and eliminated all invalid `py-0.2` Tailwind utility classes across the repository (`ServicesPanel`, `DatabasePanel`, `GitPanel`, `SettingsPanel`, `DomainsPanel`, `CommandPalette`, `DeployPanel`, `WelcomePage`)
+- [x] Permanent Badge, Sidebar & Card Spacing Overhaul:
+  - [x] Expanded Sidebar width to standard 288px (`w-72`) with `px-3 py-3.5` container padding and `px-3.5 py-2.5` item padding
+  - [x] Added `mr-1` to all sidebar badges and accordion chevrons, securing a full 30px buffer from the sidebar border
+  - [x] Redesigned core Design System `Badge.tsx` with `px-2.5 py-1 text-[10.5px] leading-tight tracking-wide rounded-md`, permanently eliminating choking/kissing borders on all badges
+  - [x] Upgraded starter template cards in `WelcomePage.tsx` to `p-5 space-y-3` with generous `w-8 h-8` icon containers and breathable `px-2.5 py-1` language tags
+  - [x] Upgraded Local Dev Daemons, AI Gateway, and modal template badges with `px-2.5 py-1 rounded-md`
 - [x] Quality Gates Verified:
-  - [x] `npm run build` succeeds (0 TypeScript/lint errors in 282ms)
+  - [x] `npm run build` succeeds (0 TypeScript/lint errors in 285ms)
   - [x] `cargo check` in `src-tauri` passes
 
