@@ -8,6 +8,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Multi-Engine Database Studio with SQLite Default in DEV (`src/components/panels/DatabasePanel.tsx`)**:
+  - **SQLite Default in DEV Environment**:
+    - Automatically selects embedded SQLite engine when operating in `DEV` mode (no external daemon required).
+    - Tracks active `.sqlite` database file linked to current workspace (`dev.sqlite`, customizable inline).
+    - Pre-configured SQLite schemas (`users`, `tasks`, `app_settings`, `activity_logs`) with native SQLite types (`INTEGER PRIMARY KEY`, `TEXT`, `DATETIME`).
+  - **Multi-Engine Switching**:
+    - 1-click engine switcher bar: **SQLite (Default in Dev)**, **PostgreSQL (:5432)**, **MySQL (:3306)**, and **Redis (:6379)**.
+    - Redis Key-Value explorer supporting string, hash, list, and set types with TTL tracking and memory metrics.
+  - **Dual-View Data & Schema Studio**:
+    - **Table Data (Live Records)** view: Default view showing formatted tabular data rows, record counts, row indexing, and real-time column sorting & filtering.
+    - **Schema Definition** view: Shows column specs, data types, primary key badges, and nullability constraints.
+  - **Quick SQL Templates & Execution Console**:
+    - 1-click query template chips (`SELECT *`, `COUNT(*)`, `PRAGMA table_info`, `INSERT INTO`, `CREATE TABLE`, `KEYS *`).
+    - Real-time query execution with execution duration timing (ms) and row stats.
+    - Instant database snapshot backup (`.backup.gz`) and table dump export.
 - **Real Terminal Shell & Full Root Access Engine**:
   - **Live Command Execution Bridges (`vite.config.ts`, `src-tauri/src/lib.rs`, `src/lib/tauri.ts`)**:
     - Vite dev middleware `/api/terminal/exec` running commands via Node.js `child_process` with zsh environment.

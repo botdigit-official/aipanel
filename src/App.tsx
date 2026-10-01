@@ -734,6 +734,7 @@ export default function App() {
               <DatabasePanel
                 environment={environment}
                 projectName={projectInfo?.name}
+                projectPath={projectPath}
               />
             ) : activePanel === "tunnels" ? (
               <TunnelsPanel

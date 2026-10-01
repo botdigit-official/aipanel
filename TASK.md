@@ -146,8 +146,20 @@
     - [x] Dynamic prompt: `root#>` (amber) vs `user@mac:workspace ❯` (emerald)
     - [x] Live process execution feedback with spinner (`Loader2`) and exit codes
     - [x] 1-click system probe chips: `whoami`, `pwd`, `ls -la`, `help`, `clear`
+- [x] Multi-Engine Database Studio (SQLite Default in Dev):
+  - [x] Engine Selection Bar (`SQLite (Default Dev)`, `PostgreSQL (:5432)`, `MySQL (:3306)`, `Redis (:6379)`):
+    - [x] Defaults to SQLite in `DEV` environment with zero-daemon local `.sqlite` file management
+    - [x] PostgreSQL canonical port :5432 with schema explorer and SSL status
+    - [x] MySQL canonical port :3306 with accounts and orders tables
+    - [x] Redis key-value explorer (:6379) with key types, TTL countdowns, and memory telemetry
+  - [x] Dual-View Data & Schema Studio (`src/components/panels/DatabasePanel.tsx`):
+    - [x] **Table Data (Live Records)** view as default tab with real row grids, column headers, and search filter
+    - [x] **Schema Definition** view with column types, primary key flags, and nullability
+    - [x] 1-click Quick SQL Templates (`SELECT *`, `COUNT(*)`, `PRAGMA table_info`, `INSERT INTO`, `CREATE TABLE`)
+    - [x] Interactive query execution with execution duration timing and row counts
+    - [x] Editable SQLite file path and 1-click database backup/export
 - [x] Quality Gates Verified:
   - [x] `cargo check` succeeds (0 Rust errors)
-  - [x] `npm run build` succeeds (0 TypeScript/lint errors in 368ms)
+  - [x] `npm run build` succeeds (0 TypeScript/lint errors in 364ms)
   - [x] React Fast Refresh compatibility verified (clean hot reloads)
 
