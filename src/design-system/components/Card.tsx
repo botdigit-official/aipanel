@@ -7,15 +7,17 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ({ variant = "default", hoverable = false, className = "", children, ...props }, ref) => {
-    let baseStyles = "bg-[#11131A] border border-white/10 rounded-xl p-4";
+    let baseStyles =
+      "bg-[#131622] border border-[#23293d] rounded-xl p-4 shadow-md shadow-black/40 ring-1 ring-white/5";
 
     if (variant === "elevated") {
-      baseStyles = "bg-[#161923] border border-white/12 rounded-xl p-5 shadow-lg shadow-black/40";
+      baseStyles =
+        "bg-[#171b2b] border border-[#2a324b] rounded-xl p-5 shadow-xl shadow-black/50 ring-1 ring-white/10";
     }
 
     const hoverStyles =
       hoverable || variant === "interactive"
-        ? "transition-all duration-200 hover:border-violet-500/30 hover:bg-[#151722] hover:shadow-md cursor-pointer"
+        ? "transition-all duration-200 hover:border-violet-500/50 hover:bg-[#1a1f32] hover:shadow-lg hover:shadow-violet-950/20 cursor-pointer"
         : "";
 
     return (

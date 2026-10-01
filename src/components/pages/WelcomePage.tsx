@@ -25,6 +25,7 @@ import {
   RefreshCw,
   Lock,
   GitCommit,
+  Rocket,
 } from "lucide-react";
 import { open } from "@tauri-apps/plugin-dialog";
 import { Card, Button, Badge, StatusIndicator } from "../../design-system";
@@ -190,12 +191,12 @@ export default function WelcomePage({
         ];
 
   return (
-    <div className="flex-1 bg-[#08090D] overflow-y-auto px-6 lg:px-8 py-6 select-none w-full">
+    <div className="flex-1 bg-[#090a10] overflow-y-auto px-6 lg:px-8 py-6 select-none w-full">
       <div className="w-full space-y-6 animate-in fade-in duration-150">
         {/* ── Top Header Banner (Full Width) ── */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl bg-[#11131A] border border-white/8 shadow-md">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl bg-gradient-to-r from-[#141829] via-[#101322] to-[#141829] border border-[#242d45] shadow-xl shadow-black/40 ring-1 ring-white/5">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-violet-600/20 border border-violet-500/35 flex items-center justify-center text-violet-400 font-extrabold text-xl shrink-0 shadow-sm">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 border border-violet-400/40 flex items-center justify-center text-white font-extrabold text-2xl shrink-0 shadow-lg shadow-violet-950/50">
               A
             </div>
             <div>
@@ -229,7 +230,7 @@ export default function WelcomePage({
           </div>
         </div>
 
-        {/* ── 3-Column Powerhouse Dashboard Grid (Fills 100% of the display width) ── */}
+        {/* ── 3-Column Powerhouse Dashboard Grid (Fills display width) ── */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-12 gap-6 items-start w-full">
           {/* ════════ COLUMN 1: Workspaces & Architecture Templates (4 Columns) ════════ */}
           <div className="xl:col-span-4 space-y-5">
@@ -251,11 +252,11 @@ export default function WelcomePage({
                     key={project.path}
                     variant="interactive"
                     onClick={() => onOpenRecent(project.path)}
-                    className="p-3.5 group border-white/8 hover:border-violet-500/40"
+                    className="p-3.5 group border-[#242d44] hover:border-violet-500/50 bg-[#121624] hover:bg-[#161b2e] shadow-md ring-1 ring-white/5"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-start gap-3 min-w-0">
-                        <div className="w-9 h-9 rounded-lg bg-violet-600/15 border border-violet-500/30 flex items-center justify-center text-violet-400 font-bold shrink-0 group-hover:scale-105 transition-transform">
+                        <div className="w-9 h-9 rounded-lg bg-violet-600/20 border border-violet-500/35 flex items-center justify-center text-violet-300 font-bold shrink-0 group-hover:scale-105 transition-transform shadow-inner">
                           <Box className="w-4 h-4" />
                         </div>
                         <div className="min-w-0">
@@ -267,7 +268,7 @@ export default function WelcomePage({
                               DEV
                             </Badge>
                           </div>
-                          <div className="text-[11px] font-mono text-zinc-500 truncate mt-0.5">
+                          <div className="text-[11px] font-mono text-zinc-400 truncate mt-0.5">
                             {project.path}
                           </div>
                           <div className="flex items-center gap-2.5 mt-1.5 text-[10px] text-zinc-400 font-mono">
@@ -313,13 +314,13 @@ export default function WelcomePage({
                         setSelectedTemplate(tpl.id);
                         setShowModal(true);
                       }}
-                      className="p-3 rounded-xl bg-[#11131A] hover:bg-[#161923] border border-white/8 hover:border-violet-500/30 transition-all cursor-pointer group"
+                      className="p-3 rounded-xl bg-[#131728] hover:bg-[#181d32] border border-[#242d44] hover:border-violet-500/50 shadow-md ring-1 ring-white/5 transition-all cursor-pointer group"
                     >
                       <div className="flex items-center justify-between mb-1.5">
                         <div className="w-6 h-6 rounded-md bg-white/5 border border-white/10 flex items-center justify-center text-violet-400 group-hover:bg-violet-600/20 transition-colors">
                           <Icon className="w-3.5 h-3.5" />
                         </div>
-                        <span className="text-[9px] font-mono text-zinc-400 bg-white/5 px-1.5 py-0.2 rounded border border-white/8">
+                        <span className="text-[9px] font-mono text-zinc-300 bg-white/10 px-1.5 py-0.2 rounded border border-white/10">
                           {tpl.badge}
                         </span>
                       </div>
@@ -346,48 +347,48 @@ export default function WelcomePage({
                 <button
                   type="button"
                   onClick={onNavigateToCode}
-                  className="flex items-center gap-2 p-2 rounded-xl bg-[#11131A] hover:bg-[#161923] border border-white/8 hover:border-white/16 transition-colors text-left cursor-pointer group"
+                  className="flex items-center gap-2 p-2.5 rounded-xl bg-[#131728] hover:bg-[#181d32] border border-[#242d44] hover:border-blue-500/50 shadow-md ring-1 ring-white/5 transition-colors text-left cursor-pointer group"
                 >
                   <Code2 className="w-4 h-4 text-blue-400 shrink-0" />
                   <div className="min-w-0">
                     <div className="text-xs font-semibold text-zinc-200 truncate">Code Editor</div>
-                    <div className="text-[10px] text-zinc-500 truncate">Buffer & Tree</div>
+                    <div className="text-[10px] text-zinc-400 truncate">Buffer & Tree</div>
                   </div>
                 </button>
 
                 <button
                   type="button"
                   onClick={onNavigateToAI}
-                  className="flex items-center gap-2 p-2 rounded-xl bg-[#11131A] hover:bg-[#161923] border border-white/8 hover:border-white/16 transition-colors text-left cursor-pointer group"
+                  className="flex items-center gap-2 p-2.5 rounded-xl bg-[#131728] hover:bg-[#181d32] border border-[#242d44] hover:border-violet-500/50 shadow-md ring-1 ring-white/5 transition-colors text-left cursor-pointer group"
                 >
                   <Sparkles className="w-4 h-4 text-violet-400 shrink-0" />
                   <div className="min-w-0">
                     <div className="text-xs font-semibold text-zinc-200 truncate">AI Agent</div>
-                    <div className="text-[10px] text-zinc-500 truncate">Context Engine</div>
+                    <div className="text-[10px] text-zinc-400 truncate">Context Engine</div>
                   </div>
                 </button>
 
                 <button
                   type="button"
                   onClick={onNavigateToGit}
-                  className="flex items-center gap-2 p-2 rounded-xl bg-[#11131A] hover:bg-[#161923] border border-white/8 hover:border-white/16 transition-colors text-left cursor-pointer group"
+                  className="flex items-center gap-2 p-2.5 rounded-xl bg-[#131728] hover:bg-[#181d32] border border-[#242d44] hover:border-emerald-500/50 shadow-md ring-1 ring-white/5 transition-colors text-left cursor-pointer group"
                 >
                   <GitBranch className="w-4 h-4 text-emerald-400 shrink-0" />
                   <div className="min-w-0">
                     <div className="text-xs font-semibold text-zinc-200 truncate">Git Cockpit</div>
-                    <div className="text-[10px] text-zinc-500 truncate">Commits & Diff</div>
+                    <div className="text-[10px] text-zinc-400 truncate">Commits & Diff</div>
                   </div>
                 </button>
 
                 <button
                   type="button"
                   onClick={onNavigateToServers}
-                  className="flex items-center gap-2 p-2 rounded-xl bg-[#11131A] hover:bg-[#161923] border border-white/8 hover:border-white/16 transition-colors text-left cursor-pointer group"
+                  className="flex items-center gap-2 p-2.5 rounded-xl bg-[#131728] hover:bg-[#181d32] border border-[#242d44] hover:border-sky-500/50 shadow-md ring-1 ring-white/5 transition-colors text-left cursor-pointer group"
                 >
                   <Activity className="w-4 h-4 text-sky-400 shrink-0" />
                   <div className="min-w-0">
                     <div className="text-xs font-semibold text-zinc-200 truncate">Fleet Control</div>
-                    <div className="text-[10px] text-zinc-500 truncate">VPS & Telemetry</div>
+                    <div className="text-[10px] text-zinc-400 truncate">VPS & Telemetry</div>
                   </div>
                 </button>
               </div>
@@ -397,68 +398,68 @@ export default function WelcomePage({
           {/* ════════ COLUMN 2: Workspace Activity, Local Daemons & CLI Runners (4 Columns) ════════ */}
           <div className="xl:col-span-4 space-y-5">
             {/* Active Backing Services & Daemons Cockpit */}
-            <Card className="p-4 space-y-3.5 border-white/10">
-              <div className="flex items-center justify-between border-b border-white/6 pb-2.5">
+            <Card className="p-4 space-y-3.5 bg-[#121624] border-[#242d44] shadow-md ring-1 ring-white/5">
+              <div className="flex items-center justify-between border-b border-[#21283d] pb-2.5">
                 <div className="flex items-center gap-2">
                   <Server className="w-4 h-4 text-emerald-400" />
                   <span className="text-xs font-bold text-zinc-100 uppercase tracking-wider font-mono">
                     Local Dev Daemons
                   </span>
                 </div>
-                <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 font-semibold">
                   4 Active
                 </span>
               </div>
 
               <div className="space-y-2 text-xs font-mono">
-                <div className="flex items-center justify-between p-2.5 rounded-lg bg-[#0C0D12] border border-white/6">
+                <div className="flex items-center justify-between p-2.5 rounded-lg bg-[#0d101a] border border-[#1e2538]">
                   <div className="flex items-center gap-2">
                     <Database className="w-3.5 h-3.5 text-blue-400" />
                     <div>
                       <span className="text-zinc-200 font-semibold block">PostgreSQL 16</span>
-                      <span className="text-[10px] text-zinc-500">127.0.0.1:5432</span>
+                      <span className="text-[10px] text-zinc-400">127.0.0.1:5432</span>
                     </div>
                   </div>
-                  <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded">
+                  <span className="text-[10px] text-emerald-400 bg-emerald-500/15 px-1.5 py-0.5 rounded font-semibold border border-emerald-500/20">
                     Running (4 conn)
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between p-2.5 rounded-lg bg-[#0C0D12] border border-white/6">
+                <div className="flex items-center justify-between p-2.5 rounded-lg bg-[#0d101a] border border-[#1e2538]">
                   <div className="flex items-center gap-2">
                     <HardDrive className="w-3.5 h-3.5 text-rose-400" />
                     <div>
                       <span className="text-zinc-200 font-semibold block">Redis 7.2 Cache</span>
-                      <span className="text-[10px] text-zinc-500">127.0.0.1:6379</span>
+                      <span className="text-[10px] text-zinc-400">127.0.0.1:6379</span>
                     </div>
                   </div>
-                  <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded">
+                  <span className="text-[10px] text-emerald-400 bg-emerald-500/15 px-1.5 py-0.5 rounded font-semibold border border-emerald-500/20">
                     Running (2.4MB)
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between p-2.5 rounded-lg bg-[#0C0D12] border border-white/6">
+                <div className="flex items-center justify-between p-2.5 rounded-lg bg-[#0d101a] border border-[#1e2538]">
                   <div className="flex items-center gap-2">
                     <Wifi className="w-3.5 h-3.5 text-teal-400" />
                     <div>
                       <span className="text-zinc-200 font-semibold block">Caddy v2.8 Proxy</span>
-                      <span className="text-[10px] text-zinc-500">Ports 80 / 443</span>
+                      <span className="text-[10px] text-zinc-400">Ports 80 / 443</span>
                     </div>
                   </div>
-                  <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded">
+                  <span className="text-[10px] text-emerald-400 bg-emerald-500/15 px-1.5 py-0.5 rounded font-semibold border border-emerald-500/20">
                     TLS 1.3 Active
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between p-2.5 rounded-lg bg-[#0C0D12] border border-white/6">
+                <div className="flex items-center justify-between p-2.5 rounded-lg bg-[#0d101a] border border-[#1e2538]">
                   <div className="flex items-center gap-2">
                     <Shield className="w-3.5 h-3.5 text-amber-400" />
                     <div>
                       <span className="text-zinc-200 font-semibold block">CF Zero Trust Tunnel</span>
-                      <span className="text-[10px] text-zinc-500">*.botdigit.site</span>
+                      <span className="text-[10px] text-zinc-400">*.botdigit.site</span>
                     </div>
                   </div>
-                  <span className="text-[10px] text-sky-400 bg-sky-500/10 px-1.5 py-0.5 rounded">
+                  <span className="text-[10px] text-sky-400 bg-sky-500/15 px-1.5 py-0.5 rounded font-semibold border border-sky-500/20">
                     Edge Synced
                   </span>
                 </div>
@@ -466,36 +467,36 @@ export default function WelcomePage({
             </Card>
 
             {/* Recent Git Activity Stream */}
-            <Card className="p-4 space-y-3 border-white/10">
-              <div className="flex items-center justify-between border-b border-white/6 pb-2.5">
+            <Card className="p-4 space-y-3 bg-[#121624] border-[#242d44] shadow-md ring-1 ring-white/5">
+              <div className="flex items-center justify-between border-b border-[#21283d] pb-2.5">
                 <div className="flex items-center gap-2">
                   <GitCommit className="w-4 h-4 text-violet-400" />
                   <span className="text-xs font-bold text-zinc-100 uppercase tracking-wider font-mono">
                     Workspace Git Stream
                   </span>
                 </div>
-                <span className="text-[10px] font-mono text-zinc-400">develop</span>
+                <span className="text-[10px] font-mono text-zinc-400 font-semibold">develop</span>
               </div>
 
               <div className="space-y-2 text-xs font-mono">
-                <div className="p-2 rounded-lg bg-[#0C0D12] border border-white/6 space-y-1">
+                <div className="p-2.5 rounded-lg bg-[#0d101a] border border-[#1e2538] space-y-1">
                   <div className="flex items-center justify-between">
-                    <span className="text-violet-400 font-semibold truncate">
+                    <span className="text-violet-300 font-semibold truncate">
                       feat(ui): establish design system
                     </span>
-                    <span className="text-[10px] text-zinc-500">Just now</span>
+                    <span className="text-[10px] text-zinc-400">Just now</span>
                   </div>
                   <p className="text-[11px] text-zinc-400 font-sans line-clamp-1">
                     Layered surfaces, tokens, command center and balanced cockpit.
                   </p>
                 </div>
 
-                <div className="p-2 rounded-lg bg-[#0C0D12] border border-white/6 space-y-1">
+                <div className="p-2.5 rounded-lg bg-[#0d101a] border border-[#1e2538] space-y-1">
                   <div className="flex items-center justify-between">
-                    <span className="text-zinc-300 font-semibold truncate">
+                    <span className="text-zinc-200 font-semibold truncate">
                       feat(installer): 1-click server setup
                     </span>
-                    <span className="text-[10px] text-zinc-500">30m ago</span>
+                    <span className="text-[10px] text-zinc-400">30m ago</span>
                   </div>
                   <p className="text-[11px] text-zinc-400 font-sans line-clamp-1">
                     Zero-prompt hardware audit, swap provisioning and firewall rules.
@@ -505,7 +506,7 @@ export default function WelcomePage({
             </Card>
 
             {/* Quick Command CLI Runners */}
-            <div className="p-3.5 rounded-xl bg-[#11131A] border border-white/8 space-y-2">
+            <div className="p-3.5 rounded-xl bg-[#121624] border border-[#242d44] shadow-md ring-1 ring-white/5 space-y-2">
               <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider font-mono flex items-center gap-1.5">
                 <Terminal className="w-3.5 h-3.5 text-zinc-500" />
                 Quick Terminal Tasks
@@ -514,24 +515,24 @@ export default function WelcomePage({
                 <button
                   type="button"
                   onClick={onNavigateToCode}
-                  className="flex items-center justify-between p-2 rounded-lg bg-[#0C0D12] border border-white/6 hover:border-violet-500/30 text-zinc-300 hover:text-white transition-colors cursor-pointer"
+                  className="flex items-center justify-between p-2 rounded-lg bg-[#0d101a] border border-[#1e2538] hover:border-violet-500/40 text-zinc-300 hover:text-white transition-colors cursor-pointer"
                 >
                   <span className="flex items-center gap-1">
                     <Play className="w-3 h-3 text-emerald-400" />
                     aipanel dev
                   </span>
-                  <span className="text-[10px] text-zinc-500">Run</span>
+                  <span className="text-[10px] text-zinc-400 font-semibold">Run</span>
                 </button>
                 <button
                   type="button"
                   onClick={onNavigateToCode}
-                  className="flex items-center justify-between p-2 rounded-lg bg-[#0C0D12] border border-white/6 hover:border-violet-500/30 text-zinc-300 hover:text-white transition-colors cursor-pointer"
+                  className="flex items-center justify-between p-2 rounded-lg bg-[#0d101a] border border-[#1e2538] hover:border-violet-500/40 text-zinc-300 hover:text-white transition-colors cursor-pointer"
                 >
                   <span className="flex items-center gap-1">
                     <RefreshCw className="w-3 h-3 text-cyan-400" />
                     aipanel build
                   </span>
-                  <span className="text-[10px] text-zinc-500">Run</span>
+                  <span className="text-[10px] text-zinc-400 font-semibold">Run</span>
                 </button>
               </div>
             </div>
@@ -540,8 +541,8 @@ export default function WelcomePage({
           {/* ════════ COLUMN 3: Live Hardware Telemetry & Fleet Cloud (4 Columns) ════════ */}
           <div className="xl:col-span-4 space-y-5">
             {/* Live Host Hardware Telemetry Card */}
-            <Card className="p-4 space-y-3.5 border-white/10">
-              <div className="flex items-center justify-between border-b border-white/6 pb-2.5">
+            <Card className="p-4 space-y-3.5 bg-[#121624] border-[#242d44] shadow-md ring-1 ring-white/5">
+              <div className="flex items-center justify-between border-b border-[#21283d] pb-2.5">
                 <div className="flex items-center gap-2">
                   <Activity className="w-4 h-4 text-cyan-400" />
                   <span className="text-xs font-bold text-zinc-100 uppercase tracking-wider font-mono">
@@ -560,8 +561,8 @@ export default function WelcomePage({
                   </span>
                   <span className="text-zinc-200 font-semibold">12%</span>
                 </div>
-                <div className="w-full h-2 rounded-full bg-white/5 overflow-hidden">
-                  <div className="h-full bg-cyan-400 rounded-full w-[12%]" />
+                <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full w-[12%]" />
                 </div>
               </div>
 
@@ -574,58 +575,58 @@ export default function WelcomePage({
                   </span>
                   <span className="text-zinc-200 font-semibold">1.2 GB / 8.0 GB (15%)</span>
                 </div>
-                <div className="w-full h-2 rounded-full bg-white/5 overflow-hidden">
-                  <div className="h-full bg-purple-400 rounded-full w-[15%]" />
+                <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full w-[15%]" />
                 </div>
               </div>
 
               {/* Disk & Network Metrics */}
               <div className="grid grid-cols-2 gap-2 pt-1 text-[11px] font-mono">
-                <div className="p-2.5 rounded-lg bg-[#0C0D12] border border-white/6">
-                  <span className="text-zinc-500 block">NVMe Pool</span>
-                  <span className="text-zinc-200 font-semibold mt-0.5 block">54 GB / 120 GB</span>
+                <div className="p-2.5 rounded-lg bg-[#0d101a] border border-[#1e2538]">
+                  <span className="text-zinc-400 block">NVMe Pool</span>
+                  <span className="text-zinc-100 font-semibold mt-0.5 block">54 GB / 120 GB</span>
                 </div>
-                <div className="p-2.5 rounded-lg bg-[#0C0D12] border border-white/6">
-                  <span className="text-zinc-500 block">10Gbps Network</span>
+                <div className="p-2.5 rounded-lg bg-[#0d101a] border border-[#1e2538]">
+                  <span className="text-zinc-400 block">10Gbps Network</span>
                   <span className="text-emerald-400 font-semibold mt-0.5 block">↑ 1.4M · ↓ 4.2M</span>
                 </div>
               </div>
             </Card>
 
             {/* Server Fleet Management Card */}
-            <Card className="p-4 space-y-3 border-white/10">
-              <div className="flex items-center justify-between border-b border-white/6 pb-2.5">
+            <Card className="p-4 space-y-3 bg-[#121624] border-[#242d44] shadow-md ring-1 ring-white/5">
+              <div className="flex items-center justify-between border-b border-[#21283d] pb-2.5">
                 <div className="flex items-center gap-2">
                   <Server className="w-4 h-4 text-purple-400" />
                   <span className="text-xs font-bold text-zinc-100 uppercase tracking-wider font-mono">
                     Managed Server Fleet
                   </span>
                 </div>
-                <span className="text-[10px] font-mono text-zinc-400">2 Nodes</span>
+                <span className="text-[10px] font-mono text-zinc-400 font-semibold">2 Nodes</span>
               </div>
 
               <div className="space-y-2 text-xs font-mono">
-                <div className="p-2.5 rounded-lg bg-[#0C0D12] border border-white/6 flex items-center justify-between">
+                <div className="p-2.5 rounded-lg bg-[#0d101a] border border-[#1e2538] flex items-center justify-between">
                   <div>
                     <div className="flex items-center gap-1.5 font-semibold text-zinc-200">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                       <span>srv-staging-01</span>
                     </div>
-                    <span className="text-[10px] text-zinc-500">US-East • 24ms • 3 services</span>
+                    <span className="text-[10px] text-zinc-400">US-East • 24ms • 3 services</span>
                   </div>
                   <Badge category="env" env="staging">
                     STAGING
                   </Badge>
                 </div>
 
-                <div className="p-2.5 rounded-lg bg-[#0C0D12] border border-white/6 flex items-center justify-between">
+                <div className="p-2.5 rounded-lg bg-[#0d101a] border border-[#1e2538] flex items-center justify-between">
                   <div>
                     <div className="flex items-center gap-1.5 font-semibold text-zinc-200">
                       <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
                       <span>srv-prod-01</span>
                       <Lock className="w-3 h-3 text-rose-400" />
                     </div>
-                    <span className="text-[10px] text-zinc-500">EU-Central • 68ms • 5 services</span>
+                    <span className="text-[10px] text-zinc-400">EU-Central • 68ms • 5 services</span>
                   </div>
                   <Badge category="env" env="production">
                     PROD
@@ -635,33 +636,33 @@ export default function WelcomePage({
             </Card>
 
             {/* AI Multi-Model Gateway Card */}
-            <Card className="p-4 space-y-3 border-white/10">
-              <div className="flex items-center justify-between border-b border-white/6 pb-2.5">
+            <Card className="p-4 space-y-3 bg-[#121624] border-[#242d44] shadow-md ring-1 ring-white/5">
+              <div className="flex items-center justify-between border-b border-[#21283d] pb-2.5">
                 <div className="flex items-center gap-2">
                   <Bot className="w-4 h-4 text-violet-400" />
                   <span className="text-xs font-bold text-zinc-100 uppercase tracking-wider font-mono">
                     AI Model Gateway
                   </span>
                 </div>
-                <span className="text-[10px] font-mono text-zinc-400 bg-violet-500/10 px-2 py-0.5 rounded border border-violet-500/20">
+                <span className="text-[10px] font-mono text-violet-300 bg-violet-500/15 px-2 py-0.5 rounded border border-violet-500/30 font-semibold">
                   BYOK
                 </span>
               </div>
 
               <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-                <div className="p-2 rounded-lg bg-[#0C0D12] border border-white/6">
+                <div className="p-2 rounded-lg bg-[#0d101a] border border-[#1e2538]">
                   <span className="text-zinc-200 font-semibold block truncate">Claude 3.7</span>
                   <span className="text-[10px] text-emerald-400">● Connected</span>
                 </div>
-                <div className="p-2 rounded-lg bg-[#0C0D12] border border-white/6">
+                <div className="p-2 rounded-lg bg-[#0d101a] border border-[#1e2538]">
                   <span className="text-zinc-200 font-semibold block truncate">GPT-4o</span>
                   <span className="text-[10px] text-emerald-400">● Connected</span>
                 </div>
-                <div className="p-2 rounded-lg bg-[#0C0D12] border border-white/6">
+                <div className="p-2 rounded-lg bg-[#0d101a] border border-[#1e2538]">
                   <span className="text-zinc-200 font-semibold block truncate">Gemini 2.5</span>
                   <span className="text-[10px] text-emerald-400">● Connected</span>
                 </div>
-                <div className="p-2 rounded-lg bg-[#0C0D12] border border-white/6">
+                <div className="p-2 rounded-lg bg-[#0d101a] border border-[#1e2538]">
                   <span className="text-zinc-200 font-semibold block truncate">Ollama Local</span>
                   <span className="text-[10px] text-sky-400">:11434</span>
                 </div>
@@ -669,11 +670,11 @@ export default function WelcomePage({
             </Card>
 
             {/* Pre-Flight Doctor Gate Card */}
-            <div className="p-3.5 rounded-xl bg-gradient-to-r from-emerald-950/20 via-[#11131A] to-[#11131A] border border-emerald-500/20 flex items-center justify-between text-xs">
+            <div className="p-3.5 rounded-xl bg-gradient-to-r from-emerald-950/30 via-[#121624] to-[#121624] border border-emerald-500/30 flex items-center justify-between text-xs shadow-md ring-1 ring-white/5">
               <div className="flex items-center gap-2.5">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                 <div>
-                  <div className="font-semibold text-zinc-200">Pre-Flight Doctor Ready</div>
+                  <div className="font-semibold text-zinc-100">Pre-Flight Doctor Ready</div>
                   <div className="text-[11px] text-zinc-400">6/6 Deployment Gates Verified</div>
                 </div>
               </div>
@@ -682,6 +683,100 @@ export default function WelcomePage({
               </Badge>
             </div>
           </div>
+        </div>
+
+        {/* ── BOTTOM COCKPIT ROW: Infrastructure Mesh & Deployment Controls (Full Viewport Fill) ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full pt-2">
+          {/* Active Ports & Mesh Table (8 Columns) */}
+          <Card className="lg:col-span-8 p-5 bg-[#121624] border-[#242d44] shadow-md ring-1 ring-white/5 space-y-4">
+            <div className="flex items-center justify-between border-b border-[#21283d] pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                  <Wifi className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-zinc-100">Infrastructure Mesh & Port Governance</h3>
+                  <p className="text-[11px] text-zinc-400">Standard BotDigit ports (41000-41799) & Core Backing Services</p>
+                </div>
+              </div>
+              <span className="text-xs font-mono px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold">
+                All Ports Bound
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs font-mono">
+              <div className="p-3 rounded-xl bg-[#0d101a] border border-[#1e2538] space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-zinc-400">PostgreSQL</span>
+                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                </div>
+                <div className="text-base font-bold text-zinc-100">:5432</div>
+                <div className="text-[10px] text-zinc-500">Shared DB • Read/Write</div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-[#0d101a] border border-[#1e2538] space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-zinc-400">Redis Cache</span>
+                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                </div>
+                <div className="text-base font-bold text-zinc-100">:6379</div>
+                <div className="text-[10px] text-zinc-500">Shared Key-Value</div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-[#0d101a] border border-[#1e2538] space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-zinc-400">Caddy Edge</span>
+                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                </div>
+                <div className="text-base font-bold text-zinc-100">:80 / :443</div>
+                <div className="text-[10px] text-zinc-500">Auto SSL / mTLS Proxy</div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-[#0d101a] border border-[#1e2538] space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-zinc-400">AIPanel Dev</span>
+                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+                </div>
+                <div className="text-base font-bold text-cyan-300">:1420</div>
+                <div className="text-[10px] text-zinc-500">Vite + React 19 Client</div>
+              </div>
+            </div>
+          </Card>
+
+          {/* Quick Operations & System Actions (4 Columns) */}
+          <Card className="lg:col-span-4 p-5 bg-[#121624] border-[#242d44] shadow-md ring-1 ring-white/5 space-y-4 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between border-b border-[#21283d] pb-3 mb-3">
+                <div className="flex items-center gap-2">
+                  <Rocket className="w-4 h-4 text-violet-400" />
+                  <h3 className="text-sm font-bold text-zinc-100">Quick DevOps Pipeline</h3>
+                </div>
+                <span className="text-[10px] font-mono text-zinc-400">Active</span>
+              </div>
+              <p className="text-xs text-zinc-400 mb-3">
+                One-click safe triggers for deployment, health check, and code buffer navigation.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <button
+                type="button"
+                onClick={onNavigateToCode}
+                className="w-full py-2.5 px-3 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-lg shadow-violet-950/50 transition-all cursor-pointer"
+              >
+                <Code2 className="w-4 h-4" />
+                Open Code Studio
+              </button>
+              <button
+                type="button"
+                onClick={onNavigateToServers}
+                className="w-full py-2 px-3 rounded-xl bg-[#0d101a] hover:bg-[#151a2b] border border-[#232b40] hover:border-violet-500/40 text-zinc-300 hover:text-white text-xs font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer"
+              >
+                <Server className="w-4 h-4 text-purple-400" />
+                Inspect Fleet Health
+              </button>
+            </div>
+          </Card>
         </div>
       </div>
 

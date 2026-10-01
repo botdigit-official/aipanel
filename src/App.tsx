@@ -109,8 +109,10 @@ export default function App() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Project state
-  const [projectPath, setProjectPath] = useState<string | null>(null);
+  // Project state - default to current workspace
+  const [projectPath, setProjectPath] = useState<string | null>(
+    "/Volumes/Mac2TB/Botdigit/Developer/Projects/aipanel"
+  );
   const [projectInfo, setProjectInfo] = useState<ProjectInfo | null>(null);
   const [showDetectionBanner, setShowDetectionBanner] = useState(false);
 
@@ -124,6 +126,16 @@ export default function App() {
 
   // Services
   const [services] = useState<ServiceStatus[]>(defaultDevServices);
+
+  // Auto-detect project on startup
+  useEffect(() => {
+    const defaultPath = "/Volumes/Mac2TB/Botdigit/Developer/Projects/aipanel";
+    detectProject(defaultPath)
+      .then((info) => {
+        setProjectInfo(info);
+      })
+      .catch((e) => console.warn("Initial detect project:", e));
+  }, []);
 
   // Recent projects persisted in localStorage
   const [recentProjects, setRecentProjects] = useState<RecentProject[]>(() => {
@@ -141,9 +153,15 @@ export default function App() {
     return [
       {
         name: "aipanel",
-        path: "/Users/tarunsharma/Documents/aipanel",
+        path: "/Volumes/Mac2TB/Botdigit/Developer/Projects/aipanel",
         framework: "React 19 (Vite + Tauri)",
         lastOpened: "Just now",
+      },
+      {
+        name: "yaarpahari.com",
+        path: "/Volumes/Mac2TB/Botdigit/Developer/Live/yaarpahari.com",
+        framework: "Node.js + Telegram Bot",
+        lastOpened: "15 mins ago",
       },
     ];
   });
@@ -189,19 +207,19 @@ export default function App() {
           }
         } catch (dialogErr) {
           console.warn("Native file picker unavailable, opening workspace:", dialogErr);
-          selectedPath = "/Users/tarunsharma/Documents/aipanel";
+          selectedPath = "/Volumes/Mac2TB/Botdigit/Developer/Projects/aipanel";
         }
       }
 
       if (!selectedPath) {
-        selectedPath = "/Users/tarunsharma/Documents/aipanel";
+        selectedPath = "/Volumes/Mac2TB/Botdigit/Developer/Projects/aipanel";
       }
 
       try {
         const info = await detectProject(selectedPath);
         setProjectPath(selectedPath);
         setProjectInfo(info);
-        setShowDetectionBanner(!info.has_aipanel_toml && !info.has_aipanel_toml);
+        setShowDetectionBanner(!info.has_aipanel_toml);
         setActivePanel("explorer");
         setTabs([]);
         setActiveTab(null);
@@ -318,11 +336,25 @@ export default function App() {
     (id: string) => {
       if (id === "ai") {
         setShowAI(!showAI);
+      } else if (id === "explorer") {
+        setActivePanel("explorer");
+        const currentPath = projectPath || "/Volumes/Mac2TB/Botdigit/Developer/Projects/aipanel";
+        if (!projectPath) {
+          setProjectPath(currentPath);
+        }
+        if (tabs.length === 0) {
+          handleFileClick({
+            name: "README.md",
+            path: `${currentPath}/README.md`,
+            is_dir: false,
+            size: 1024,
+          });
+        }
       } else {
         setActivePanel(id);
       }
     },
-    [showAI]
+    [showAI, projectPath, tabs.length, handleFileClick]
   );
 
   // ── Render ──────────────────────────────────────────────────────
@@ -347,8 +379,8 @@ export default function App() {
     "billing",
     "domains",
   ].includes(activePanel);
-  const showExplorer = operatingMode === "desktop" && activePanel === "explorer" && Boolean(projectPath);
-  const showDashboard = operatingMode === "desktop" && (activePanel === "dashboard" || !projectPath) && !isGlobalToolPanel;
+  const showExplorer = operatingMode === "desktop" && activePanel === "explorer";
+  const showDashboard = operatingMode === "desktop" && activePanel === "dashboard" && !isGlobalToolPanel;
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-bg-base">

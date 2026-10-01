@@ -2,19 +2,19 @@
 
 export const colors = {
   // Layered Surfaces
-  bgBase: "#08090D",
-  bgSidebar: "#0C0D12",
-  bgTopbar: "#0B0C11",
-  bgSurface: "#11131A",
-  bgElevated: "#161923",
-  bgHover: "#1B1E28",
-  bgActive: "#222736",
+  bgBase: "#090a0f",
+  bgSidebar: "#0d0f16",
+  bgTopbar: "#0d0f17",
+  bgSurface: "#131622",
+  bgElevated: "#171b2b",
+  bgHover: "#1e2336",
+  bgActive: "#262d44",
 
   // Borders
-  borderSubtle: "rgba(255, 255, 255, 0.06)",
-  borderDefault: "rgba(255, 255, 255, 0.09)",
-  borderStrong: "rgba(255, 255, 255, 0.16)",
-  borderActive: "rgba(139, 92, 246, 0.40)",
+  borderSubtle: "rgba(255, 255, 255, 0.08)",
+  borderDefault: "rgba(255, 255, 255, 0.12)",
+  borderStrong: "rgba(255, 255, 255, 0.20)",
+  borderActive: "rgba(139, 92, 246, 0.50)",
 
   // Brand / Primary
   primary: {

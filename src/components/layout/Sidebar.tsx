@@ -135,19 +135,37 @@ export default function Sidebar({
     onSelectPanel?.(id);
     onItemClick?.(id);
   };
-  // Persisted collapse state per group
+  // Persisted collapse state per group with progressive disclosure defaults
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>(() => {
     try {
       const saved = localStorage.getItem("aipanel_sidebar_collapsed_groups");
-      return saved ? JSON.parse(saved) : {};
+      if (saved) return JSON.parse(saved);
     } catch {
-      return {};
+      // ignore
     }
+    // Default progressive disclosure: Keep core IDE groups open, collapse secondary groups
+    return {
+      workspace: false,
+      development: false,
+      delivery: true,
+      infrastructure: true,
+      clients: true,
+      control: true,
+    };
   });
+
+  // Automatically expand group if its child is active
+  const isGroupExpanded = (groupKey: string, groupItems: NavItem[]) => {
+    if (groupItems.some((it) => it.id === currentActive)) {
+      return true;
+    }
+    return !collapsedGroups[groupKey];
+  };
 
   const toggleGroup = useCallback((groupKey: string) => {
     setCollapsedGroups((prev) => {
-      const updated = { ...prev, [groupKey]: !prev[groupKey] };
+      const isCurrentlyCollapsed = prev[groupKey] ?? (groupKey !== "workspace" && groupKey !== "development");
+      const updated = { ...prev, [groupKey]: !isCurrentlyCollapsed };
       localStorage.setItem("aipanel_sidebar_collapsed_groups", JSON.stringify(updated));
       return updated;
     });
@@ -155,16 +173,16 @@ export default function Sidebar({
 
   return (
     <aside
-      className={`h-full bg-[#0C0D12] border-r border-white/8 flex flex-col shrink-0 transition-all duration-200 select-none z-20 ${
+      className={`h-full bg-[#0c0e16] border-r border-[#1e2437] flex flex-col shrink-0 transition-all duration-200 select-none z-20 ${
         collapsed ? "w-14" : "w-64"
       }`}
     >
       {/* Sidebar Header */}
-      <div className="h-11 px-3 flex items-center justify-between border-b border-white/6 shrink-0">
+      <div className="h-11 px-3 flex items-center justify-between border-b border-[#1b2030] shrink-0 bg-[#0a0c13]/50">
         {!collapsed ? (
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-bold tracking-wider text-zinc-400 uppercase font-mono">
-              WORKSPACE
+            <span className="text-[10px] font-extrabold tracking-widest text-zinc-400 uppercase font-mono">
+              WORKSPACE EXPLORER
             </span>
           </div>
         ) : null}
@@ -178,9 +196,9 @@ export default function Sidebar({
       </div>
 
       {/* Nav Groups Container */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden py-2 px-2 space-y-4">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden py-2 px-2 space-y-3">
         {navGroups.map((group) => {
-          const isGroupCollapsed = Boolean(collapsedGroups[group.key]);
+          const expanded = isGroupExpanded(group.key, group.items);
 
           return (
             <div key={group.key} className="space-y-0.5">
@@ -189,11 +207,11 @@ export default function Sidebar({
                 <button
                   type="button"
                   onClick={() => toggleGroup(group.key)}
-                  className="w-full flex items-center justify-between px-2.5 py-1 text-[11px] font-bold text-zinc-400 tracking-wider hover:text-zinc-300 rounded group cursor-pointer transition-colors"
+                  className="w-full flex items-center justify-between px-2.5 py-1 text-[10px] font-extrabold text-zinc-400 tracking-widest hover:text-zinc-200 rounded group cursor-pointer transition-colors"
                 >
-                  <span>{group.label}</span>
+                  <span className="font-mono">{group.label}</span>
                   <span className="text-zinc-500 group-hover:text-zinc-400">
-                    {isGroupCollapsed ? (
+                    {!expanded ? (
                       <ChevronRight className="w-3 h-3" />
                     ) : (
                       <ChevronDown className="w-3 h-3" />
@@ -201,11 +219,11 @@ export default function Sidebar({
                   </span>
                 </button>
               ) : (
-                <div className="h-1 border-t border-white/5 mx-2 my-1.5" />
+                <div className="h-px border-t border-[#1e2437] mx-2 my-1.5" />
               )}
 
               {/* Group Items */}
-              {(!isGroupCollapsed || collapsed) && (
+              {(expanded || collapsed) && (
                 <div className="space-y-0.5">
                   {group.items.map((item) => {
                     const Icon = item.icon;
