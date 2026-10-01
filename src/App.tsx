@@ -28,6 +28,7 @@ import ClientCRMPanel from "./components/hosting/ClientCRMPanel";
 import ModeSelectorModal from "./components/layout/ModeSelectorModal";
 import WorkspaceSwitcherModal from "./components/modals/WorkspaceSwitcherModal";
 import FreeAIModal from "./components/modals/FreeAIModal";
+import ResizeHandle from "./components/layout/ResizeHandle";
 import { CommandPalette } from "./design-system";
 import { initialPlugins } from "./lib/plugins";
 import type { OperatingMode, AIPanelPlugin } from "./lib/types";
@@ -102,6 +103,68 @@ export default function App() {
   const [showCommandPalette, setShowCommandPalette] = useState(false);
   const [showWorkspaceSwitcher, setShowWorkspaceSwitcher] = useState(false);
   const [showFreeAIModal, setShowFreeAIModal] = useState(false);
+
+  // Resizable panel dimensions with local persistence
+  const [explorerWidth, setExplorerWidth] = useState<number>(() => {
+    try {
+      const saved = localStorage.getItem("aipanel_explorer_width");
+      if (saved) {
+        const val = parseInt(saved, 10);
+        if (!isNaN(val) && val >= 180 && val <= 600) return val;
+      }
+    } catch {}
+    return 288;
+  });
+
+  const [aiWidth, setAiWidth] = useState<number>(() => {
+    try {
+      const saved = localStorage.getItem("aipanel_ai_width");
+      if (saved) {
+        const val = parseInt(saved, 10);
+        if (!isNaN(val) && val >= 260 && val <= 700) return val;
+      }
+    } catch {}
+    return 340;
+  });
+
+  const [bottomHeight, setBottomHeight] = useState<number>(() => {
+    try {
+      const saved = localStorage.getItem("aipanel_bottom_height");
+      if (saved) {
+        const val = parseInt(saved, 10);
+        if (!isNaN(val) && val >= 120 && val <= 600) return val;
+      }
+    } catch {}
+    return 224;
+  });
+
+  const handleExplorerResize = useCallback((delta: number) => {
+    setExplorerWidth((prev) => {
+      const next = Math.max(180, Math.min(600, prev + delta));
+      try {
+        localStorage.setItem("aipanel_explorer_width", String(next));
+      } catch {}
+      return next;
+    });
+  }, []);
+
+  const handleAiResize = useCallback((delta: number) => {
+    setAiWidth((prev) => {
+      // Dragging left (negative delta) increases AI panel width
+      const next = Math.max(260, Math.min(700, prev - delta));
+      try {
+        localStorage.setItem("aipanel_ai_width", String(next));
+      } catch {}
+      return next;
+    });
+  }, []);
+
+  const handleBottomHeightChange = useCallback((newHeight: number) => {
+    setBottomHeight(newHeight);
+    try {
+      localStorage.setItem("aipanel_bottom_height", String(newHeight));
+    } catch {}
+  }, []);
 
   // Global ⌘K / Ctrl+K Shortcut
   useEffect(() => {
@@ -545,14 +608,30 @@ export default function App() {
           <div className="flex-1 flex min-h-0">
             {/* File Explorer Panel */}
             {showExplorer && (
-              <div className="w-72 border-r border-border-default shrink-0 overflow-hidden flex flex-col">
-                <FileExplorer
-                  projectPath={projectPath}
-                  onFileClick={handleFileClick}
-                  activeFilePath={activeTab || undefined}
-                  onOpenWorkspaceSwitcher={() => setShowWorkspaceSwitcher(true)}
+              <>
+                <div
+                  style={{ width: `${explorerWidth}px` }}
+                  className="border-r border-border-default shrink-0 overflow-hidden flex flex-col"
+                >
+                  <FileExplorer
+                    projectPath={projectPath}
+                    onFileClick={handleFileClick}
+                    activeFilePath={activeTab || undefined}
+                    onOpenWorkspaceSwitcher={() => setShowWorkspaceSwitcher(true)}
+                  />
+                </div>
+                <ResizeHandle
+                  direction="vertical"
+                  onResize={handleExplorerResize}
+                  onDoubleClick={() => {
+                    setExplorerWidth(288);
+                    try {
+                      localStorage.setItem("aipanel_explorer_width", "288");
+                    } catch {}
+                  }}
+                  title="Drag left/right to resize file explorer • Double-click to reset (288px)"
                 />
-              </div>
+              </>
             )}
 
             {/* Editor / Welcome / Services / Server Panel */}
@@ -687,21 +766,37 @@ export default function App() {
 
             {/* AI Panel (Only in Desktop Workspace / Editor mode) */}
             {operatingMode === "desktop" && activePanel === "explorer" && showAI && projectPath && (
-              <div className="w-80 shrink-0 border-l border-zinc-800">
-                <AIPanel
-                  environment={environment}
-                  projectName={projectInfo?.name}
-                  projectPath={projectPath}
-                  activeFilePath={activeTab || undefined}
-                  onOpenBilling={() => setActivePanel("billing")}
-                  onOpenFreeAI={() => setShowFreeAIModal(true)}
-                  onApplyCode={(code) => {
-                    if (activeTab) {
-                      handleContentChange(activeTab, code);
-                    }
+              <>
+                <ResizeHandle
+                  direction="vertical"
+                  onResize={handleAiResize}
+                  onDoubleClick={() => {
+                    setAiWidth(340);
+                    try {
+                      localStorage.setItem("aipanel_ai_width", "340");
+                    } catch {}
                   }}
+                  title="Drag left/right to resize AI panel • Double-click to reset (340px)"
                 />
-              </div>
+                <div
+                  style={{ width: `${aiWidth}px` }}
+                  className="shrink-0 border-l border-zinc-800 overflow-hidden flex flex-col"
+                >
+                  <AIPanel
+                    environment={environment}
+                    projectName={projectInfo?.name}
+                    projectPath={projectPath}
+                    activeFilePath={activeTab || undefined}
+                    onOpenBilling={() => setActivePanel("billing")}
+                    onOpenFreeAI={() => setShowFreeAIModal(true)}
+                    onApplyCode={(code) => {
+                      if (activeTab) {
+                        handleContentChange(activeTab, code);
+                      }
+                    }}
+                  />
+                </div>
+              </>
             )}
 
             {/* DevOps Control Center Dock (Only in Desktop Workspace / Editor mode) */}
@@ -724,6 +819,14 @@ export default function App() {
           <BottomPanel
             expanded={bottomExpanded}
             onToggle={() => setBottomExpanded(!bottomExpanded)}
+            height={bottomHeight}
+            onHeightChange={handleBottomHeightChange}
+            onResetHeight={() => {
+              setBottomHeight(224);
+              try {
+                localStorage.setItem("aipanel_bottom_height", "224");
+              } catch {}
+            }}
           />
         </div>
       </div>

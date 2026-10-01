@@ -13,6 +13,7 @@ import {
   Maximize2,
   Minimize2,
 } from "lucide-react";
+import ResizeHandle from "../layout/ResizeHandle";
 
 // ── Types ────────────────────────────────────────────────────────
 
@@ -21,6 +22,9 @@ type BottomTab = "terminal" | "logs" | "tests" | "workers" | "database" | "deplo
 interface BottomPanelProps {
   expanded: boolean;
   onToggle: () => void;
+  height?: number;
+  onHeightChange?: (height: number) => void;
+  onResetHeight?: () => void;
 }
 
 interface CommandLog {
@@ -39,7 +43,13 @@ const tabs: { id: BottomTab; label: string; icon: typeof Terminal }[] = [
   { id: "doctor", label: "Doctor", icon: Stethoscope },
 ];
 
-export default function BottomPanel({ expanded, onToggle }: BottomPanelProps) {
+export default function BottomPanel({
+  expanded,
+  onToggle,
+  height = 224,
+  onHeightChange,
+  onResetHeight,
+}: BottomPanelProps) {
   const [activeTab, setActiveTab] = useState<BottomTab>("terminal");
   const [inputVal, setInputVal] = useState("");
   const [isMaximized, setIsMaximized] = useState(false);
@@ -150,14 +160,32 @@ export default function BottomPanel({ expanded, onToggle }: BottomPanelProps) {
 
   return (
     <div
+      style={expanded && !isMaximized ? { height: `${height}px` } : undefined}
       className={`
-        flex flex-col bg-zinc-950 border-t border-zinc-800/80 select-none
-        transition-all duration-200 ease-out
-        ${expanded ? (isMaximized ? "h-[60vh]" : "h-56") : "h-9"}
+        flex flex-col bg-zinc-950 border-t border-zinc-800/80 select-none relative
+        ${isMaximized ? "h-[60vh]" : !expanded ? "h-9" : ""}
       `}
     >
+      {/* Top Resize Handle */}
+      {expanded && !isMaximized && (
+        <ResizeHandle
+          direction="horizontal"
+          onResize={(delta) => {
+            if (onHeightChange) {
+              const newHeight = Math.max(120, Math.min(600, height - delta));
+              onHeightChange(newHeight);
+            }
+          }}
+          onDoubleClick={onResetHeight || onToggle}
+          title="Drag up/down to resize terminal • Double-click to reset"
+        />
+      )}
+
       {/* Tab bar */}
-      <div className="flex items-center h-9 px-2 bg-zinc-900/95 border-b border-zinc-800/80 shrink-0 select-none">
+      <div
+        onDoubleClick={onToggle}
+        className="flex items-center h-9 px-2 bg-zinc-900/95 border-b border-zinc-800/80 shrink-0 select-none cursor-default"
+      >
         <div className="flex items-center space-x-1 overflow-x-auto no-scrollbar">
           {tabs.map((tab) => {
             const Icon = tab.icon;

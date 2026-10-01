@@ -8,6 +8,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Multi-Panel Resizing System**:
+  - **Reusable Pointer-Capture `ResizeHandle` (`src/components/layout/ResizeHandle.tsx`)**:
+    - Smooth 60fps dragging with `PointerCapture`, disabling text selection during resize.
+    - Double-click handlers to instantly reset panels to canonical defaults.
+    - Indigo accent glow line indicator when dragging.
+  - **Resizable File Explorer**:
+    - Drag handle between Explorer and Editor with 180px–600px range.
+    - Remembers customized width in `localStorage` (`aipanel_explorer_width`).
+  - **Resizable AI Panel**:
+    - Drag handle between Editor and AI Assistant with 260px–700px range.
+    - Remembers customized width in `localStorage` (`aipanel_ai_width`).
+  - **Resizable Bottom Terminal**:
+    - Horizontal drag handle on top edge of BottomPanel with 120px–600px range.
+    - Remembers customized height in `localStorage` (`aipanel_bottom_height`).
+    - Double-click on handle or tab bar toggles collapse/expand.
 - **Free AI Engine Hub & Zero-Cost Integrations**:
   - **Free AI Modal (`src/components/modals/FreeAIModal.tsx`)**:
     - Google Gemini Free API tab: 15 RPM / 1M TPM / 1500 RPD zero-cost setup, direct link to Google AI Studio, and API key tester & storage.

@@ -117,7 +117,25 @@
     - [x] Compact default height (`h-56` / 224px) leaving 70%+ vertical space for code editing
     - [x] Maximize/Restore button (`Maximize2` / `Minimize2`) toggling to `h-[60vh]` for deep logging
     - [x] Collapsible to `h-9` status bar for 100% editor canvas
+- [x] Multi-Panel Resizing System:
+  - [x] Reusable Pointer-Capture `ResizeHandle` (`src/components/layout/ResizeHandle.tsx`):
+    - [x] Supports `vertical` (`col-resize`) and `horizontal` (`row-resize`) directions
+    - [x] Pointer capture with document text selection protection during rapid drags
+    - [x] Subtle hover highlight and active indigo glow indicator
+    - [x] Double-click to reset dimensions to canonical defaults
+  - [x] Resizable File Explorer:
+    - [x] Left vertical splitter with 180px–600px boundaries (default 288px)
+    - [x] Persistent width memory saved in `localStorage` (`aipanel_explorer_width`)
+    - [x] Double-click to instantly snap back to 288px
+  - [x] Resizable AI Panel:
+    - [x] Right vertical splitter with 260px–700px boundaries (default 340px)
+    - [x] Persistent width memory saved in `localStorage` (`aipanel_ai_width`)
+    - [x] Double-click to instantly snap back to 340px
+  - [x] Resizable Bottom Terminal Panel:
+    - [x] Top horizontal splitter with 120px–600px boundaries (default 224px)
+    - [x] Persistent height memory saved in `localStorage` (`aipanel_bottom_height`)
+    - [x] Double-click on handle or tab bar to toggle collapse/expand
 - [x] Quality Gates Verified:
-  - [x] `npm run build` succeeds (0 TypeScript/lint errors in 301ms)
+  - [x] `npm run build` succeeds (0 TypeScript/lint errors in 324ms)
   - [x] React Fast Refresh compatibility verified (clean hot reloads)
 
