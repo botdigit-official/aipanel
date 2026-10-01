@@ -135,7 +135,19 @@
     - [x] Top horizontal splitter with 120px–600px boundaries (default 224px)
     - [x] Persistent height memory saved in `localStorage` (`aipanel_bottom_height`)
     - [x] Double-click on handle or tab bar to toggle collapse/expand
+- [x] Real Terminal Shell & Full Root Access Engine:
+  - [x] Backend Execution Bridges (`vite.config.ts`, `src-tauri/src/lib.rs`, `src/lib/tauri.ts`):
+    - [x] Vite dev middleware `/api/terminal/exec` executing zsh commands with child_process
+    - [x] Native Tauri IPC `execute_terminal_command` with std::process::Command
+    - [x] Full macOS PATH resolution (`/opt/homebrew/bin`, `/usr/local/bin`, cargo, nvm)
+    - [x] Working directory navigation engine (`cd ..`, `cd src`, `cd ~`)
+  - [x] Interactive Terminal Interface (`src/components/panels/BottomPanel.tsx`):
+    - [x] Root / Sudo Mode toggle (`[⚡ ROOT ACCESS]`) for elevated system commands
+    - [x] Dynamic prompt: `root#>` (amber) vs `user@mac:workspace ❯` (emerald)
+    - [x] Live process execution feedback with spinner (`Loader2`) and exit codes
+    - [x] 1-click system probe chips: `whoami`, `pwd`, `ls -la`, `help`, `clear`
 - [x] Quality Gates Verified:
-  - [x] `npm run build` succeeds (0 TypeScript/lint errors in 324ms)
+  - [x] `cargo check` succeeds (0 Rust errors)
+  - [x] `npm run build` succeeds (0 TypeScript/lint errors in 368ms)
   - [x] React Fast Refresh compatibility verified (clean hot reloads)
 

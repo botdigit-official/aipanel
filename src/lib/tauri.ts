@@ -646,3 +646,62 @@ export async function getAppInfo(): Promise<AppInfo> {
     tagline: "Local-first AI Development + Deployment IDE",
   });
 }
+
+export interface TerminalResult {
+  command?: string;
+  stdout: string;
+  stderr: string;
+  exit_code: number;
+  user: string;
+  cwd: string;
+}
+
+export async function executeTerminal(
+  command: string,
+  cwd?: string,
+  asRoot?: boolean
+): Promise<TerminalResult> {
+  if (isTauri()) {
+    return safeInvoke<TerminalResult>(
+      "execute_terminal_command",
+      { command, cwd, asRoot },
+      {
+        stdout: "",
+        stderr: "Tauri terminal runner error",
+        exit_code: 1,
+        user: asRoot ? "root" : "botdigit",
+        cwd: cwd || ".",
+      }
+    );
+  }
+
+  try {
+    const res = await fetch("/api/terminal/exec", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ command, cwd, asRoot }),
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+    const errData = await res.json().catch(() => ({}));
+    return {
+      command,
+      stdout: "",
+      stderr: errData.error || `HTTP ${res.status}: Failed to execute`,
+      exit_code: res.status,
+      user: asRoot ? "root" : "botdigit",
+      cwd: cwd || ".",
+    };
+  } catch (err: any) {
+    return {
+      command,
+      stdout: "",
+      stderr: err?.message || String(err),
+      exit_code: 1,
+      user: asRoot ? "root" : "botdigit",
+      cwd: cwd || ".",
+    };
+  }
+}
+

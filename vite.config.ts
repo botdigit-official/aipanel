@@ -5,6 +5,8 @@ import { defineConfig, type Plugin } from "vite";
 import process from "node:process";
 import fs from "node:fs/promises";
 import path from "node:path";
+import { exec } from "node:child_process";
+import os from "node:os";
 
 const host = process.env.TAURI_DEV_HOST;
 
@@ -39,7 +41,7 @@ function devFsPlugin(): Plugin {
     name: "aipanel-dev-fs",
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
-        if (!req.url?.startsWith("/api/fs/")) {
+        if (!req.url?.startsWith("/api/fs/") && !req.url?.startsWith("/api/terminal/")) {
           return next();
         }
 
@@ -281,6 +283,148 @@ function devFsPlugin(): Plugin {
             }
             res.setHeader("Content-Type", "application/json");
             res.end(JSON.stringify(folders));
+            return;
+          }
+
+          if (pathname === "/api/terminal/exec" && req.method === "POST") {
+            let bodyStr = "";
+            req.on("data", (chunk) => {
+              bodyStr += chunk;
+            });
+            req.on("end", async () => {
+              try {
+                const body = JSON.parse(bodyStr || "{}");
+                const rawCmd = (body.command || "").trim();
+                const targetCwd = body.cwd || process.cwd();
+                const asRoot = Boolean(body.asRoot);
+                const currentUser = asRoot ? "root" : (process.env.USER || os.userInfo?.().username || "botdigit");
+
+                if (!rawCmd) {
+                  res.statusCode = 400;
+                  res.setHeader("Content-Type", "application/json");
+                  res.end(JSON.stringify({ error: "Empty command string" }));
+                  return;
+                }
+
+                // Handle directory navigation (cd command)
+                if (rawCmd === "cd" || rawCmd === "cd ~") {
+                  const home = os.homedir();
+                  res.setHeader("Content-Type", "application/json");
+                  res.end(
+                    JSON.stringify({
+                      command: rawCmd,
+                      stdout: `Switched directory to: ${home}`,
+                      stderr: "",
+                      exit_code: 0,
+                      cwd: home,
+                      user: currentUser,
+                    })
+                  );
+                  return;
+                }
+
+                if (rawCmd.startsWith("cd ")) {
+                  const targetRel = rawCmd.slice(3).trim();
+                  const resolved = targetRel.startsWith("/")
+                    ? targetRel
+                    : targetRel.startsWith("~")
+                    ? path.join(os.homedir(), targetRel.slice(1))
+                    : path.resolve(targetCwd, targetRel);
+                  try {
+                    const stat = await fs.stat(resolved);
+                    if (stat.isDirectory()) {
+                      res.setHeader("Content-Type", "application/json");
+                      res.end(
+                        JSON.stringify({
+                          command: rawCmd,
+                          stdout: `Switched directory to: ${resolved}`,
+                          stderr: "",
+                          exit_code: 0,
+                          cwd: resolved,
+                          user: currentUser,
+                        })
+                      );
+                      return;
+                    }
+                  } catch {
+                    res.setHeader("Content-Type", "application/json");
+                    res.end(
+                      JSON.stringify({
+                        command: rawCmd,
+                        stdout: "",
+                        stderr: `cd: no such file or directory: ${targetRel}`,
+                        exit_code: 1,
+                        cwd: targetCwd,
+                        user: currentUser,
+                      })
+                    );
+                    return;
+                  }
+                }
+
+                // When root access is requested, invoke with sudo
+                let cmdToRun = rawCmd;
+                if (asRoot && !rawCmd.startsWith("sudo")) {
+                  // Non-interactive sudo or elevated execution
+                  cmdToRun = `sudo -n ${rawCmd} 2>&1 || sudo ${rawCmd}`;
+                }
+
+                // Construct full system PATH for zsh
+                const fullPath = [
+                  "/opt/homebrew/bin",
+                  "/opt/homebrew/sbin",
+                  "/usr/local/bin",
+                  "/usr/bin",
+                  "/bin",
+                  "/usr/sbin",
+                  "/sbin",
+                  `${os.homedir()}/.cargo/bin`,
+                  `${os.homedir()}/.nvm/versions/node/current/bin`,
+                  process.env.PATH || "",
+                ].join(":");
+
+                const env = {
+                  ...process.env,
+                  PATH: fullPath,
+                  HOME: os.homedir(),
+                  USER: currentUser,
+                };
+
+                exec(
+                  cmdToRun,
+                  {
+                    cwd: targetCwd,
+                    env,
+                    shell: "/bin/zsh",
+                    maxBuffer: 20 * 1024 * 1024, // 20MB buffer
+                    timeout: 60000, // 60s timeout
+                  },
+                  (error, stdout, stderr) => {
+                    const exitCode =
+                      error && typeof error.code === "number"
+                        ? error.code
+                        : error
+                        ? 1
+                        : 0;
+                    res.setHeader("Content-Type", "application/json");
+                    res.end(
+                      JSON.stringify({
+                        command: rawCmd,
+                        stdout: stdout || "",
+                        stderr: stderr || (error && error.message ? error.message : ""),
+                        exit_code: exitCode,
+                        cwd: targetCwd,
+                        user: currentUser,
+                      })
+                    );
+                  }
+                );
+              } catch (err: any) {
+                res.statusCode = 500;
+                res.setHeader("Content-Type", "application/json");
+                res.end(JSON.stringify({ error: err?.message || String(err) }));
+              }
+            });
             return;
           }
 

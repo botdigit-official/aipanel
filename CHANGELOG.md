@@ -8,6 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Real Terminal Shell & Full Root Access Engine**:
+  - **Live Command Execution Bridges (`vite.config.ts`, `src-tauri/src/lib.rs`, `src/lib/tauri.ts`)**:
+    - Vite dev middleware `/api/terminal/exec` running commands via Node.js `child_process` with zsh environment.
+    - Native Tauri IPC command `execute_terminal_command` running `std::process::Command` with zsh shell.
+    - Full system environment PATH containing `/opt/homebrew/bin`, `/usr/local/bin`, `.cargo/bin`, and nvm.
+    - Dynamic directory tracking engine supporting `cd <dir>`, `cd ..`, and `cd ~`.
+  - **Interactive Terminal Interface with Root / Sudo Mode (`src/components/panels/BottomPanel.tsx`)**:
+    - `[⚡ ROOT ACCESS]` toggle button in the terminal tab bar switching between user and root permissions.
+    - Dynamic prompt display (`root#>` in amber vs `user@mac:workspace ❯` in emerald).
+    - Real-time command status indicators with spinner (`Loader2`) and exit code feedback.
+    - Quick test chips: `whoami`, `pwd`, `ls -la`, `help`, `clear`.
 - **Multi-Panel Resizing System**:
   - **Reusable Pointer-Capture `ResizeHandle` (`src/components/layout/ResizeHandle.tsx`)**:
     - Smooth 60fps dragging with `PointerCapture`, disabling text selection during resize.

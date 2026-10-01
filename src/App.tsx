@@ -827,6 +827,7 @@ export default function App() {
                 localStorage.setItem("aipanel_bottom_height", "224");
               } catch {}
             }}
+            projectPath={projectPath}
           />
         </div>
       </div>

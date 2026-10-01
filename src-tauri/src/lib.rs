@@ -1345,6 +1345,52 @@ fn get_app_info() -> serde_json::Value {
     })
 }
 
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct TerminalCommandOutput {
+    pub stdout: String,
+    pub stderr: String,
+    pub exit_code: i32,
+    pub cwd: String,
+    pub user: String,
+}
+
+#[tauri::command]
+fn execute_terminal_command(
+    command: String,
+    cwd: Option<String>,
+    as_root: Option<bool>,
+) -> Result<TerminalCommandOutput, String> {
+    let target_cwd = cwd.unwrap_or_else(|| ".".to_string());
+    let is_root = as_root.unwrap_or(false);
+
+    let mut cmd = std::process::Command::new("/bin/zsh");
+    cmd.current_dir(&target_cwd);
+
+    let final_command = if is_root && !command.trim().starts_with("sudo") {
+        format!("sudo -n {} 2>&1 || sudo {}", command, command)
+    } else {
+        command
+    };
+
+    cmd.arg("-c").arg(&final_command);
+
+    match cmd.output() {
+        Ok(out) => {
+            let stdout = String::from_utf8_lossy(&out.stdout).to_string();
+            let stderr = String::from_utf8_lossy(&out.stderr).to_string();
+            let exit_code = out.status.code().unwrap_or(if out.status.success() { 0 } else { 1 });
+            Ok(TerminalCommandOutput {
+                stdout,
+                stderr,
+                exit_code,
+                cwd: target_cwd,
+                user: if is_root { "root".to_string() } else { "botdigit".to_string() },
+            })
+        }
+        Err(e) => Err(format!("Failed to execute command: {}", e)),
+    }
+}
+
 // ── App Entry ──────────────────────────────────────────────────────
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -1377,6 +1423,7 @@ pub fn run() {
             check_ollama_status,
             collect_project_context,
             get_app_info,
+            execute_terminal_command,
         ])
         .run(tauri::generate_context!())
         .expect("error while running AIPanel");
