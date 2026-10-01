@@ -24,13 +24,26 @@
   - [x] Unified search across commands, actions, navigation, and AI queries
   - [x] Keyboard navigation (`ArrowUp`, `ArrowDown`, `Enter`, `Escape`)
 - [x] High-Density Dashboard (`WelcomePage.tsx`):
-  - [x] Eliminated excessive empty space
-  - [x] Contextual time-aware greeting
+  - [x] Eliminated excessive empty space with Bottom Infrastructure Mesh & DevOps triggers
+  - [x] Contextual time-aware greeting and glowing brand header
   - [x] Real Recent Projects cards with framework badges and 1-click open
   - [x] System Capabilities telemetry status grid (Environment, AI, Source Control, Server Fleet)
   - [x] Fast workflow triggers (Editor, AI, Git, Servers)
+- [x] Surface Contrast & Boundaries (`Card.tsx`, `colors.ts`):
+  - [x] Boosted card surface background to `#121624` and `#171b2b`
+  - [x] Crisp visible borders (`#23293d` / `#2a324b`) with top edge shine ring
+  - [x] Deep drop shadows for sculpted physical depth
+- [x] Progressive Disclosure Defaults (`Sidebar.tsx`):
+  - [x] Core IDE groups (WORKSPACE, DEVELOPMENT) open by default
+  - [x] Secondary groups (DELIVERY, INFRASTRUCTURE, CLIENTS, CONTROL) collapsed by default
+  - [x] Auto-expansion when an item inside a collapsed group is active
+- [x] Workspace Navigation & Editor Unlocking (`App.tsx`):
+  - [x] Resolved editor locking issue where `activePanel === "explorer"` was stuck on Welcome page
+  - [x] Configured real workspace path `/Volumes/Mac2TB/Botdigit/Developer/Projects/aipanel`
+  - [x] Clicking 'Code' immediately activates Monaco Editor and File Tree
 - [x] Structured Interactive Status Bar (`StatusBar.tsx`):
   - [x] Environment status pill, Git branch button, interactive service indicators, CPU/RAM metrics
 - [x] Quality Gates Verified:
-  - [x] `npm run build` succeeds (0 TypeScript/lint errors)
+  - [x] `npm run build` succeeds (0 TypeScript/lint errors in 271ms)
   - [x] `cargo check` in `src-tauri` passes
+

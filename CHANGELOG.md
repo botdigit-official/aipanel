@@ -41,3 +41,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Refactored `StatusBar.tsx` into structured interactive status items with popover triggers for environment, git, and individual services.
 - **Documentation**:
   - Updated `README.md` and `docs/getting-started/installation.md` with VPS installation instructions and post-install CLI guide.
+
+### Fixed
+- **Surface Contrast & Visual Containment**:
+  - Replaced flat low-contrast card backgrounds (`#11131A`) with distinct elevated surfaces (`#121624` and `#171b2b`) and visible borders (`#23293d` / `#2a324b`) with top edge shine rings, eliminating the "floating text on black void" problem.
+- **Viewport Layout & Bottom Void Elimination**:
+  - Expanded `WelcomePage.tsx` with a full-width bottom section featuring a real-time **Infrastructure Mesh & Port Governance** grid (ports :5432, :6379, :80/:443, :1420) and a **Quick DevOps Pipeline** action bar, filling the 1080p/Retina viewport naturally.
+- **Sidebar Progressive Disclosure Defaults**:
+  - Configured default collapse state so only core IDE sections (WORKSPACE and DEVELOPMENT) are open on load, while DELIVERY, INFRASTRUCTURE, CLIENTS, and CONTROL are collapsed by default to avoid the 20-item admin menu clutter.
+  - Added auto-expansion whenever an active route lives within a collapsed group.
+- **Editor Locking & Navigation Bug**:
+  - Fixed condition in `src/App.tsx` where `!projectPath` forced the app to always render the Welcome dashboard when clicking "Code" (`activePanel === "explorer"`).
+  - Configured current workspace path `/Volumes/Mac2TB/Botdigit/Developer/Projects/aipanel` as the active project, and automatically opens the file tree and `README.md` in Monaco upon clicking "Code".
+
