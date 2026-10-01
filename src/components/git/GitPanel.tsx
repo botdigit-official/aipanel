@@ -10,6 +10,7 @@ import {
   Clock,
   ShieldCheck,
   FileCode,
+  Eye,
 } from "lucide-react";
 import {
   getGitStatus,
@@ -18,9 +19,14 @@ import {
   gitCommit,
   getDeploymentVersions,
   createDeploymentVersion,
+  getGitLog,
+  getCommitDetail,
   type GitStatusResult,
   type DeploymentVersion,
+  type CommitDetail,
 } from "../../lib/tauri";
+import GitTimeline from "./GitTimeline";
+import GitDiffViewer from "./GitDiffViewer";
 
 interface GitPanelProps {
   projectPath: string;
@@ -30,9 +36,12 @@ interface GitPanelProps {
 export default function GitPanel({ projectPath, onRefreshBranch }: GitPanelProps) {
   const [gitStatus, setGitStatus] = useState<GitStatusResult | null>(null);
   const [versions, setVersions] = useState<DeploymentVersion[]>([]);
+  const [commits, setCommits] = useState<CommitDetail[]>([]);
+  const [selectedCommit, setSelectedCommit] = useState<CommitDetail | null>(null);
   const [commitMessage, setCommitMessage] = useState("");
   const [activeTab, setActiveTab] = useState<"changes" | "history" | "versions">("changes");
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [isCommitting, setIsCommitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -60,9 +69,31 @@ export default function GitPanel({ projectPath, onRefreshBranch }: GitPanelProps
     }
   }, [projectPath, onRefreshBranch]);
 
+  const fetchHistory = useCallback(async () => {
+    if (!projectPath) return;
+    setIsLoadingHistory(true);
+    try {
+      const log = await getGitLog(projectPath, 35);
+      setCommits(log);
+      if (log.length > 0 && !selectedCommit) {
+        setSelectedCommit(log[0]);
+      }
+    } catch (err) {
+      console.error("Failed to fetch git history:", err);
+    } finally {
+      setIsLoadingHistory(false);
+    }
+  }, [projectPath, selectedCommit]);
+
   useEffect(() => {
     fetchStatus();
   }, [fetchStatus]);
+
+  useEffect(() => {
+    if (activeTab === "history") {
+      fetchHistory();
+    }
+  }, [activeTab, fetchHistory]);
 
   const handleStage = async (filePath: string) => {
     try {
@@ -89,6 +120,7 @@ export default function GitPanel({ projectPath, onRefreshBranch }: GitPanelProps
       await gitCommit(projectPath, commitMessage.trim());
       setCommitMessage("");
       await fetchStatus();
+      await fetchHistory();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       setErrorMsg(msg);
@@ -108,6 +140,22 @@ export default function GitPanel({ projectPath, onRefreshBranch }: GitPanelProps
     }
   };
 
+  const handleSelectVersionCommit = (commitHash: string) => {
+    setActiveTab("history");
+    const found = commits.find(
+      (c) =>
+        c.hash.toLowerCase() === commitHash.toLowerCase() ||
+        c.short_hash.toLowerCase() === commitHash.toLowerCase()
+    );
+    if (found) {
+      setSelectedCommit(found);
+    } else {
+      getCommitDetail(projectPath, commitHash)
+        .then((detail) => setSelectedCommit(detail))
+        .catch(console.error);
+    }
+  };
+
   const stagedFiles = gitStatus?.files.filter((f) => f.is_staged) || [];
   const unstagedFiles = gitStatus?.files.filter((f) => !f.is_staged) || [];
 
@@ -121,26 +169,44 @@ export default function GitPanel({ projectPath, onRefreshBranch }: GitPanelProps
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold text-zinc-100">Source Control</span>
-              <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-zinc-800 text-purple-300 border border-zinc-700">
+              <span className="text-xs font-semibold text-zinc-200">
                 {gitStatus?.branch || "main"}
+              </span>
+              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-zinc-800 text-zinc-400 border border-zinc-700">
+                Local Git
               </span>
             </div>
           </div>
         </div>
 
-        <button
-          onClick={fetchStatus}
-          disabled={isLoading}
-          className="p-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-750 text-zinc-400 hover:text-zinc-200 transition-colors"
-          title="Refresh Git Status"
-        >
-          <RotateCw size={13} className={isLoading ? "animate-spin" : ""} />
-        </button>
+        <div className="flex items-center gap-2">
+          {gitStatus && (
+            <div className="flex items-center gap-2 text-xs font-mono text-zinc-400 mr-2">
+              {gitStatus.ahead > 0 && (
+                <span className="text-emerald-400">↑{gitStatus.ahead}</span>
+              )}
+              {gitStatus.behind > 0 && (
+                <span className="text-amber-400">↓{gitStatus.behind}</span>
+              )}
+            </div>
+          )}
+
+          <button
+            onClick={() => {
+              fetchStatus();
+              if (activeTab === "history") fetchHistory();
+            }}
+            disabled={isLoading || isLoadingHistory}
+            className="p-1.5 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 transition-colors disabled:opacity-40"
+            title="Refresh Status"
+          >
+            <RotateCw size={14} className={isLoading ? "animate-spin" : ""} />
+          </button>
+        </div>
       </div>
 
-      {/* Navigation Sub-Tabs */}
-      <div className="flex items-center gap-1 px-4 border-b border-zinc-850 bg-zinc-900/30 text-xs shrink-0 h-9">
+      {/* Tabs */}
+      <div className="h-10 border-b border-zinc-800 px-4 flex items-center gap-4 bg-zinc-900/20 text-xs shrink-0">
         <button
           onClick={() => setActiveTab("changes")}
           className={`flex items-center gap-1.5 px-3 h-full border-b-2 font-medium transition-colors ${
@@ -150,8 +216,9 @@ export default function GitPanel({ projectPath, onRefreshBranch }: GitPanelProps
           }`}
         >
           <GitCommit size={13} />
-          <span>Changes ({gitStatus?.files.length || 0})</span>
+          <span>Working Changes ({gitStatus?.files.length || 0})</span>
         </button>
+
         <button
           onClick={() => setActiveTab("history")}
           className={`flex items-center gap-1.5 px-3 h-full border-b-2 font-medium transition-colors ${
@@ -161,8 +228,9 @@ export default function GitPanel({ projectPath, onRefreshBranch }: GitPanelProps
           }`}
         >
           <Clock size={13} />
-          <span>Commits ({gitStatus?.recent_commits.length || 0})</span>
+          <span>Timeline & Diffs ({commits.length || gitStatus?.recent_commits.length || 0})</span>
         </button>
+
         <button
           onClick={() => setActiveTab("versions")}
           className={`flex items-center gap-1.5 px-3 h-full border-b-2 font-medium transition-colors ${
@@ -177,15 +245,16 @@ export default function GitPanel({ projectPath, onRefreshBranch }: GitPanelProps
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 overflow-auto p-4 space-y-4">
+      <div className="flex-1 overflow-hidden flex flex-col">
         {errorMsg && (
-          <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs font-mono">
+          <div className="m-4 p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs font-mono">
             {errorMsg}
           </div>
         )}
 
+        {/* Tab 1: Working Changes */}
         {activeTab === "changes" && (
-          <div className="space-y-4 max-w-2xl">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 max-w-3xl">
             {/* Commit Message Box */}
             <div className="p-3 rounded-xl bg-zinc-900/70 border border-zinc-800 space-y-2">
               <textarea
@@ -284,30 +353,45 @@ export default function GitPanel({ projectPath, onRefreshBranch }: GitPanelProps
           </div>
         )}
 
+        {/* Tab 2: Visual Timeline & Diffs */}
         {activeTab === "history" && (
-          <div className="space-y-2 max-w-2xl">
-            <div className="border border-zinc-800 rounded-xl overflow-hidden bg-zinc-900/40 divide-y divide-zinc-850">
-              {gitStatus?.recent_commits.map((c) => (
-                <div key={c.hash} className="p-3 hover:bg-zinc-850/50 transition-colors">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-medium text-zinc-100">{c.message}</span>
-                    <span className="font-mono text-[10px] text-purple-400 bg-purple-500/10 px-1.5 py-0.5 rounded border border-purple-500/20">
-                      {c.hash}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-3 text-[11px] text-zinc-500 font-mono">
-                    <span>{c.author}</span>
-                    <span>•</span>
-                    <span>{c.relative_time}</span>
+          <div className="flex-1 flex overflow-hidden">
+            {/* Left Column: Interactive Visual Timeline */}
+            <div className="w-96 border-r border-zinc-800 flex flex-col shrink-0 overflow-hidden">
+              <GitTimeline
+                commits={commits}
+                versions={versions}
+                selectedCommit={selectedCommit}
+                onSelectCommit={(commit) => setSelectedCommit(commit)}
+                isLoading={isLoadingHistory}
+              />
+            </div>
+
+            {/* Right Column: Diff & AI Code Movement Inspector */}
+            <div className="flex-1 flex flex-col overflow-hidden bg-zinc-950">
+              {selectedCommit ? (
+                <GitDiffViewer
+                  projectPath={projectPath}
+                  commit={selectedCommit}
+                />
+              ) : (
+                <div className="flex-1 flex items-center justify-center p-8 text-center text-zinc-600 text-xs">
+                  <div className="max-w-sm space-y-2">
+                    <Clock size={28} className="mx-auto text-zinc-700" />
+                    <p className="font-medium text-zinc-400">Select a commit from the timeline</p>
+                    <p className="text-zinc-600 text-[11px]">
+                      View changed files, unified additions/deletions, and AI analysis of architectural code movement.
+                    </p>
                   </div>
                 </div>
-              ))}
+              )}
             </div>
           </div>
         )}
 
+        {/* Tab 3: Deployment Versions */}
         {activeTab === "versions" && (
-          <div className="space-y-4 max-w-2xl">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 max-w-2xl">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-xs font-semibold text-zinc-200">
@@ -328,7 +412,10 @@ export default function GitPanel({ projectPath, onRefreshBranch }: GitPanelProps
 
             <div className="border border-zinc-800 rounded-xl overflow-hidden bg-zinc-900/40 divide-y divide-zinc-850">
               {versions.map((ver) => (
-                <div key={ver.version} className="p-3.5 flex items-center justify-between hover:bg-zinc-850/40">
+                <div
+                  key={ver.version}
+                  className="p-3.5 flex items-center justify-between hover:bg-zinc-850/40 transition-colors"
+                >
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center">
                       <Tag size={15} />
@@ -348,10 +435,17 @@ export default function GitPanel({ projectPath, onRefreshBranch }: GitPanelProps
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => handleSelectVersionCommit(ver.commit_hash)}
+                      className="px-2 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white text-xs flex items-center gap-1 transition-colors"
+                    >
+                      <Eye size={12} />
+                      <span>Inspect Diff</span>
+                    </button>
                     <span className="text-xs text-zinc-400 flex items-center gap-1">
                       <ShieldCheck size={13} className="text-emerald-400" />
-                      <span>Zero-Downtime Ready</span>
+                      <span>Zero-Downtime</span>
                     </span>
                   </div>
                 </div>

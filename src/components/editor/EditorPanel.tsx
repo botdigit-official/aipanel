@@ -25,18 +25,12 @@ import {
   FileText,
   ArrowRight,
   BookOpen,
+  History,
+  RotateCcw,
+  GitCompare,
+  Zap,
 } from "lucide-react";
-
-// ── Types ────────────────────────────────────────────────────────
-
-export interface EditorTab {
-  path: string;
-  name: string;
-  language: string;
-  content: string;
-  originalContent: string;
-  isDirty: boolean;
-}
+import { useEditorStore, type EditorTab, type FileHistoryEntry } from "../../stores/editor";
 
 interface EditorPanelProps {
   tabs: EditorTab[];
@@ -45,6 +39,7 @@ interface EditorPanelProps {
   onTabClose: (path: string) => void;
   onContentChange: (path: string, content: string) => void;
   onSave: (path: string) => void;
+  onRevert?: (path: string) => void;
   projectPath?: string | null;
   projectName?: string;
   projectFramework?: string | null;
@@ -184,6 +179,70 @@ function highlightLine(line: string, language: string): ReactNode {
   return <>{parts.length > 0 ? parts : "\u00A0"}</>;
 }
 
+// ── Line-by-Line Visual Diff Utility ──────────────────────────────
+
+interface DiffLine {
+  type: "added" | "removed" | "unchanged";
+  text: string;
+  originalLineNum?: number;
+  newLineNum?: number;
+}
+
+function computeSimpleDiff(original: string, modified: string): DiffLine[] {
+  const origLines = original.split("\n");
+  const modLines = modified.split("\n");
+  const diff: DiffLine[] = [];
+
+  let i = 0;
+  let j = 0;
+  let origLineNum = 1;
+  let newLineNum = 1;
+
+  while (i < origLines.length && j < modLines.length) {
+    if (origLines[i] === modLines[j]) {
+      diff.push({
+        type: "unchanged",
+        text: origLines[i],
+        originalLineNum: origLineNum++,
+        newLineNum: newLineNum++,
+      });
+      i++;
+      j++;
+    } else {
+      const nextMatchInMod = modLines.indexOf(origLines[i], j);
+      const nextMatchInOrig = origLines.indexOf(modLines[j], i);
+
+      if (nextMatchInMod !== -1 && (nextMatchInOrig === -1 || nextMatchInMod - j <= nextMatchInOrig - i)) {
+        while (j < nextMatchInMod) {
+          diff.push({ type: "added", text: modLines[j], newLineNum: newLineNum++ });
+          j++;
+        }
+      } else if (nextMatchInOrig !== -1) {
+        while (i < nextMatchInOrig) {
+          diff.push({ type: "removed", text: origLines[i], originalLineNum: origLineNum++ });
+          i++;
+        }
+      } else {
+        diff.push({ type: "removed", text: origLines[i], originalLineNum: origLineNum++ });
+        diff.push({ type: "added", text: modLines[j], newLineNum: newLineNum++ });
+        i++;
+        j++;
+      }
+    }
+  }
+
+  while (i < origLines.length) {
+    diff.push({ type: "removed", text: origLines[i], originalLineNum: origLineNum++ });
+    i++;
+  }
+  while (j < modLines.length) {
+    diff.push({ type: "added", text: modLines[j], newLineNum: newLineNum++ });
+    j++;
+  }
+
+  return diff;
+}
+
 // ── Component ────────────────────────────────────────────────────
 
 export default function EditorPanel({
@@ -193,6 +252,7 @@ export default function EditorPanel({
   onTabClose,
   onContentChange,
   onSave,
+  onRevert,
   projectPath,
   projectName,
   projectFramework,
@@ -200,7 +260,14 @@ export default function EditorPanel({
   onOpenWorkspaceSwitcher,
 }: EditorPanelProps) {
   const currentTab = tabs.find((t) => t.path === activeTab);
+  const autoSave = useEditorStore((s) => s.autoSave);
+  const setAutoSave = useEditorStore((s) => s.setAutoSave);
+  const saveStatus = useEditorStore((s) => s.saveStatus);
+  const dismissAIEditSummary = useEditorStore((s) => s.dismissAIEditSummary);
+
   const [viewMode, setViewMode] = useState<"edit" | "preview">("edit");
+  const [showDiffView, setShowDiffView] = useState(false);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [cursorPos, setCursorPos] = useState({ line: 1, col: 1, selectionLen: 0 });
   const [wordWrap, setWordWrap] = useState(false);
   const [copiedFile, setCopiedFile] = useState(false);
@@ -492,6 +559,12 @@ export default function EditorPanel({
 
   const lines = currentTab ? currentTab.content.split("\n") : [];
 
+  const diffLines = (currentTab && (showDiffView || currentTab.isDirty))
+    ? computeSimpleDiff(currentTab.originalContent, currentTab.content)
+    : [];
+  const addedCount = diffLines.filter((l) => l.type === "added").length;
+  const removedCount = diffLines.filter((l) => l.type === "removed").length;
+
   const getTabIconColor = (name: string) => {
     const ext = name.split(".").pop()?.toLowerCase() || "";
     if (ext === "json") return "text-amber-400";
@@ -598,9 +671,12 @@ export default function EditorPanel({
 
             {/* View Mode Toggle */}
             <button
-              onClick={() => setViewMode(viewMode === "edit" ? "preview" : "edit")}
-              className={`px-2 py-1 rounded-md text-xs flex items-center gap-1.5 border transition-all ${
-                viewMode === "preview"
+              onClick={() => {
+                setShowDiffView(false);
+                setViewMode(viewMode === "edit" ? "preview" : "edit");
+              }}
+              className={`px-2 py-1 rounded-md text-xs flex items-center gap-1.5 border transition-all cursor-pointer ${
+                viewMode === "preview" && !showDiffView
                   ? "bg-indigo-500/20 text-indigo-300 border-indigo-500/40"
                   : "bg-zinc-800/50 text-zinc-300 border-zinc-700/50 hover:bg-zinc-800 hover:text-zinc-100"
               }`}
@@ -610,11 +686,59 @@ export default function EditorPanel({
               <span className="text-[11px] font-mono capitalize">{viewMode}</span>
             </button>
 
+            {/* Diff View Toggle */}
+            <button
+              onClick={() => setShowDiffView((v) => !v)}
+              className={`px-2 py-1 rounded-md text-xs flex items-center gap-1.5 border transition-all cursor-pointer ${
+                showDiffView
+                  ? "bg-indigo-600/30 text-indigo-300 border-indigo-500/50 shadow-xs"
+                  : "bg-zinc-800/50 text-zinc-300 border-zinc-700/50 hover:bg-zinc-800 hover:text-zinc-100"
+              }`}
+              title="Toggle Visual Line Diff against original file"
+            >
+              <GitCompare size={12} className={showDiffView ? "text-indigo-400" : "text-zinc-400"} />
+              <span className="text-[11px] font-mono">
+                Diff {addedCount > 0 || removedCount > 0 ? `(+${addedCount}/-${removedCount})` : ""}
+              </span>
+            </button>
+
+            {/* History Button */}
+            <button
+              onClick={() => setShowHistoryModal(true)}
+              className="px-2 py-1 rounded-md text-xs flex items-center gap-1.5 border border-zinc-700/50 bg-zinc-800/50 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 transition-colors cursor-pointer"
+              title="View Changes History & Recovery Snapshots"
+            >
+              <History size={12} className="text-indigo-400" />
+              <span className="text-[11px] font-mono">
+                History ({currentTab.history?.length || 0})
+              </span>
+            </button>
+
+            {/* Auto-Save Toggle */}
+            <button
+              onClick={() => setAutoSave(!autoSave)}
+              className={`px-2 py-1 rounded-md text-xs flex items-center gap-1.5 border transition-all cursor-pointer ${
+                autoSave
+                  ? "bg-emerald-500/10 text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/20"
+                  : "bg-zinc-800/50 text-zinc-400 border-zinc-700/50 hover:bg-zinc-800 hover:text-zinc-200"
+              }`}
+              title={
+                autoSave
+                  ? "Auto-Save is ON (Changes auto-save to disk like Gemini / Cursor)"
+                  : "Auto-Save is OFF (Click to enable auto-save)"
+              }
+            >
+              <Zap size={11} className={autoSave ? "text-emerald-400 fill-emerald-400" : "text-zinc-500"} />
+              <span className="text-[10.5px] font-mono">
+                {autoSave ? "Auto-Save ON" : "Auto-Save OFF"}
+              </span>
+            </button>
+
             {/* Save Button */}
             <button
               onClick={handleSaveClick}
               disabled={!currentTab.isDirty && !justSaved}
-              className={`px-2.5 py-1 rounded-md text-xs flex items-center gap-1.5 border font-medium transition-all ${
+              className={`px-2.5 py-1 rounded-md text-xs flex items-center gap-1.5 border font-medium transition-all cursor-pointer ${
                 justSaved
                   ? "bg-emerald-600/30 text-emerald-300 border-emerald-500/50"
                   : currentTab.isDirty
@@ -721,6 +845,67 @@ export default function EditorPanel({
         </div>
       )}
 
+      {/* ── AI Modification & Review Banner ── */}
+      {currentTab && (currentTab.isDirty || currentTab.aiEditSummary) && (
+        <div className="bg-indigo-950/40 border-b border-indigo-500/30 px-3 py-1.5 flex flex-wrap items-center justify-between gap-2 text-xs shrink-0">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="flex items-center gap-1 px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/40 text-[10.5px]">
+              <Sparkles size={11} className="text-indigo-400" />
+              {currentTab.aiEditAuthor || "AI"} Modification
+            </span>
+            <span className="text-zinc-300 truncate max-w-md font-sans text-[11.5px]">
+              {currentTab.aiEditSummary || `Buffer modified (+${addedCount} / -${removedCount} lines)`}
+            </span>
+            {autoSave && !currentTab.isDirty && (
+              <span className="flex items-center gap-1 text-[10.5px] text-emerald-400 font-medium px-2 py-0.5 rounded bg-emerald-950/60 border border-emerald-800/50">
+                <Check size={11} /> Auto-Saved to Disk
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-1.5 shrink-0 font-mono text-[11px]">
+            <button
+              onClick={() => setShowDiffView((v) => !v)}
+              className={`flex items-center gap-1 px-2 py-0.5 rounded border transition-colors cursor-pointer ${
+                showDiffView
+                  ? "bg-indigo-600 text-white border-indigo-400 shadow-xs"
+                  : "bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border-zinc-700"
+              }`}
+            >
+              <GitCompare size={11} />
+              {showDiffView ? "Hide Diff" : "Show Visual Diff"}
+            </button>
+            {onRevert && (
+              <button
+                onClick={() => onRevert(currentTab.path)}
+                className="flex items-center gap-1 px-2 py-0.5 rounded bg-rose-950/60 hover:bg-rose-900/80 text-rose-300 border border-rose-800/60 transition-colors cursor-pointer"
+                title="Undo AI edit and restore previous content from disk"
+              >
+                <RotateCcw size={11} />
+                Revert (Undo)
+              </button>
+            )}
+            {currentTab.isDirty ? (
+              <button
+                onClick={handleSaveClick}
+                className="flex items-center gap-1 px-2.5 py-0.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-medium shadow-xs transition-colors cursor-pointer"
+              >
+                <Save size={11} />
+                Save (⌘S)
+              </button>
+            ) : (
+              <button
+                onClick={() => dismissAIEditSummary(currentTab.path)}
+                className="flex items-center gap-1 px-2 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-medium border border-zinc-700 transition-colors cursor-pointer"
+                title="Dismiss AI modification notice"
+              >
+                <Check size={11} className="text-emerald-400" />
+                Done
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* ── Breadcrumb Bar ── */}
       {currentTab && (
         <div className="h-7 bg-zinc-925/80 border-b border-zinc-800/70 flex items-center justify-between px-3 text-[11px] font-mono text-zinc-400 shrink-0">
@@ -752,75 +937,164 @@ export default function EditorPanel({
         </div>
       )}
 
-      {/* ── Main Code Canvas & Line Numbers ── */}
+      {/* ── Main Canvas (Visual Diff OR Code Editor) ── */}
       {currentTab && (
-        <div className="flex-1 flex overflow-hidden bg-zinc-950 font-mono text-[13px] relative min-h-0">
-          {/* Synchronized Line Numbers Gutter */}
-          <div
-            ref={lineNumbersRef}
-            className="w-14 shrink-0 overflow-hidden bg-zinc-925/60 border-r border-zinc-800/80 select-none text-right pr-3 py-2.5 text-zinc-600 text-[12px] leading-6 font-mono"
-          >
-            {lines.map((_, i) => {
-              const lineNum = i + 1;
-              const isCurrentLine = cursorPos.line === lineNum;
-              return (
-                <div
-                  key={i}
-                  className={`transition-colors ${
-                    isCurrentLine
-                      ? "text-indigo-400 font-bold bg-indigo-500/10 -mr-3 pr-3"
-                      : "hover:text-zinc-400"
-                  }`}
+        showDiffView ? (
+          /* Visual Line-by-Line Diff Canvas */
+          <div className="flex-1 overflow-auto bg-zinc-950 font-mono text-[12.5px] leading-6 custom-scrollbar select-text">
+            <div className="sticky top-0 z-10 bg-zinc-900/95 backdrop-blur border-b border-zinc-800 px-4 py-2 flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2.5">
+                <GitCompare size={14} className="text-indigo-400" />
+                <span className="font-semibold text-zinc-100">Visual Line-by-Line Diff</span>
+                <span className="px-2 py-0.5 rounded-full bg-emerald-950/60 text-emerald-400 border border-emerald-800/50 text-[10.5px] font-bold">
+                  +{addedCount} additions
+                </span>
+                <span className="px-2 py-0.5 rounded-full bg-rose-950/60 text-rose-400 border border-rose-800/50 text-[10.5px] font-bold">
+                  -{removedCount} deletions
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                {onRevert && (
+                  <button
+                    onClick={() => {
+                      onRevert(currentTab.path);
+                      setShowDiffView(false);
+                    }}
+                    className="px-2 py-1 rounded bg-rose-950/60 hover:bg-rose-900/80 text-rose-300 border border-rose-800/60 text-xs transition-colors cursor-pointer"
+                  >
+                    Revert All
+                  </button>
+                )}
+                <button
+                  onClick={handleSaveClick}
+                  className="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium transition-colors cursor-pointer"
                 >
-                  {lineNum}
-                </div>
-              );
-            })}
-            <div className="h-48" />
-          </div>
+                  Accept & Save
+                </button>
+                <button
+                  onClick={() => setShowDiffView(false)}
+                  className="text-xs text-zinc-400 hover:text-zinc-200 px-2 py-1 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors cursor-pointer"
+                >
+                  Back to Editor
+                </button>
+              </div>
+            </div>
 
-          {/* Code Textarea or Syntax Preview */}
-          {viewMode === "edit" ? (
-            <textarea
-              ref={textareaRef}
-              value={currentTab.content}
-              onChange={handleTextChange}
-              onKeyDown={handleKeyDown}
-              onScroll={handleScroll}
-              onClick={(e) => updateCursorPosition(e.currentTarget)}
-              onKeyUp={(e) => updateCursorPosition(e.currentTarget)}
-              onSelect={(e) => updateCursorPosition(e.currentTarget)}
-              spellCheck={false}
-              autoCapitalize="off"
-              autoComplete="off"
-              className={`
-                flex-1 py-2.5 pl-4 pr-6 bg-transparent text-zinc-200 resize-none outline-none
-                font-mono text-[13px] leading-6 tab-size-2 overflow-auto caret-indigo-400
-                selection:bg-indigo-500/30
-                ${wordWrap ? "whitespace-pre-wrap break-words" : "whitespace-pre"}
-              `}
-              style={{ tabSize: 2 }}
-            />
-          ) : (
-            <div className="flex-1 overflow-auto py-2.5 pl-4 pr-6 text-zinc-200 leading-6 custom-scrollbar font-mono text-[13px]">
-              {lines.map((line, i) => {
+            <div className="py-2">
+              {diffLines.length === 0 ? (
+                <div className="p-8 text-center text-zinc-500 text-xs">
+                  No changes between current buffer and disk version.
+                </div>
+              ) : (
+                diffLines.map((line, idx) => {
+                  if (line.type === "added") {
+                    return (
+                      <div
+                        key={idx}
+                        className="flex items-stretch bg-emerald-950/30 hover:bg-emerald-900/40 text-emerald-200 border-l-2 border-emerald-500"
+                      >
+                        <span className="w-12 shrink-0 select-none text-right pr-2 text-zinc-700 font-mono text-[11px] py-0.5 bg-emerald-950/20"></span>
+                        <span className="w-12 shrink-0 select-none text-right pr-2 text-emerald-400 font-mono text-[11px] py-0.5 bg-emerald-950/20">{line.newLineNum}</span>
+                        <span className="w-6 shrink-0 select-none text-center text-emerald-400 font-bold py-0.5">+</span>
+                        <span className="flex-1 py-0.5 whitespace-pre pr-4 overflow-x-auto">{line.text || "\u00A0"}</span>
+                      </div>
+                    );
+                  }
+                  if (line.type === "removed") {
+                    return (
+                      <div
+                        key={idx}
+                        className="flex items-stretch bg-rose-950/30 hover:bg-rose-900/40 text-rose-200 border-l-2 border-rose-500"
+                      >
+                        <span className="w-12 shrink-0 select-none text-right pr-2 text-rose-400 font-mono text-[11px] py-0.5 bg-rose-950/20">{line.originalLineNum}</span>
+                        <span className="w-12 shrink-0 select-none text-right pr-2 text-zinc-700 font-mono text-[11px] py-0.5 bg-rose-950/20"></span>
+                        <span className="w-6 shrink-0 select-none text-center text-rose-400 font-bold py-0.5">-</span>
+                        <span className="flex-1 py-0.5 whitespace-pre pr-4 overflow-x-auto line-through decoration-rose-500/60 opacity-80">{line.text || "\u00A0"}</span>
+                      </div>
+                    );
+                  }
+                  return (
+                    <div key={idx} className="flex items-stretch text-zinc-400 hover:bg-zinc-900/50">
+                      <span className="w-12 shrink-0 select-none text-right pr-2 text-zinc-600 font-mono text-[11px] py-0.5">{line.originalLineNum}</span>
+                      <span className="w-12 shrink-0 select-none text-right pr-2 text-zinc-600 font-mono text-[11px] py-0.5">{line.newLineNum}</span>
+                      <span className="w-6 shrink-0 select-none text-center text-zinc-600 py-0.5"> </span>
+                      <span className="flex-1 py-0.5 whitespace-pre pr-4 overflow-x-auto text-zinc-300">{line.text || "\u00A0"}</span>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        ) : (
+          /* Regular Code Editor / Syntax Preview Canvas */
+          <div className="flex-1 flex overflow-hidden bg-zinc-950 font-mono text-[13px] relative min-h-0">
+            {/* Synchronized Line Numbers Gutter */}
+            <div
+              ref={lineNumbersRef}
+              className="w-14 shrink-0 overflow-hidden bg-zinc-925/60 border-r border-zinc-800/80 select-none text-right pr-3 py-2.5 text-zinc-600 text-[12px] leading-6 font-mono"
+            >
+              {lines.map((_, i) => {
                 const lineNum = i + 1;
                 const isCurrentLine = cursorPos.line === lineNum;
                 return (
                   <div
                     key={i}
-                    className={`whitespace-pre px-1 rounded-xs ${
-                      isCurrentLine ? "bg-indigo-500/10" : ""
+                    className={`transition-colors ${
+                      isCurrentLine
+                        ? "text-indigo-400 font-bold bg-indigo-500/10 -mr-3 pr-3"
+                        : "hover:text-zinc-400"
                     }`}
                   >
-                    {highlightLine(line, currentTab.language)}
+                    {lineNum}
                   </div>
                 );
               })}
               <div className="h-48" />
             </div>
-          )}
-        </div>
+
+            {/* Code Textarea or Syntax Preview */}
+            {viewMode === "edit" ? (
+              <textarea
+                ref={textareaRef}
+                value={currentTab.content}
+                onChange={handleTextChange}
+                onKeyDown={handleKeyDown}
+                onScroll={handleScroll}
+                onClick={(e) => updateCursorPosition(e.currentTarget)}
+                onKeyUp={(e) => updateCursorPosition(e.currentTarget)}
+                onSelect={(e) => updateCursorPosition(e.currentTarget)}
+                spellCheck={false}
+                autoCapitalize="off"
+                autoComplete="off"
+                className={`
+                  flex-1 py-2.5 pl-4 pr-6 bg-transparent text-zinc-200 resize-none outline-none
+                  font-mono text-[13px] leading-6 tab-size-2 overflow-auto caret-indigo-400
+                  selection:bg-indigo-500/30
+                  ${wordWrap ? "whitespace-pre-wrap break-words" : "whitespace-pre"}
+                `}
+                style={{ tabSize: 2 }}
+              />
+            ) : (
+              <div className="flex-1 overflow-auto py-2.5 pl-4 pr-6 text-zinc-200 leading-6 custom-scrollbar font-mono text-[13px]">
+                {lines.map((line, i) => {
+                  const lineNum = i + 1;
+                  const isCurrentLine = cursorPos.line === lineNum;
+                  return (
+                    <div
+                      key={i}
+                      className={`whitespace-pre px-1 rounded-xs ${
+                        isCurrentLine ? "bg-indigo-500/10" : ""
+                      }`}
+                    >
+                      {highlightLine(line, currentTab.language)}
+                    </div>
+                  );
+                })}
+                <div className="h-48" />
+              </div>
+            )}
+          </div>
+        )
       )}
 
       {/* ── Editor Footer Status Bar ── */}
@@ -849,12 +1123,108 @@ export default function EditorPanel({
             <div className="flex items-center gap-1.5">
               <span
                 className={`w-2 h-2 rounded-full ${
-                  currentTab.isDirty ? "bg-amber-400" : "bg-emerald-400"
+                  currentTab.isDirty ? "bg-amber-400" : saveStatus === "saving" ? "bg-blue-400 animate-pulse" : "bg-emerald-400"
                 }`}
               />
-              <span className="text-zinc-500 text-[10px]">
-                {currentTab.isDirty ? "Modified" : "Saved"}
+              <span className="text-zinc-400 text-[10px] font-mono">
+                {saveStatus === "saving"
+                  ? "Saving..."
+                  : currentTab.isDirty
+                  ? "Modified"
+                  : autoSave
+                  ? "Auto-Saved"
+                  : "Saved"}
               </span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Changes History Modal ── */}
+      {showHistoryModal && currentTab && (
+        <div className="absolute inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-zinc-900 border border-zinc-700/80 rounded-xl shadow-2xl max-w-2xl w-full max-h-[85vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="px-5 py-3.5 border-b border-zinc-800 flex items-center justify-between bg-zinc-925">
+              <div className="flex items-center gap-2">
+                <History size={16} className="text-indigo-400" />
+                <h3 className="text-sm font-semibold text-zinc-100">Changes History & Snapshots</h3>
+                <span className="text-xs text-zinc-500 font-mono">({currentTab.name})</span>
+              </div>
+              <button
+                onClick={() => setShowHistoryModal(false)}
+                className="p-1 rounded hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 cursor-pointer"
+              >
+                <X size={15} />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-5 space-y-3 custom-scrollbar">
+              {(!currentTab.history || currentTab.history.length === 0) ? (
+                <div className="text-center py-10 text-zinc-500 text-xs">
+                  <History size={32} className="mx-auto text-zinc-700 mb-2 opacity-50" />
+                  <div>No previous edit snapshots recorded yet for this session.</div>
+                  <div className="mt-1 text-zinc-600">Whenever the AI edits this file, a recovery snapshot is automatically created.</div>
+                </div>
+              ) : (
+                currentTab.history.slice().reverse().map((entry: FileHistoryEntry, idx: number) => (
+                  <div
+                    key={entry.id || idx}
+                    className="p-3.5 rounded-lg bg-zinc-950/70 border border-zinc-800 hover:border-zinc-700 transition-all flex items-start justify-between gap-4"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                          {entry.author}
+                        </span>
+                        <span className="text-xs font-medium text-zinc-200">
+                          {entry.summary || "Snapshot"}
+                        </span>
+                        <span className="text-[10.5px] text-zinc-500 ml-auto">
+                          {new Date(entry.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                        </span>
+                      </div>
+                      <div className="text-[11px] text-zinc-400 font-mono">
+                        Snapshot size: {entry.afterContent.length.toLocaleString()} characters ({entry.afterContent.split("\n").length} lines)
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <button
+                        onClick={() => {
+                          onContentChange(currentTab.path, entry.beforeContent);
+                          setShowHistoryModal(false);
+                        }}
+                        className="flex items-center gap-1 px-2.5 py-1 rounded bg-zinc-800 hover:bg-rose-600 text-zinc-300 hover:text-white text-xs border border-zinc-700/80 transition-all cursor-pointer"
+                        title="Revert to state before this modification"
+                      >
+                        <RotateCcw size={12} />
+                        Revert Before
+                      </button>
+                      <button
+                        onClick={() => {
+                          onContentChange(currentTab.path, entry.afterContent);
+                          setShowHistoryModal(false);
+                        }}
+                        className="flex items-center gap-1 px-2.5 py-1 rounded bg-zinc-800 hover:bg-indigo-600 text-zinc-300 hover:text-white text-xs border border-zinc-700/80 transition-all cursor-pointer"
+                        title="Apply this exact edit version"
+                      >
+                        <Check size={12} />
+                        Restore Version
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            <div className="px-5 py-3 border-t border-zinc-800/80 bg-zinc-950/50 flex items-center justify-between text-xs text-zinc-400">
+              <span className="truncate max-w-sm">File: <span className="font-mono text-zinc-300">{currentTab.path}</span></span>
+              <button
+                onClick={() => setShowHistoryModal(false)}
+                className="px-3 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer"
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>

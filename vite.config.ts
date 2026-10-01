@@ -162,6 +162,109 @@ function devFsPlugin(): Plugin {
             return;
           }
 
+          if (pathname === "/api/fs/create-project" && req.method === "POST") {
+            let body = "";
+            for await (const chunk of req) {
+              body += chunk;
+            }
+            const { targetDir, projectName, template = "clean-ai", idea = "" } = JSON.parse(body || "{}");
+            const destDir = path.join(targetDir, projectName);
+
+            await fs.mkdir(destDir, { recursive: true });
+
+            if (template === "clean-ai" || template === "clean") {
+              const visionStatement = idea.trim()
+                ? `**Initial Project Vision**: "${idea.trim()}"`
+                : `This project is currently in the **AI Ideation & Architecture** phase. The core problem, target audience, and business model are being defined in collaboration with the AIPanel AI Assistant.`;
+
+              const readmeContent = `# ${projectName}\n\n> **Project Vision & Architecture Blueprint**  \n> *Initialized via AIPanel Clean AI Ideation*\n\n## 1. Executive Summary & Vision\n${visionStatement}\n\n- **Status**: 🚀 Ideation & Blueprinting\n- **Project Type**: Clean Custom Architecture\n- **Target Tech Stack**: Pending Architecture Review (Budget vs Enterprise)\n\n## 2. Core Problem to Solve\n<!-- Describe the specific pain point this project addresses -->\n- [ ] Define the primary user persona and value proposition.\n- [ ] Identify high-impact features for the Minimum Viable Product (MVP).\n- [ ] Select appropriate technology stack and data persistence strategy.\n\n## 3. Recommended Workflow\n1. Open the **AI Assistant** (\`⌘L\` or right-side panel).\n2. Brainstorm product requirements and candidate architectures.\n3. Review candidate stacks (Budget Stack vs Enterprise Stack).\n4. Auto-generate database schemas and initial application structure.\n5. Deploy to Staging / Production via AIPanel 1-Click DevOps.\n`;
+              await fs.writeFile(path.join(destDir, "README.md"), readmeContent, "utf-8");
+
+              const taskContent = `# Project Roadmap & Sprint Tasks — ${projectName}\n\n## Phase 1: Product Ideation & Architecture (Active)\n- [ ] Brainstorm core product vision and user flows with AIPanel AI\n- [ ] Choose tech stack (Frontend, Backend, Database, Infrastructure)\n- [ ] Formalize database schema (Entities, Relations, Constraints)\n- [ ] Establish initial project dependencies and boilerplate\n\n## Phase 2: Core Engineering & Backend Services\n- [ ] Implement database migrations & seeds\n- [ ] Build core REST / GraphQL / RPC API endpoints\n- [ ] Set up authentication & role-based access control (RBAC)\n- [ ] Wire background worker queues (Redis / Celery / BullMQ)\n\n## Phase 3: Frontend & User Experience\n- [ ] Establish design tokens & UI components\n- [ ] Build responsive primary user dashboard & flows\n- [ ] Implement real-time data sync / WebSockets\n\n## Phase 4: Verification, Security & Launch\n- [ ] Automated smoke tests & integration test suite\n- [ ] Security audit (CORS, Rate Limiting, Input Validation)\n- [ ] Configure environment variables & production secrets\n- [ ] 1-Click Deploy via AIPanel Fleet Manager\n`;
+              await fs.writeFile(path.join(destDir, "TASK.md"), taskContent, "utf-8");
+              await fs.writeFile(path.join(destDir, "TODO.md"), taskContent, "utf-8");
+
+              const archContent = `# Architecture Decision Record & System Design — ${projectName}\n\n## 1. System Overview\nHigh-level architectural blueprint for **${projectName}**.\n\n\`\`\`mermaid\ngraph TD\n    Client[Web / Mobile Clients] --> Gateway[Reverse Proxy / Caddy]\n    Gateway --> App[Application Server]\n    App --> DB[(Primary Database)]\n    App --> Cache[(Redis Cache / Queue)]\n    App --> Storage[Object Storage / S3]\n\`\`\`\n\n## 2. Candidate Stack Decision Matrix\n\n| Dimension | Option A: Budget / Lean Stack | Option B: Enterprise / Scale Stack |\n|---|---|---|\n| **Monthly Cost** | $0 - $10 / month | $50 - $150+ / month |\n| **Backend** | Fastify / Hono / Go / Python | Next.js / Rust Axum / NestJS |\n| **Database** | SQLite 3 + Litestream (WAL replication) | PostgreSQL 16 Cluster + PgBouncer |\n| **Cache / Queue** | In-Memory / SQLite queue | Redis 7.2 Cluster |\n| **Deployment** | Single VPS ($4/mo Hetzner/DigitalOcean) | Multi-Node Docker Swarm / Kubernetes |\n\n## 3. Data Flow & Security\n- Strict type validation on all incoming payload boundaries.\n- Environment variables managed through AIPanel Vault.\n`;
+              await fs.writeFile(path.join(destDir, "ARCHITECTURE.md"), archContent, "utf-8");
+
+              // Create .agents and skills
+              const agentsDir = path.join(destDir, ".agents");
+              const skillsDir = path.join(agentsDir, "skills");
+              await fs.mkdir(path.join(skillsDir, "01-discovery"), { recursive: true });
+              await fs.mkdir(path.join(skillsDir, "02-project-context"), { recursive: true });
+
+              const agentsMd = `# AGENTS.md — AI Agent Operating Rules for ${projectName}\n\nThis file guides all AI coding assistants operating on **${projectName}**.\n\n## 1. Operating Principles\n- **Inspect First**: Understand existing code and architecture before editing.\n- **Maintain Task List**: Update \`TASK.md\` as progress is made.\n- **Sync Documentation**: Keep \`README.md\` and \`ARCHITECTURE.md\` up to date.\n- **Zero Broken Builds**: Ensure tests and builds pass before finalizing tasks.\n\n## 2. Skills & Capabilities\n- Architectural Decision Making\n- Database Schema Design & Migration\n- Security Auditing & Code Hardening\n- 1-Click DevOps & Deployment\n`;
+              await fs.writeFile(path.join(agentsDir, "AGENTS.md"), agentsMd, "utf-8");
+
+              await fs.writeFile(
+                path.join(skillsDir, "01-discovery", "SKILL.md"),
+                "---\nname: discovery\ndescription: Discovers project structure, stack, dependencies, and configuration.\n---\n# Discovery Workflow\nRun discovery across the repository to detect package managers, build scripts, port assignments, and environment requirements.\n",
+                "utf-8"
+              );
+              await fs.writeFile(
+                path.join(skillsDir, "02-project-context", "SKILL.md"),
+                "---\nname: project-context\ndescription: Tracks project language, framework, database, and infrastructure state.\n---\n# Project Context Workflow\nMaintains project metadata and verifies compatibility with AIPanel deploy scripts.\n",
+                "utf-8"
+              );
+
+              const aipanelToml = `[project]\nname = "${projectName}"\ntype = "clean-ai"\nruntime = "pending"\nframework = "AI Ideation"\nsuggested_dev_command = ""\nsuggested_build_command = ""\n`;
+              await fs.writeFile(path.join(destDir, "aipanel.toml"), aipanelToml, "utf-8");
+            } else if (template === "blank") {
+              const readme = `# ${projectName}\n\nClean, minimal project repository initialized with AIPanel.\n`;
+              await fs.writeFile(path.join(destDir, "README.md"), readme, "utf-8");
+              const aipanelToml = `[project]\nname = "${projectName}"\ntype = "blank"\n`;
+              await fs.writeFile(path.join(destDir, "aipanel.toml"), aipanelToml, "utf-8");
+            } else if (template === "nextjs") {
+              const pkg = JSON.stringify({
+                name: projectName,
+                version: "0.1.0",
+                private: true,
+                scripts: { dev: "next dev", build: "next build", start: "next start" },
+                dependencies: { next: "^15.0.0", react: "^19.0.0", "react-dom": "^19.0.0" }
+              }, null, 2);
+              await fs.writeFile(path.join(destDir, "package.json"), pkg, "utf-8");
+              await fs.mkdir(path.join(destDir, "src", "app"), { recursive: true });
+              await fs.writeFile(path.join(destDir, "src", "app", "page.tsx"), "export default function Home() { return <main><h1>AIPanel Next.js Starter</h1></main>; }", "utf-8");
+            } else if (template === "fastapi") {
+              const pyMain = `from fastapi import FastAPI\n\napp = FastAPI(title="AIPanel FastAPI Service")\n\n@app.get("/")\ndef read_root():\n    return {"status": "ok", "app": "AIPanel FastAPI Starter"}\n`;
+              await fs.writeFile(path.join(destDir, "main.py"), pyMain, "utf-8");
+              await fs.writeFile(path.join(destDir, "requirements.txt"), "fastapi>=0.115.0\nuvicorn>=0.30.0\n", "utf-8");
+            } else if (template === "rust-axum") {
+              const cargo = `[package]\nname = "${projectName}"\nversion = "0.1.0"\nedition = "2021"\n\n[dependencies]\naxum = "0.8"\ntokio = { version = "1.0", features = ["full"] }\n`;
+              await fs.writeFile(path.join(destDir, "Cargo.toml"), cargo, "utf-8");
+              await fs.mkdir(path.join(destDir, "src"), { recursive: true });
+              await fs.writeFile(path.join(destDir, "src", "main.rs"), "use axum::{routing::get, Router};\n#[tokio::main]\nasync fn main() {\n    let app = Router::new().route(\"/\", get(|| async { \"Hello from AIPanel Axum!\" }));\n    println!(\"Axum listening on port 3000\");\n}\n", "utf-8");
+            } else {
+              const pkg = JSON.stringify({
+                name: projectName,
+                version: "0.1.0",
+                private: true,
+                scripts: { dev: "vite", build: "vite build" }
+              }, null, 2);
+              await fs.writeFile(path.join(destDir, "package.json"), pkg, "utf-8");
+            }
+
+            res.setHeader("Content-Type", "application/json");
+            res.end(
+              JSON.stringify({
+                name: projectName,
+                path: destDir,
+                framework: template === "clean-ai" ? "AI Ideation" : template,
+                runtime: "pending",
+                has_git: true,
+                has_docker: false,
+                has_aipanel_toml: true,
+                suggested_file: path.join(destDir, "README.md"),
+                detected_services: [],
+                detected_workers: [],
+                suggested_dev_command: "",
+                suggested_build_command: "",
+                suggested_port: 3000,
+              })
+            );
+            return;
+          }
+
           if (pathname === "/api/fs/delete" && req.method === "POST") {
             let body = "";
             for await (const chunk of req) {
@@ -283,6 +386,48 @@ function devFsPlugin(): Plugin {
             }
             res.setHeader("Content-Type", "application/json");
             res.end(JSON.stringify(folders));
+            return;
+          }
+
+          if (pathname === "/api/fs/scaffold-workspace" && req.method === "POST") {
+            let bodyStr = "";
+            for await (const chunk of req) {
+              bodyStr += chunk;
+            }
+            const { baseDir } = JSON.parse(bodyStr || "{}");
+            if (!baseDir) {
+              res.statusCode = 400;
+              res.end(JSON.stringify({ error: "baseDir required" }));
+              return;
+            }
+
+            const targetRoot = baseDir.endsWith("/Projects")
+              ? path.dirname(baseDir)
+              : baseDir;
+
+            const subDirs = ["Projects", "Live", "Staging", "Static", "Infrastructure", "Backups"];
+            const created = [];
+            for (const sub of subDirs) {
+              const full = path.join(targetRoot, sub);
+              try {
+                await fs.mkdir(full, { recursive: true });
+                created.push(full);
+              } catch {
+                // ignore
+              }
+            }
+
+            // Write master workspace README if not present
+            const masterReadme = path.join(targetRoot, "WORKSPACE.md");
+            try {
+              await fs.access(masterReadme);
+            } catch {
+              const content = `# Developer Workspace Root\n\nManaged by **AIPanel**.\n\n- \`Projects/\`: Active application repositories and codebases.\n- \`Live/\`: Production deployments and active services.\n- \`Staging/\`: Staging previews and ephemeral build testing.\n- \`Static/\`: Static assets, uploads, and CDN storage.\n- \`Infrastructure/\`: Docker compose manifests, Caddy configurations, and databases.\n- \`Backups/\`: Automated database dumps and volume snapshots.\n`;
+              await fs.writeFile(masterReadme, content, "utf-8");
+            }
+
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ ok: true, created, baseDir }));
             return;
           }
 

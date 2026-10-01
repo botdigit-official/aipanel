@@ -576,6 +576,148 @@ fn create_project_from_template(
     fs::create_dir_all(&dest_dir).map_err(|e| e.to_string())?;
 
     match template.as_str() {
+        "clean-ai" | "clean" => {
+            // Scaffold clean AI ideation blueprint: README.md, TASK.md, ARCHITECTURE.md, .agents skills
+            let readme = format!(
+                r#"# {}
+
+> **Project Vision & Architecture Blueprint**  
+> *Initialized via AIPanel Clean AI Ideation*
+
+## 1. Executive Summary & Vision
+This project is currently in the **AI Ideation & Architecture** phase. The core problem, target audience, and business model are being defined in collaboration with the AIPanel AI Assistant.
+
+- **Status**: 🚀 Ideation & Blueprinting
+- **Project Type**: Clean Custom Architecture
+- **Target Tech Stack**: Pending Architecture Review (Budget vs Enterprise)
+
+## 2. Core Problem to Solve
+- [ ] Define the primary user persona and value proposition.
+- [ ] Identify high-impact features for the Minimum Viable Product (MVP).
+- [ ] Select appropriate technology stack and data persistence strategy.
+
+## 3. Recommended Workflow
+1. Open the **AI Assistant** (`⌘L` or right-side panel).
+2. Brainstorm product requirements and candidate architectures.
+3. Review candidate stacks (Budget Stack vs Enterprise Stack).
+4. Auto-generate database schemas and initial application structure.
+5. Deploy to Staging / Production via AIPanel 1-Click DevOps.
+"#,
+                project_name
+            );
+            fs::write(dest_dir.join("README.md"), readme).map_err(|e| e.to_string())?;
+
+            let task_md = format!(
+                r#"# Project Roadmap & Sprint Tasks — {}
+
+## Phase 1: Product Ideation & Architecture (Active)
+- [ ] Brainstorm core product vision and user flows with AIPanel AI
+- [ ] Choose tech stack (Frontend, Backend, Database, Infrastructure)
+- [ ] Formalize database schema (Entities, Relations, Constraints)
+- [ ] Establish initial project dependencies and boilerplate
+
+## Phase 2: Core Engineering & Backend Services
+- [ ] Implement database migrations & seeds
+- [ ] Build core REST / GraphQL / RPC API endpoints
+- [ ] Set up authentication & role-based access control (RBAC)
+- [ ] Wire background worker queues (Redis / Celery / BullMQ)
+
+## Phase 3: Frontend & User Experience
+- [ ] Establish design tokens & UI components
+- [ ] Build responsive primary user dashboard & flows
+- [ ] Implement real-time data sync / WebSockets
+
+## Phase 4: Verification, Security & Launch
+- [ ] Automated smoke tests & integration test suite
+- [ ] Security audit (CORS, Rate Limiting, Input Validation)
+- [ ] Configure environment variables & production secrets
+- [ ] 1-Click Deploy via AIPanel Fleet Manager
+"#,
+                project_name
+            );
+            fs::write(dest_dir.join("TASK.md"), &task_md).map_err(|e| e.to_string())?;
+            fs::write(dest_dir.join("TODO.md"), &task_md).map_err(|e| e.to_string())?;
+
+            let arch_md = format!(
+                r#"# Architecture Decision Record & System Design — {}
+
+## 1. System Overview
+High-level architectural blueprint for **{}**.
+
+```mermaid
+graph TD
+    Client[Web / Mobile Clients] --> Gateway[Reverse Proxy / Caddy]
+    Gateway --> App[Application Server]
+    App --> DB[(Primary Database)]
+    App --> Cache[(Redis Cache / Queue)]
+    App --> Storage[Object Storage / S3]
+```
+
+## 2. Candidate Stack Decision Matrix
+
+| Dimension | Option A: Budget / Lean Stack | Option B: Enterprise / Scale Stack |
+|---|---|---|
+| **Monthly Cost** | $0 - $10 / month | $50 - $150+ / month |
+| **Backend** | Fastify / Hono / Go / Python | Next.js / Rust Axum / NestJS |
+| **Database** | SQLite 3 + Litestream (WAL replication) | PostgreSQL 16 Cluster + PgBouncer |
+| **Cache / Queue** | In-Memory / SQLite queue | Redis 7.2 Cluster |
+| **Deployment** | Single VPS ($4/mo Hetzner/DigitalOcean) | Multi-Node Docker Swarm / Kubernetes |
+
+## 3. Data Flow & Security
+- Strict type validation on all incoming payload boundaries.
+- Environment variables managed through AIPanel Vault.
+"#,
+                project_name, project_name
+            );
+            fs::write(dest_dir.join("ARCHITECTURE.md"), arch_md).map_err(|e| e.to_string())?;
+
+            // Create .agents and skills
+            let agents_dir = dest_dir.join(".agents");
+            let skills_dir = agents_dir.join("skills");
+            fs::create_dir_all(skills_dir.join("01-discovery")).map_err(|e| e.to_string())?;
+            fs::create_dir_all(skills_dir.join("02-project-context")).map_err(|e| e.to_string())?;
+
+            let agents_md = format!(
+                r#"# AGENTS.md — AI Agent Operating Rules for {}
+
+This file guides all AI coding assistants operating on **{}**.
+
+## 1. Operating Principles
+- **Inspect First**: Understand existing code and architecture before editing.
+- **Maintain Task List**: Update `TASK.md` as progress is made.
+- **Sync Documentation**: Keep `README.md` and `ARCHITECTURE.md` up to date.
+- **Zero Broken Builds**: Ensure tests and builds pass before finalizing tasks.
+
+## 2. Skills & Capabilities
+- Architectural Decision Making
+- Database Schema Design & Migration
+- Security Auditing & Code Hardening
+- 1-Click DevOps & Deployment
+"#,
+                project_name, project_name
+            );
+            fs::write(agents_dir.join("AGENTS.md"), agents_md).map_err(|e| e.to_string())?;
+
+            fs::write(
+                skills_dir.join("01-discovery").join("SKILL.md"),
+                "---\nname: discovery\ndescription: Discovers project structure, stack, dependencies, and configuration.\n---\n# Discovery Workflow\nRun discovery across the repository to detect package managers, build scripts, port assignments, and environment requirements.\n",
+            ).map_err(|e| e.to_string())?;
+
+            fs::write(
+                skills_dir.join("02-project-context").join("SKILL.md"),
+                "---\nname: project-context\ndescription: Tracks project language, framework, database, and infrastructure state.\n---\n# Project Context Workflow\nMaintains project metadata and verifies compatibility with AIPanel deploy scripts.\n",
+            ).map_err(|e| e.to_string())?;
+        }
+        "blank" => {
+            let readme = format!(
+                r#"# {}
+
+Clean, minimal project repository initialized with AIPanel.
+"#,
+                project_name
+            );
+            fs::write(dest_dir.join("README.md"), readme).map_err(|e| e.to_string())?;
+        }
         "nextjs" => {
             let pkg = format!(
                 r#"{{
@@ -674,6 +816,32 @@ async fn main() {
     let _ = generate_aipanel_config(dest_dir.to_string_lossy().to_string());
 
     detect_project(dest_dir.to_string_lossy().to_string())
+}
+
+/// Auto-scaffold standard workspace directory structure (Projects, Live, Staging, Static, Infrastructure, Backups)
+#[tauri::command]
+fn scaffold_workspace(base_dir: String) -> Result<Vec<String>, String> {
+    let mut p = PathBuf::from(&base_dir);
+    if p.file_name().and_then(|n| n.to_str()) == Some("Projects") {
+        if let Some(parent) = p.parent() {
+            p = parent.to_path_buf();
+        }
+    }
+    let sub_dirs = ["Projects", "Live", "Staging", "Static", "Infrastructure", "Backups"];
+    let mut created = Vec::new();
+    for sub in &sub_dirs {
+        let full = p.join(sub);
+        if !full.exists() {
+            let _ = fs::create_dir_all(&full);
+            created.push(full.to_string_lossy().to_string());
+        }
+    }
+    let readme = p.join("WORKSPACE.md");
+    if !readme.exists() {
+        let content = "# Developer Workspace Root\n\nManaged by **AIPanel**.\n\n- `Projects/`: Active application repositories and codebases.\n- `Live/`: Production deployments and active services.\n- `Staging/`: Staging previews and ephemeral build testing.\n- `Static/`: Static assets, uploads, and CDN storage.\n- `Infrastructure/`: Docker compose manifests, Caddy configurations, and databases.\n- `Backups/`: Automated database dumps and volume snapshots.\n";
+        let _ = fs::write(readme, content);
+    }
+    Ok(created)
 }
 
 /// Count files in a project (for status bar)
@@ -812,7 +980,220 @@ fn git_commit(path: String, message: String) -> Result<String, String> {
     Ok(String::from_utf8_lossy(&output.stdout).to_string())
 }
 
+// ── Enhanced Git History & Diff Commands ────────────────────────────
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CommitDetail {
+    pub hash: String,
+    pub short_hash: String,
+    pub message: String,
+    pub body: String,
+    pub author_name: String,
+    pub author_email: String,
+    pub date: String,
+    pub relative_date: String,
+    pub files_changed: usize,
+    pub insertions: usize,
+    pub deletions: usize,
+    pub changed_files: Vec<CommitFileChange>,
+    pub parent_hash: String,
+    pub is_merge: bool,
+    pub refs: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CommitFileChange {
+    pub path: String,
+    pub status: String,
+    pub insertions: usize,
+    pub deletions: usize,
+}
+
+/// Get detailed info for a single commit including diff stats
+#[tauri::command]
+fn get_commit_detail(path: String, hash: String) -> Result<CommitDetail, String> {
+    let repo_path = std::path::Path::new(&path);
+    if !repo_path.exists() {
+        return Err(format!("Path does not exist: {}", path));
+    }
+
+    // Get commit metadata
+    let format_str = "%H|%h|%s|%b|%an|%ae|%ci|%cr|%P|%D";
+    let meta_out = std::process::Command::new("git")
+        .args(["log", "-1", &format!("--format={}", format_str), &hash])
+        .current_dir(&repo_path)
+        .output()
+        .map_err(|e| e.to_string())?;
+    let meta = String::from_utf8_lossy(&meta_out.stdout);
+    let parts: Vec<&str> = meta.trim().splitn(10, '|').collect();
+    if parts.len() < 8 {
+        return Err("Could not parse commit metadata".to_string());
+    }
+
+    // Get diff --stat (file change stats)
+    let stat_out = std::process::Command::new("git")
+        .args(["diff", "--numstat", &format!("{}~1..{}", hash, hash)])
+        .current_dir(&repo_path)
+        .output()
+        .map_err(|e| e.to_string())?;
+    let stat_str = String::from_utf8_lossy(&stat_out.stdout);
+
+    let mut changed_files = Vec::new();
+    let mut total_ins = 0usize;
+    let mut total_del = 0usize;
+    for line in stat_str.lines() {
+        let fields: Vec<&str> = line.split('\t').collect();
+        if fields.len() >= 3 {
+            let ins = fields[0].parse::<usize>().unwrap_or(0);
+            let del = fields[1].parse::<usize>().unwrap_or(0);
+            let file_path = fields[2].to_string();
+            total_ins += ins;
+            total_del += del;
+
+            let status = if ins > 0 && del > 0 { "M" }
+                else if ins > 0 { "A" }
+                else { "D" };
+
+            changed_files.push(CommitFileChange {
+                path: file_path,
+                status: status.to_string(),
+                insertions: ins,
+                deletions: del,
+            });
+        }
+    }
+
+    let parents = parts.get(8).unwrap_or(&"");
+    let is_merge = parents.contains(' ');
+    let parent_hash = parents.split(' ').next().unwrap_or("").to_string();
+
+    Ok(CommitDetail {
+        hash: parts[0].to_string(),
+        short_hash: parts[1].to_string(),
+        message: parts[2].to_string(),
+        body: parts[3].to_string(),
+        author_name: parts[4].to_string(),
+        author_email: parts[5].to_string(),
+        date: parts[6].to_string(),
+        relative_date: parts[7].to_string(),
+        files_changed: changed_files.len(),
+        insertions: total_ins,
+        deletions: total_del,
+        changed_files,
+        parent_hash,
+        is_merge,
+        refs: parts.get(9).unwrap_or(&"").to_string(),
+    })
+}
+
+/// Get the unified diff for a specific file at a commit
+#[tauri::command]
+fn get_file_diff(path: String, hash: String, file_path: String) -> Result<String, String> {
+    let repo = std::path::Path::new(&path);
+    let output = std::process::Command::new("git")
+        .args(["diff", &format!("{}~1..{}", hash, hash), "--", &file_path])
+        .current_dir(repo)
+        .output()
+        .map_err(|e| e.to_string())?;
+
+    // If first commit or diff fails, try showing the blob directly
+    if !output.status.success() || output.stdout.is_empty() {
+        let show_out = std::process::Command::new("git")
+            .args(["show", &format!("{}:{}", hash, file_path)])
+            .current_dir(repo)
+            .output()
+            .map_err(|e| e.to_string())?;
+        let content = String::from_utf8_lossy(&show_out.stdout);
+        return Ok(format!("+ {}", content.lines().collect::<Vec<_>>().join("\n+ ")));
+    }
+
+    Ok(String::from_utf8_lossy(&output.stdout).to_string())
+}
+
+/// Get extended commit log with stats (for timeline)
+#[tauri::command]
+fn get_git_log(path: String, count: Option<usize>) -> Result<Vec<CommitDetail>, String> {
+    let repo = std::path::Path::new(&path);
+    if !repo.exists() {
+        return Err(format!("Path does not exist: {}", path));
+    }
+    let limit = count.unwrap_or(20);
+
+    // Get commit list with stats in one pass
+    let output = std::process::Command::new("git")
+        .args([
+            "log",
+            &format!("-n{}", limit),
+            "--format=COMMIT_SEP%H|%h|%s|%an|%ae|%ci|%cr|%P|%D",
+            "--numstat",
+        ])
+        .current_dir(repo)
+        .output()
+        .map_err(|e| e.to_string())?;
+
+    let raw = String::from_utf8_lossy(&output.stdout);
+    let mut commits: Vec<CommitDetail> = Vec::new();
+
+    for block in raw.split("COMMIT_SEP").skip(1) {
+        let lines: Vec<&str> = block.lines().collect();
+        if lines.is_empty() { continue; }
+
+        let header = lines[0];
+        let parts: Vec<&str> = header.splitn(9, '|').collect();
+        if parts.len() < 7 { continue; }
+
+        let mut changed_files = Vec::new();
+        let mut total_ins = 0usize;
+        let mut total_del = 0usize;
+
+        for &line in &lines[1..] {
+            if line.trim().is_empty() { continue; }
+            let fields: Vec<&str> = line.split('\t').collect();
+            if fields.len() >= 3 {
+                let ins = fields[0].parse::<usize>().unwrap_or(0);
+                let del = fields[1].parse::<usize>().unwrap_or(0);
+                total_ins += ins;
+                total_del += del;
+                let status = if ins > 0 && del > 0 { "M" }
+                    else if ins > 0 { "A" }
+                    else { "D" };
+                changed_files.push(CommitFileChange {
+                    path: fields[2].to_string(),
+                    status: status.to_string(),
+                    insertions: ins,
+                    deletions: del,
+                });
+            }
+        }
+
+        let parents = parts.get(7).unwrap_or(&"");
+        let is_merge = parents.contains(' ');
+        let parent_hash = parents.split(' ').next().unwrap_or("").to_string();
+
+        commits.push(CommitDetail {
+            hash: parts[0].to_string(),
+            short_hash: parts[1].to_string(),
+            message: parts[2].to_string(),
+            body: String::new(),
+            author_name: parts[3].to_string(),
+            author_email: parts[4].to_string(),
+            date: parts[5].to_string(),
+            relative_date: parts[6].to_string(),
+            files_changed: changed_files.len(),
+            insertions: total_ins,
+            deletions: total_del,
+            changed_files,
+            parent_hash,
+            is_merge,
+            refs: parts.get(8).unwrap_or(&"").to_string(),
+        });
+    }
+
+    Ok(commits)
+}
+
 /// Get deployment versions and releases
+
 #[tauri::command]
 fn get_deployment_versions(_path: String) -> Result<Vec<DeploymentVersion>, String> {
     let versions = vec![
@@ -1415,11 +1796,15 @@ pub fn run() {
             detect_project,
             generate_aipanel_config,
             create_project_from_template,
+            scaffold_workspace,
             count_project_files,
             get_git_status,
             git_stage_file,
             git_unstage_file,
             git_commit,
+            get_commit_detail,
+            get_file_diff,
+            get_git_log,
             get_deployment_versions,
             create_deployment_version,
             get_servers,

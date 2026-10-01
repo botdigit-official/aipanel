@@ -23,9 +23,11 @@ import {
   Wifi,
   Server,
   Zap,
+  Package,
 } from "lucide-react";
 import ResizeHandle from "../layout/ResizeHandle";
 import { executeTerminal } from "../../lib/tauri";
+import CPanelExportModal from "../modals/CPanelExportModal";
 
 // ── Types ────────────────────────────────────────────────────────
 
@@ -101,6 +103,7 @@ export default function BottomPanel({
   const [isInstallingNgrok, setIsInstallingNgrok] = useState(false);
   const [ngrokInstalled, setNgrokInstalled] = useState(false);
   const [cfInstalled, setCfInstalled] = useState(true);
+  const [showCPanelModal, setShowCPanelModal] = useState(false);
 
   // Sync working directory when project changes
   useEffect(() => {
@@ -859,6 +862,15 @@ export default function BottomPanel({
                     )}
                   </div>
 
+                  <button
+                    onClick={() => setShowCPanelModal(true)}
+                    className="px-2.5 py-1 rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold text-[11px] shadow-sm flex items-center gap-1.5 transition-all"
+                    title="1-Click cPanel Production ZIP, phpMyAdmin SQL Dump & Step-by-Step Guide"
+                  >
+                    <Package size={12} />
+                    <span>cPanel / Export ZIP & Guide</span>
+                  </button>
+
                   {onOpenTunnels && (
                     <button
                       onClick={onOpenTunnels}
@@ -1051,6 +1063,14 @@ export default function BottomPanel({
           )}
         </div>
       )}
+
+      {/* ── Universal cPanel & Export Studio Modal ── */}
+      <CPanelExportModal
+        isOpen={showCPanelModal}
+        onClose={() => setShowCPanelModal(false)}
+        projectName={projectName}
+        projectPath={projectPath}
+      />
     </div>
   );
 }

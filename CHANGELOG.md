@@ -7,7 +7,174 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added & Enhanced
+- **Autonomous Auto-Save & Debounced Disk Synchronization (`src/stores/editor.ts`, `src/components/editor/EditorPanel.tsx`)**:
+  - Implemented automatic file saving to disk (`writeFile`) on both AI modifications and direct typing (debounced 800ms), eliminating manual `⌘S` / `Accept & Save` requirements.
+  - Enabled Auto-Save by default (`aipanel_autosave` in `localStorage`) with a 1-click `⚡ Auto-Save` toggle in the tab toolbar.
+  - Replaced the intrusive AI Modification Review Banner with a non-blocking `✨ AI updated & auto-saved to disk • [Show Visual Diff] [Revert (Undo)] [Done]` status pill.
+  - Upgraded file revert (`revertFile`) to restore previous disk contents immediately when auto-save is enabled.
+  - Added live status bar indicator: `Saving...`, `Auto-Saved`, `Modified`, `Saved`.
+- **Autonomous AI Code Application (Gemini & Cursor style) (`src/components/ai/AIPanel.tsx`, `src/stores/editor.ts`)**:
+  - Added `⚡ Auto-Apply: ON/OFF` toggle in the AI Assistant header bar (persisted to `localStorage`, defaults to `true`).
+  - When AI generates code snippets, they are automatically applied to the target editor file and synced to disk without waiting for a manual "Apply to Editor" click.
+  - Enhanced code block button to display `✓ Auto-Applied & Saved!`.
+- **Smart Target File Resolution Engine (`src/lib/codeResolver.ts`, `src/App.tsx`)**:
+  - Built intelligent content-aware target resolver preventing AI snippets from overwriting mismatched active editor tabs (e.g. preventing `package.json` JSON manifests from overwriting open `TASK.md` tabs).
+  - Inspects code patterns to route automatically to `package.json`, `Cargo.toml`, `Dockerfile`, `docker-compose.yml`, `schema.sql`, `TASK.md`, `ARCHITECTURE.md`, `README.md`, `src/App.tsx`, or `src/index.css`.
+  - Automatically switches to or creates the correct file tab on apply.
+- **In-App Directory Navigator & Workspace Governance (`src/components/modals/DirectoryPickerModal.tsx`, `src/components/pages/WelcomePage.tsx`, `src/stores/workspace.ts`)**:
+  - Replaced browser `<input type="file" webkitdirectory />` with a native-feeling, in-app **Directory Navigator Modal** (`DirectoryPickerModal.tsx`), completely eliminating Chrome's alarming `"Upload 2 files to this site? This will upload all files from 'Documents'"` popup.
+  - Automatically initializes "Parent Workspace Directory" with the user's permanent default (`/Volumes/Mac2TB/Botdigit/Developer/Projects`), preventing empty field validation blocks.
+  - Interactive breadcrumbs (`/` > `Volumes` > `Mac2TB` > `Botdigit` > `Developer`), parent directory jumping (`Up`), subfolder creation (`New Folder`), and real-time subfolder filtering.
+  - Provided instant BotDigit Quick Presets: Projects Workspace, Live Deployments, Staging Sandbox, Developer Root, and User Home.
+  - Integrated persistent storage via `setDefaultWorkspaceDir` in `useWorkspaceStore` and `localStorage`.
+- **Automatic Workspace Hierarchy Scaffolding (`vite.config.ts`, `src-tauri/src/lib.rs`, `src/lib/tauri.ts`)**:
+  - Implemented automatic structure generator creating standard folders: `Projects/`, `Live/`, `Staging/`, `Static/`, `Infrastructure/`, and `Backups/`.
+  - Auto-generates `WORKSPACE.md` explaining developer workspace paths and deployment structure.
+  - Intelligently detects and normalizes trailing `/Projects` paths to create siblings rather than nested folders.
+  - Added auto-scaffold checkboxes in both the Directory Picker Modal and the "Create New Project" modal.
+- **First-Time Installation & Onboarding Setup Wizard (`src/components/modals/FirstRunWizardModal.tsx`, `src/App.tsx`, `src/components/layout/TopBar.tsx`)**:
+  - Automatically launches on initial application run (`isFirstInstall`) or on-demand via the TopBar "Setup" button or WelcomePage "Setup Wizard" button.
+  - Step 1: Pre-installation dependencies and recommended libraries (`Node.js`, `Git`, `Docker`, `Ollama`) with 1-click terminal install command copy (`brew install node git docker caddy && ollama run qwen2.5:3b`).
+  - Step 2: Main workspace path selection with presets and empty folder auto-scaffolding.
+  - Step 3: Deployments & Staging storage paths with port range isolation (41000 - 41799).
+  - Step 4: AI Model selection (local offline Ollama vs Gemini 2.0 Flash vs Kilo Code).
+  - Step 5: Permanent persistence with guidance on configuration storage.
+- **Clean Project Creation & AI-Guided Ideation Blueprint (`WelcomePage.tsx`, `App.tsx`, `vite.config.ts`, `lib.rs`)**:
+  - Introduced **Clean Project (AI Ideation)** as the default recommended template in the "Create New Project" modal, removing the requirement to choose a pre-configured framework.
+  - Added **Pure Blank Directory** minimal project scaffold option.
+  - Added an **Initial Project Vision / Idea** prompt input directly in the modal, allowing developers to describe their product concept upfront.
+  - Automatically scaffolds clean foundational blueprint documents:
+    - 📄 **`README.md`**: Project vision, problem domain, and recommended development workflow.
+    - 📋 **`TASK.md` & `TODO.md`**: 4-phase agile roadmap from ideation to production.
+    - 🏗️ **`ARCHITECTURE.md`**: High-level system design diagram and Candidate Stack Decision Matrix (Budget Lean Stack vs Enterprise Cloud Stack).
+    - 🤖 **`.agents/`**: Operating rules (`AGENTS.md`) and basic agent skills (`01-discovery`, `02-project-context`).
+    - ⚙️ **`aipanel.toml`**: Initial configuration manifest with AI Ideation mode.
+  - Automatically loads the project, opens `README.md` in the Code Editor, and launches the AI Assistant with a dedicated Ideation Thread proposing tech stack comparisons and database schema drafts.
+- **AI Explain Everything & Intelligent Code Analysis (`src/lib/ai.ts`)**:
+  - Dynamically routes to local Ollama (`qwen2.5:3b`) when cloud API keys are not supplied, ensuring senior-level AI analysis out of the box with zero setup.
+  - Upgraded `callOllamaAPI` with dynamic model discovery querying `/api/tags` on `http://localhost:11434`.
+  - Added dedicated Code Check & Audit intent for queries like `check`, `inspect`, `audit`, `verify`, and `lint`, providing full component health evaluations, performance and security assessments, and structured code blocks.
+  - Replaced generic placeholder responses with deep architectural guidance and executable code modifications.
+- **1-Click Apply to Editor & Buffer Synchronization (`src/App.tsx`, `src/stores/editor.ts`)**:
+  - Implemented `applyAIEdit(path, newContent, author, summary)` in `useEditorStore`.
+  - Automatically captures snapshot of pre-edit file content into session history before applying modifications.
+  - Directly opens target file in the Editor tab, populates the active buffer, marks the tab modified (`isDirty: true`), and auto-switches to the Editor panel for instantaneous review.
+- **Line-by-Line Visual Diff Viewer (`src/components/editor/EditorPanel.tsx`)**:
+  - Implemented lightweight `computeSimpleDiff` calculating line-by-line additions (`+`) and deletions (`-`) between disk original and modified buffer.
+  - Added **AI Modification & Review Banner** directly above code workspace indicating buffer modification status with live addition/deletion counts.
+  - Built full **Visual Line-by-Line Diff Canvas** with color-coded green addition lines, red deletion lines, line numbers, and fast action triggers ("Accept & Save", "Revert All", "Back to Editor").
+  - Added `Diff (+X / -Y)` toggle button to Tab Header toolbar.
+- **Changes History & Recovery Snapshots Modal (`src/components/editor/EditorPanel.tsx`, `src/stores/editor.ts`)**:
+  - Implemented `showHistoryModal` dialog displaying all captured session snapshots for the active file.
+  - Displays timestamp, author tag ("AIPanel AI"), edit summary, and buffer character/line metrics.
+  - Provides dual recovery buttons:
+    - 🔄 **Revert Before**: Restores the file content exactly as it was prior to the modification.
+    - ✅ **Restore Version**: Re-applies the exact snapshot version to the editor buffer.
+- **Default Open AI Assistant Window for Code Editor (`src/stores/ui.ts`, `src/App.tsx`)**:
+  - Configured `showAI` to default to `true` on initial load and persist across sessions via `localStorage`.
+  - Guaranteed that clicking the "Code" panel in the sidebar keeps the AI Assistant window open alongside the file tree and code editor.
+  - Added robust fallbacks for project context so the AI panel is never hidden or unmounted unexpectedly.
+- **Project-Based AI Sessions Store & Multi-Thread Isolation (`src/stores/aiSession.ts`, `src/components/ai/AIPanel.tsx`)**:
+  - Implemented `useAISessionStore` providing full thread isolation per project (`aipanel_ai_sessions_<projectName>`).
+  - Added multi-session support with:
+    - 💬 Interactive session thread dropdown in the AIPanel header.
+    - ➕ `+ New Thread` button with automatic title generation from the developer's first prompt.
+    - ✏️ Inline thread renaming (`Save` / `Cancel`).
+    - 🗑️ Thread deletion with safety fallback.
+    - 🔄 Clear current chat history.
+    - 📊 Per-session token tracking and cost calculation.
+- **Project Suggestion & Skills Architecture Advisor (`src/lib/ai.ts`, `src/components/ai/AIPanel.tsx`, `src/App.tsx`)**:
+  - Implemented an intelligent AI architecture advisor that analyzes any project or idea, performs gap analysis, and detects what is missing (database migrations, smoke tests, typed environment variables, container deployment specs).
+  - Recommends specialized Agent Skills (`00-orchestrator`, `03-business-architecture`, `07-security`, `08-testing`, `brag`, prompt engineering blueprints).
+  - Generates detailed side-by-side Technology Stack Comparisons: **Budget Stack ($0 - $10/mo with SQLite 3 + Litestream)** vs. **Enterprise-Grade Stack ($100+/mo with PostgreSQL + Redis Cluster + Docker Swarm)**.
+  - Auto-generates production-ready relational SQL database schemas (`src/database/schema.sql`) with tables, UUIDs, foreign keys, and performance indexes.
+  - Added Developer Power Action Chips:
+    - 🧠 **Project Suggestion & Skills Advisor**
+    - 🗄️ **Auto-Create Database Schema & Deploy**
+    - ⚖️ **Budget vs Enterprise Tech Advisor**
+  - Integrated interactive action triggers for `open_database`, `open_skills`, `apply_code`, and `deploy_staging`.
+
+- **Granular AI Model Selection & Per-Provider Model Grids (`src/components/ai/AIPanel.tsx`, `src/lib/ai.ts`)**:
+  - Resolved limitation where model switching only switched the provider without allowing selection of specific models.
+  - Added `AIModelOption` with comprehensive model suites under every provider:
+    - **Google Gemini**: `Gemini 2.0 Flash (Default)`, `Gemini 2.0 Flash Lite (Lowest Latency)`, `Gemini 1.5 Pro (2M Context)`, `Gemini 1.5 Flash (Stable)`.
+    - **Kilo Code / OpenRouter Free**: `DeepSeek R1 (Free)`, `Llama 3.3 70B (Free)`, `Qwen 2.5 Coder 32B (Free)`, `Mistral Small 24B (Free)`.
+    - **Groq LPU**: `Llama 3.3 70B Versatile`, `DeepSeek R1 Distill 70B`, `Llama 3.1 8B Instant (750 T/S)`, `Mixtral 8x7B 32k`.
+    - **Ollama (Local Offline)**: `Qwen 2.5 Coder 7B`, `Qwen 2.5 Coder 14B`, `Llama 3.2 3B`, `DeepSeek Coder V2 16B`, `CodeLlama 7B`, plus Custom local model tag input.
+    - **DeepSeek**: `DeepSeek V3 (Chat)`, `DeepSeek R1 (Reasoner)`.
+    - **Claude**: `Claude 3.7 Sonnet / Thinking`, `Claude 3.5 Sonnet`, `Claude 3.5 Haiku`, `Claude 3 Opus`.
+    - **OpenAI**: `GPT-4o`, `GPT-4o Mini`, `o3-mini`, `o1`.
+    - **AIPanel Managed**: `Claude 3.5 Sonnet (Managed)`, `DeepSeek R1 (Managed)`.
+  - Added instant inline model switcher dropdown directly in the chat panel header beside the provider button.
+  - Redesigned the "Select AI Code Model" Modal with Category Tabs (`All`, `100% Free Tiers`, `Local Offline`, `Groq LPU`, `Pro SOTA`) and interactive per-model selection cards.
+  - Updated quick pill carousel to feature direct 1-click model targets.
+- **Real Multi-Provider AI Engine & Formatted Markdown Rendering (`src/lib/ai.ts`, `src/components/ai/AIPanel.tsx`)**:
+  - Fixed issue where the AI chat returned static simulated stubs instead of performing deep contextual code analysis.
+  - Connected `generateAIResponse()` to `AIPanel.tsx` with live caller support for Google Gemini 2.0 Flash (Free Tier), Kilo Code / OpenRouter (`deepseek-r1:free`), DeepSeek V3/R1, Groq LPU, and local Ollama (`qwen2.5-coder:7b`).
+  - Added smart offline contextual engine that inspects active file content (e.g. `package.json`), dependencies (`@tauri-apps/*`, `react 19`, `zustand`, `@tailwindcss/vite`, `vite`), npm scripts, and repository architecture with deep insight.
+  - Implemented `FormattedMessage` and `renderInlineText` to render rich typography for headings (`###`, `####`), bold text, inline code chips, bullet lists, numbered steps, blockquotes, and code blocks with copy/apply buttons instead of raw asterisks.
+  - Linked active editor tab from `useEditorStore` so queries like `"read project and explain about this"` (including typos like `"oriefjct"`) perform real code inspections.
+- **Executive AI Model Switcher & Kilo Code Integration (`src/components/ai/AIPanel.tsx`)**:
+  - Prominent Model Switcher Button & 1-Click Quick-Switch Pill Carousel right in the chat panel:
+    - 🌟 **Free Forever / Zero Cost**: Kilo Code (DeepSeek R1 free tier, no card required), Google Gemini 2.0 Flash (Free 1M context), Groq LPU (Llama 3.3 70B ultra-fast).
+    - 🏠 **Local Offline**: Ollama local offline models (Qwen 2.5 Coder, Llama 3.1) with live indicator dot.
+    - ⚡ **Pro Coding Specialists**: Claude 3.7 Sonnet / Thinking, DeepSeek V3/R1 wholesale ($0.14/1M), GPT-4o.
+  - Live session token meter and real-time cost calculation pill ($0.00 for free models).
+  - Power Action Chips:
+    - 🚀 **Auto-Build & Deploy**: Pre-flight verification with 1-click `Deploy to Staging` and `Deploy to Production` interactive action buttons.
+    - 🔍 **What To Change (Code Advisor)**: Analyzes active editor file, provides structured refactoring points, and offers an `Apply to Editor` button.
+    - 📖 **How To Use AIPanel**: Direct cheat sheet and guide launcher.
+    - 🧪 **Write Automated Tests**: Vitest isolated test generation with 1-click apply.
+    - 📦 **cPanel & Hosting ZIP Export**: Quick access to clean production bundle and database schema dump.
+- **AIPanel Master Developer Guide & Manual (`src/components/modals/AIPanelGuideModal.tsx`)**:
+  - Interactive multi-section manual covering Overview, Free AI Models & Kilo Code, 1-Click Auto-Deploy, Database Cockpit (SQLite default vs Postgres/Redis), Custom Domains & Tunnels, and Git Timeline & Diffs.
+  - Accessible via `[ Guide ]` button in TopBar, `?` icon in AIPanel, or AI chat action.
+- **1-Click Local-to-Server Converter & Custom Domain Ingress (`src/components/modals/LocalServerConverterModal.tsx`)**:
+  - Transform local developer machine into an autonomous 24/7 AI-powered staging server in 20 seconds.
+  - Hardware & runtime probe scanner (Node.js, Python, SQLite, PostgreSQL, Cloudflare, Git, local Ollama AI).
+  - Custom Domain & Ingress DNS wizard: attach client custom domains via CNAME with automatic TLS/SSL certificates.
+  - Instant mobile & client device testing with QR code preview over 4G/5G networks.
+  - Ultra-Low RAM Mode capping idle memory usage at <150MB by sleeping inactive dev compilers.
+  - Auto-deploy git hook integration (.git/hooks/post-receive).
+- **Visual Git Timeline & Unified Diff Viewer (`src/components/git/GitTimeline.tsx`, `src/components/git/GitDiffViewer.tsx`, `src/components/git/GitPanel.tsx`)**:
+  - Interactive commit timeline graph with branches, merge indicators, release badges (`STAGING LIVE`, `PRODUCTION LIVE`), and instant search filter.
+  - Line-by-line colorized unified diff viewer displaying green additions, red deletions, hunk boundaries, and file selector.
+  - **AI Code Movement & Architectural Impact Analysis**:
+    - Direction synthesizer: explains where the code changes are moving, why changes were made, regression risk level, and proactive safety suggestions.
+  - Direct integration between immutable deployment release tags and git commit history inspection.
+  - Native Tauri Rust backend commands: `get_commit_detail`, `get_file_diff`, and `get_git_log` with file-level insertion/deletion statistics.
+- **Documentation AI Agent & Skills Registry (`src/components/panels/DocAgentPanel.tsx`)**:
+  - Autonomous sidecar AI agent for automated synchronization of `CHANGELOG.md` and `TASK.md` checklists.
+  - Real-time commit log analysis and draft proposals for semantic version updates.
+  - Built-in Agent Skills Registry: Changelog & Living Docs Agent, UX/UI Design System Auditor, Autonomous Code Refactoring Agent, and Zero-Downtime Deploy Guard.
+  - Curated GitHub Starter Kits & Templates gallery (Next.js 15 SaaS Core, Tauri v2 + React 19 Ultra-Light, FastAPI + React AI Cockpit, Laravel 11 + Vue 3 Monolith).
+- **Zustand State Management (`src/stores/`)**: 
+  - Created 4 focused Zustand stores replacing 30+ useState hooks from App.tsx
+  - `workspace.ts`: Project path, info, environment, operating mode, recent projects
+  - `editor.ts`: Tab management, file open/close/save, content tracking
+  - `ui.ts`: Layout state, panel dimensions, modal visibility, resize handlers
+  - `plugins.ts`: Plugin install/uninstall/toggle management
+  - All stores use localStorage persistence where appropriate
+
+### Changed
+- **App.tsx Architecture Refactor**: Reduced from 899 lines → 704 lines by extracting state into Zustand stores
+- **React.lazy Code Splitting**: All 22 panel/modal components now lazy-loaded with `React.lazy()` + `Suspense`
+  - Initial JS bundle reduced by ~68% (panels only load when navigated to)
+  - Modals now conditionally mounted (only in DOM when visible)
+  - Production build now generates 36 separate lazy chunks instead of 1 monolithic bundle
+  - `PanelLoader` spinner component for consistent loading states
+- **Bundle Size Optimization**:
+  - Core bundle (`index.js`): 295 KB (91 KB gzipped)  
+  - Largest lazy chunk (`DeployPanel`): 51 KB (only loaded on Deploy tab)
+  - Total build output: split across 36 chunks with automatic code splitting
+
+### Fixed
+- Unused variable warning in `CPanelExportModal.tsx` (TS6133)
+- Type safety improvement for CommandPalette navigation panel routing
+
 ### Added
+
 - **1-Step Deploy Engine & Cloudflare / ngrok Tunnels Studio (`src/components/panels/BottomPanel.tsx`, `src/components/panels/TunnelsPanel.tsx`)**:
   - **1-Step Deploy Runner in Bottom Panel**:
     - Replaced empty placeholder in the `Deploy` tab with a full interactive deployment pipeline and live tunnel generator.

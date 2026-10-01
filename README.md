@@ -65,12 +65,27 @@ Instead of running separate software for coding, server management, and deployme
   - Email Management (Mailcow / Postfix / Dovecot)
 - **Declared Security Permissions**: Every plugin declares explicit capability masks before installation.
 
-### 4. Bring Your Own Key (BYOK) AI Engine
-- First-class support for **Anthropic Claude 3.7**, **OpenAI GPT-4o**, **Google Gemini 2.5 / 3.0**, **DeepSeek**, **Groq**, and **Local Ollama**.
+### 4. Autonomous Development Engine & Smart Code Editor
+- **Autonomous Auto-Save (Default ON)**: Changes from both AI generation and user typing are saved automatically to disk (`writeFile`) with debounced synchronization, eliminating manual "Accept & Save" prompts.
+- **Autonomous Auto-Apply (Gemini & Cursor Mode)**: AI-generated code automatically streams into target editor files with zero manual clicks required.
+- **Smart Target File Resolution**: AST and syntax inspection ensures code routes automatically to `package.json`, `Cargo.toml`, `Dockerfile`, `schema.sql`, `TASK.md`, `ARCHITECTURE.md`, `src/App.tsx`, or `src/index.css` without overwriting mismatched active tabs.
+- **Instant Revert & Visual Diff**: Real-time line-by-line visual diff comparison with 1-click revert to disk original or changes history snapshot restoration.
+
+### 5. Bring Your Own Key (BYOK) Multi-Model AI Hub
+- First-class support for **Google Gemini 2.0 Flash (Free)**, **Kilo Code / OpenRouter (DeepSeek R1 Free, Llama 3.3 70B Free)**, **Groq LPU (500 T/S)**, **Anthropic Claude 3.7 Sonnet**, **OpenAI GPT-4o / o3-mini**, and **Local Ollama** (`qwen2.5-coder`, `llama3.2`).
 - Keys are encrypted locally at rest in hardware keyrings; never transmitted to third-party telemetry servers.
 - Context-aware code assistance, architecture analysis, deployment doctor checks, and automated unit test generation.
 
-### 5. Production Protection Safe Mode
+### 6. In-App Directory Navigator & Workspace Governance
+- Replaces generic browser upload dialogues with a native-feeling, in-app **Directory Navigator Modal** with BotDigit quick presets (`Projects/`, `Live/`, `Staging/`, `Static/`, `Infrastructure/`, `Backups/`).
+- Automatic canonical workspace scaffolding when targeting new or empty directories.
+- **First-Time Installation Onboarding Wizard**: Automated checklist for required system dependencies (`Node.js`, `Git`, `Docker`, `Ollama`), workspace storage locations, and AI provider selection.
+
+### 7. Clean Project & AI-Guided Ideation Blueprint
+- Start clean projects without forced templates. Describe your product vision upfront to automatically generate `README.md`, `TASK.md`, `TODO.md`, `ARCHITECTURE.md`, and `.agents/skills`.
+- Seeds a dedicated AI Ideation thread comparing **Budget Lean Stack** vs **Enterprise Scalable Stack** with instant database schema recommendations.
+
+### 8. Production Protection Safe Mode
 - Strict visual and behavioral gating when switched to the **Production** environment.
 - Destructive actions (dropping database schemas, container termination, live reverts) require explicit multi-step confirmation.
 
@@ -183,21 +198,28 @@ aipanel/
 │   └── install-server.sh   # 1-click curl | bash server provisioning script
 ├── src/
 │   ├── components/
-│   │   ├── ai/             # BYOK AI Panel & Prompt Assistant
+│   │   ├── ai/             # Multi-Provider AI Panel & Prompt Assistant
 │   │   ├── control-center/ # Plugins, Marketplace, Security & Audit Hub
 │   │   ├── deploy/         # Atomic Deployment & Rollback Cockpit
-│   │   ├── editor/         # Code Editor & Monaco buffer views
+│   │   ├── editor/         # Code Editor with Auto-Save, Diff & Revert
+│   │   ├── git/            # Git Cockpit, Visual Diff & Commit Timeline
 │   │   ├── hosting/        # Hosting Plans & Client CRM
 │   │   ├── layout/         # TopBar, Progressive Sidebar, Mode Selector
-│   │   ├── panels/         # Services, Database, Domains, Monitoring
+│   │   ├── modals/         # DirectoryPicker, FirstRunWizard, ServerConverter
+│   │   ├── panels/         # Services, Database, Domains, Monitoring, DocAgent
 │   │   └── server/         # aaPanel-style VPS Server Dashboard
+│   ├── design-system/      # Centralized UI tokens, components & palette
 │   ├── lib/
+│   │   ├── ai.ts           # Multi-provider LLM calling engine
+│   │   ├── codeResolver.ts # Smart content-aware target file detector
 │   │   ├── plugins.ts      # Default Plugin Registry
-│   │   ├── tauri.ts        # IPC bridge & native bindings
+│   │   ├── tauri.ts        # IPC bridge, filesystem & native bindings
 │   │   └── types.ts        # Core TypeScript domain models
+│   ├── stores/             # Zustand state management (editor, workspace, ui)
 │   └── styles/
 │       └── globals.css     # Obsidian dark design tokens
-├── src-tauri/              # Native Tauri v2 Rust project
+├── src-tauri/              # Native Tauri v2 Rust project (macOS/Win/Linux)
+├── docs/                   # Living specifications, UI/UX standard & guides
 ├── package.json
 └── README.md
 ```

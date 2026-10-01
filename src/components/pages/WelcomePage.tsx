@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   FolderOpen,
   Plus,
@@ -26,9 +26,13 @@ import {
   Lock,
   GitCommit,
   Rocket,
+  FolderCheck,
+  Settings2,
 } from "lucide-react";
-import { open } from "@tauri-apps/plugin-dialog";
+import { scaffoldWorkspace } from "../../lib/tauri";
+import { useWorkspaceStore } from "../../stores/workspace";
 import { Card, Button, Badge, StatusIndicator } from "../../design-system";
+import DirectoryPickerModal from "../modals/DirectoryPickerModal";
 
 export interface RecentProjectItem {
   name: string;
@@ -43,11 +47,12 @@ interface WelcomePageProps {
   onOpenProject: () => void;
   recentProjects: RecentProjectItem[];
   onOpenRecent: (path: string) => void;
-  onCreateProject?: (targetDir: string, name: string, template: string) => Promise<void>;
+  onCreateProject?: (targetDir: string, name: string, template: string, idea?: string) => Promise<void>;
   onNavigateToCode?: () => void;
   onNavigateToAI?: () => void;
   onNavigateToGit?: () => void;
   onNavigateToServers?: () => void;
+  onOpenSetup?: () => void;
 }
 
 interface TemplateOption {
@@ -60,6 +65,22 @@ interface TemplateOption {
 }
 
 const templates: TemplateOption[] = [
+  {
+    id: "clean-ai",
+    name: "Clean Project (AI Ideation)",
+    desc: "Blank project without framework lock-in. AI scaffolds README, TODO, Architecture & Skills.",
+    icon: Sparkles,
+    badge: "Recommended",
+    runtime: "AI-Guided",
+  },
+  {
+    id: "blank",
+    name: "Pure Blank Directory",
+    desc: "Minimal clean folder with standard README & git repository.",
+    icon: FolderOpen,
+    badge: "Minimal",
+    runtime: "Custom",
+  },
   {
     id: "nextjs",
     name: "Next.js 15 Fullstack",
@@ -103,32 +124,37 @@ export default function WelcomePage({
   onNavigateToAI,
   onNavigateToGit,
   onNavigateToServers,
+  onOpenSetup,
 }: WelcomePageProps) {
+  const { defaultWorkspaceDir, setDefaultWorkspaceDir } = useWorkspaceStore();
+
   const [showModal, setShowModal] = useState(false);
+  const [showDirPickerModal, setShowDirPickerModal] = useState(false);
   const [projectName, setProjectName] = useState("my-app");
-  const [selectedTemplate, setSelectedTemplate] = useState("nextjs");
-  const [targetDir, setTargetDir] = useState<string>("");
+  const [selectedTemplate, setSelectedTemplate] = useState("clean-ai");
+  const [projectIdea, setProjectIdea] = useState("");
+  const [targetDir, setTargetDir] = useState<string>(
+    () => defaultWorkspaceDir || "/Volumes/Mac2TB/Botdigit/Developer/Projects"
+  );
   const [isCreating, setIsCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
+
+  const [autoScaffold, setAutoScaffold] = useState(true);
+
+  // Sync if defaultWorkspaceDir is updated from store or setup wizard
+  useEffect(() => {
+    if (defaultWorkspaceDir && (!targetDir || targetDir === "")) {
+      setTargetDir(defaultWorkspaceDir);
+    }
+  }, [defaultWorkspaceDir, targetDir]);
 
   // Time-aware greeting
   const hour = new Date().getHours();
   const greeting =
     hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
 
-  const handlePickDirectory = async () => {
-    try {
-      const selected = await open({
-        directory: true,
-        multiple: false,
-        title: "Select Parent Directory for New Project",
-      });
-      if (selected && typeof selected === "string") {
-        setTargetDir(selected);
-      }
-    } catch (err) {
-      console.error("Directory pick cancelled or failed:", err);
-    }
+  const handlePickDirectory = () => {
+    setShowDirPickerModal(true);
   };
 
   const handleCreateSubmit = async () => {
@@ -137,7 +163,8 @@ export default function WelcomePage({
       setCreateError("Please enter a valid project name");
       return;
     }
-    if (!targetDir.trim()) {
+    const finalTarget = targetDir.trim() || defaultWorkspaceDir || "/Volumes/Mac2TB/Botdigit/Developer/Projects";
+    if (!finalTarget) {
       setCreateError("Please select a target directory");
       return;
     }
@@ -145,7 +172,14 @@ export default function WelcomePage({
     setIsCreating(true);
     setCreateError(null);
     try {
-      await onCreateProject(targetDir, projectName.trim(), selectedTemplate);
+      if (autoScaffold) {
+        try {
+          await scaffoldWorkspace(finalTarget);
+        } catch {
+          // ignore
+        }
+      }
+      await onCreateProject(finalTarget, projectName.trim(), selectedTemplate, projectIdea.trim());
       setShowModal(false);
     } catch (err: unknown) {
       const message =
@@ -211,6 +245,17 @@ export default function WelcomePage({
           </div>
 
           <div className="flex items-center gap-3 shrink-0 flex-wrap">
+            {onOpenSetup && (
+              <Button
+                variant="outline"
+                size="md"
+                icon={<Settings2 className="w-4 h-4 text-amber-400" />}
+                onClick={onOpenSetup}
+                title="Configure Workspace Root & Pre-requisite Commands"
+              >
+                Setup Wizard
+              </Button>
+            )}
             <Button
               variant="outline"
               size="md"
@@ -851,6 +896,31 @@ export default function WelcomePage({
               </div>
             </div>
 
+            {/* AI Ideation Context (Clean Project) */}
+            {selectedTemplate === "clean-ai" && (
+              <div className="p-3.5 rounded-xl bg-violet-600/10 border border-violet-500/30 space-y-2">
+                <div className="flex items-center gap-1.5 text-xs font-semibold text-violet-300">
+                  <Sparkles className="w-3.5 h-3.5 text-violet-400" />
+                  Clean Architecture & AI Ideation
+                </div>
+                <p className="text-[11.5px] text-zinc-300 leading-relaxed">
+                  Creates a clean foundation (<span className="font-mono text-zinc-100">README.md</span>, <span className="font-mono text-zinc-100">TASK.md</span>, <span className="font-mono text-zinc-100">ARCHITECTURE.md</span>, and <span className="font-mono text-zinc-100">.agents/skills</span>). AI will assist you in defining your tech stack, entity schemas, and deployment targets.
+                </p>
+                <div>
+                  <label className="text-[11px] font-semibold text-zinc-400 block mb-1">
+                    Initial Project Vision / Idea <span className="text-zinc-500 font-normal">(Optional)</span>
+                  </label>
+                  <textarea
+                    value={projectIdea}
+                    onChange={(e) => setProjectIdea(e.target.value)}
+                    rows={2}
+                    placeholder="e.g. Real-time fleet management SaaS, mobile order tracker, or high-throughput API gateway..."
+                    className="w-full bg-[#11131A] border border-white/10 rounded-lg px-3 py-2 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-violet-500 resize-none font-sans"
+                  />
+                </div>
+              </div>
+            )}
+
             {/* Project Details Form */}
             <div className="space-y-3.5">
               <div>
@@ -867,21 +937,55 @@ export default function WelcomePage({
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-zinc-400 block mb-1">
-                  Parent Workspace Directory
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-semibold text-zinc-400 block">
+                    Parent Workspace Directory
+                  </label>
+                  <span className="text-[10px] text-zinc-500 font-mono">
+                    Permanent Default
+                  </span>
+                </div>
                 <div className="flex items-center gap-2">
                   <input
                     type="text"
                     value={targetDir}
-                    onChange={(e) => setTargetDir(e.target.value)}
-                    placeholder="Select folder location..."
+                    onChange={(e) => {
+                      setTargetDir(e.target.value);
+                      setDefaultWorkspaceDir(e.target.value);
+                    }}
+                    placeholder="/Volumes/Mac2TB/Botdigit/Developer/Projects"
                     className="flex-1 bg-[#11131A] border border-white/10 rounded-lg px-3 py-2 text-xs font-mono text-zinc-200 focus:outline-none focus:border-violet-500"
                   />
                   <Button variant="secondary" size="sm" onClick={handlePickDirectory}>
                     Browse...
                   </Button>
                 </div>
+                <div className="flex items-center justify-between text-[11px] text-zinc-400 mt-1.5">
+                  <span className="truncate flex items-center gap-1.5">
+                    <FolderCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    Target: <code className="text-violet-300 font-mono text-[10.5px]">{targetDir || "/Volumes/Mac2TB/Botdigit/Developer/Projects"}/{projectName || "my-app"}</code>
+                  </span>
+                </div>
+              </div>
+
+              {/* Auto-Scaffold Hierarchy */}
+              <div className="p-3 rounded-xl bg-[#0e1019] border border-[#232a3e] space-y-1.5">
+                <label className="flex items-start gap-2.5 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={autoScaffold}
+                    onChange={(e) => setAutoScaffold(e.target.checked)}
+                    className="mt-0.5 rounded accent-violet-600 cursor-pointer"
+                  />
+                  <div>
+                    <span className="text-xs font-semibold text-zinc-200 block">
+                      Auto-manage Workspace Structure if Folder is Empty
+                    </span>
+                    <span className="text-[10.5px] text-zinc-400 block mt-0.5">
+                      Automatically creates canonical folders: <code className="text-zinc-300 font-mono">Projects/</code>, <code className="text-zinc-300 font-mono">Live/</code>, <code className="text-zinc-300 font-mono">Staging/</code>, <code className="text-zinc-300 font-mono">Static/</code>, <code className="text-zinc-300 font-mono">Infrastructure/</code>, and <code className="text-zinc-300 font-mono">Backups/</code>.
+                    </span>
+                  </div>
+                </label>
               </div>
             </div>
 
@@ -901,6 +1005,21 @@ export default function WelcomePage({
             </div>
           </div>
         </div>
+      )}
+      {/* ── Custom Directory Navigator Modal ── */}
+      {showDirPickerModal && (
+        <DirectoryPickerModal
+          isOpen={showDirPickerModal}
+          onClose={() => setShowDirPickerModal(false)}
+          initialPath={targetDir || defaultWorkspaceDir || "/Volumes/Mac2TB/Botdigit/Developer/Projects"}
+          onSelect={(selectedPath) => {
+            setTargetDir(selectedPath);
+            setDefaultWorkspaceDir(selectedPath);
+            setShowDirPickerModal(false);
+          }}
+          title="Select Workspace Directory"
+          description="Choose the parent directory where this and future projects will be saved."
+        />
       )}
     </div>
   );

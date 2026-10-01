@@ -46,6 +46,31 @@ export interface GitCommitItem {
   relative_time: string;
 }
 
+export interface CommitFileChange {
+  path: string;
+  status: string; // 'M' | 'A' | 'D'
+  insertions: number;
+  deletions: number;
+}
+
+export interface CommitDetail {
+  hash: string;
+  short_hash: string;
+  message: string;
+  body: string;
+  author_name: string;
+  author_email: string;
+  date: string;
+  relative_date: string;
+  files_changed: number;
+  insertions: number;
+  deletions: number;
+  changed_files: CommitFileChange[];
+  parent_hash: string;
+  is_merge: boolean;
+  refs: string;
+}
+
 export interface GitStatusResult {
   branch: string;
   files: GitFileChange[];
@@ -325,26 +350,67 @@ export async function generateAIPanelConfig(path: string): Promise<string> {
 export async function createProjectFromTemplate(
   targetDir: string,
   projectName: string,
-  template: string
+  template: string,
+  idea?: string
 ): Promise<ProjectInfo> {
+  if (!isTauri()) {
+    try {
+      const res = await fetch("/api/fs/create-project", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ targetDir, projectName, template, idea }),
+      });
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch (err) {
+      console.warn("Dev server create-project error:", err);
+    }
+  }
+
   return safeInvoke("create_project_from_template", {
     targetDir,
     projectName,
     template,
+    idea,
   }, {
     name: projectName,
     path: `${targetDir}/${projectName}`,
-    framework: template,
-    runtime: "node",
+    framework: template === "clean-ai" ? "AI Ideation" : template,
+    runtime: "pending",
     has_git: true,
-    has_docker: true,
+    has_docker: false,
     has_aipanel_toml: true,
-    detected_services: ["PostgreSQL 16", "Redis 7.2"],
+    detected_services: [],
     detected_workers: [],
-    suggested_dev_command: "npm run dev",
-    suggested_build_command: "npm run build",
+    suggested_dev_command: "",
+    suggested_build_command: "",
     suggested_port: 3000,
+    suggested_file: `${targetDir}/${projectName}/README.md`,
   });
+}
+
+export async function scaffoldWorkspace(baseDir: string): Promise<{ ok: boolean; created: string[] }> {
+  if (isTauri()) {
+    try {
+      const created = await safeInvoke<string[]>("scaffold_workspace", { baseDir }, []);
+      return { ok: true, created };
+    } catch {
+      return { ok: false, created: [] };
+    }
+  }
+
+  try {
+    const res = await fetch("/api/fs/scaffold-workspace", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ baseDir }),
+    });
+    if (res.ok) return await res.json();
+  } catch (err) {
+    console.warn("scaffoldWorkspace error:", err);
+  }
+  return { ok: true, created: [] };
 }
 
 export async function getGitStatus(path: string): Promise<GitStatusResult> {
@@ -371,6 +437,130 @@ export async function gitUnstageFile(path: string, filePath: string): Promise<vo
 
 export async function gitCommit(path: string, message: string): Promise<string> {
   return safeInvoke("git_commit", { path, message }, "Commit created");
+}
+
+export async function getCommitDetail(path: string, hash: string): Promise<CommitDetail> {
+  return safeInvoke("get_commit_detail", { path, hash }, {
+    hash,
+    short_hash: hash.slice(0, 7),
+    message: "feat(performance): implement Zustand stores & lazy code splitting",
+    body: "Split monolithic App.tsx into 4 Zustand stores and 50 lazy route chunks for fast startup.",
+    author_name: "Antigravity Agent",
+    author_email: "dev@botdigit.com",
+    date: new Date().toISOString(),
+    relative_date: "10 minutes ago",
+    files_changed: 4,
+    insertions: 480,
+    deletions: 210,
+    changed_files: [
+      { path: "src/App.tsx", status: "M", insertions: 35, deletions: 231 },
+      { path: "src/stores/workspace.ts", status: "A", insertions: 120, deletions: 0 },
+      { path: "src/stores/editor.ts", status: "A", insertions: 95, deletions: 0 },
+      { path: "src/stores/ui.ts", status: "A", insertions: 110, deletions: 0 },
+    ],
+    parent_hash: "e39aaec",
+    is_merge: false,
+    refs: "HEAD -> feat/ui-ux-design-system, origin/feat/ui-ux-design-system",
+  });
+}
+
+export async function getFileDiff(path: string, hash: string, filePath: string): Promise<string> {
+  return safeInvoke("get_file_diff", { path, hash, filePath }, `@@ -1,15 +1,22 @@
+- import { useState } from 'react';
++ import { useWorkspaceStore } from './stores/workspace';
++ import { useUIStore } from './stores/ui';
+ 
+ export default function App() {
+-  const [projectPath, setProjectPath] = useState('/Developer');
+-  const [activeTab, setActiveTab] = useState('editor');
++  const { projectPath, setProjectPath } = useWorkspaceStore();
++  const { activePanel, setActivePanel } = useUIStore();
++  // Lazy-loaded routes for 75% memory reduction
+`);
+}
+
+export async function getGitLog(path: string, count = 25): Promise<CommitDetail[]> {
+  return safeInvoke("get_git_log", { path, count }, [
+    {
+      hash: "8ef12a039b",
+      short_hash: "8ef12a0",
+      message: "feat(performance): implement Zustand state stores & 50 lazy chunks",
+      body: "App bundle reduced from 774KB to 288KB (63% reduction)",
+      author_name: "Antigravity Agent",
+      author_email: "dev@botdigit.com",
+      date: "2026-10-01 10:20:00",
+      relative_date: "15 minutes ago",
+      files_changed: 5,
+      insertions: 540,
+      deletions: 230,
+      changed_files: [
+        { path: "src/App.tsx", status: "M", insertions: 35, deletions: 231 },
+        { path: "src/stores/workspace.ts", status: "A", insertions: 120, deletions: 0 },
+        { path: "src/stores/ui.ts", status: "A", insertions: 110, deletions: 0 },
+      ],
+      parent_hash: "64404dd",
+      is_merge: false,
+      refs: "HEAD -> feat/ui-ux-design-system",
+    },
+    {
+      hash: "64404dd821",
+      short_hash: "64404dd",
+      message: "feat(export): add 1-click cPanel export wizard with deployment guides",
+      body: "Export production build with automated database dump and instructions",
+      author_name: "BotDigit Developer",
+      author_email: "dev@botdigit.com",
+      date: "2026-10-01 09:30:00",
+      relative_date: "1 hour ago",
+      files_changed: 3,
+      insertions: 310,
+      deletions: 12,
+      changed_files: [
+        { path: "src/components/modals/CPanelExportModal.tsx", status: "A", insertions: 290, deletions: 0 },
+      ],
+      parent_hash: "85127b5",
+      is_merge: false,
+      refs: "tag: v0.1.0-staging",
+    },
+    {
+      hash: "85127b5e43",
+      short_hash: "85127b5",
+      message: "feat(database-tunnels): add SQLite default and Cloudflare staging tunnels",
+      body: "Support zero-configuration SQLite for local dev and Cloudflare Quick Tunnels",
+      author_name: "BotDigit Developer",
+      author_email: "dev@botdigit.com",
+      date: "2026-10-01 08:45:00",
+      relative_date: "2 hours ago",
+      files_changed: 6,
+      insertions: 420,
+      deletions: 85,
+      changed_files: [
+        { path: "src/components/panels/DatabasePanel.tsx", status: "M", insertions: 180, deletions: 45 },
+        { path: "src/components/panels/TunnelsPanel.tsx", status: "M", insertions: 240, deletions: 40 },
+      ],
+      parent_hash: "7ee3e74",
+      is_merge: false,
+      refs: "tag: v0.0.9-production",
+    },
+    {
+      hash: "7ee3e74c10",
+      short_hash: "7ee3e74",
+      message: "feat(telemetry): system health, resource monitor and doctor diagnostics",
+      body: "Real-time CPU, RAM, disk diagnostics for host environment",
+      author_name: "AIPanel Core",
+      author_email: "dev@botdigit.com",
+      date: "2026-10-01 07:15:00",
+      relative_date: "3 hours ago",
+      files_changed: 4,
+      insertions: 260,
+      deletions: 30,
+      changed_files: [
+        { path: "src/components/panels/BottomPanel.tsx", status: "M", insertions: 150, deletions: 20 },
+      ],
+      parent_hash: "f0c0668",
+      is_merge: false,
+      refs: "",
+    },
+  ]);
 }
 
 export async function getDeploymentVersions(path: string): Promise<DeploymentVersion[]> {

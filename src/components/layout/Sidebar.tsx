@@ -24,6 +24,7 @@ import {
   ChevronRight,
   PanelLeftClose,
   PanelLeft,
+  Sparkles,
   type LucideIcon,
 } from "lucide-react";
 import { Badge } from "../../design-system";
@@ -61,6 +62,7 @@ const navGroups: NavGroup[] = [
       { id: "explorer", label: "Code", icon: Code2 },
       { id: "ai", label: "AI Agent", icon: Bot, badge: "PRO", badgeType: "type" },
       { id: "git", label: "Source Control", icon: GitBranch, badge: "3", badgeType: "type" },
+      { id: "doc-agent", label: "Docs AI & Skills", icon: Sparkles, badge: "AI", badgeType: "type" },
     ],
   },
   {

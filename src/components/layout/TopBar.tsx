@@ -12,6 +12,9 @@ import {
   Check,
   AlertTriangle,
   Blocks,
+  Server,
+  HelpCircle,
+  Settings2,
 } from "lucide-react";
 import type { OperatingMode } from "../../lib/types";
 import { Button, IconButton } from "../../design-system";
@@ -42,6 +45,9 @@ interface TopBarProps {
   onOpenDomains?: () => void;
   onOpenWorkspaceSwitcher?: () => void;
   onOpenFreeAI?: () => void;
+  onOpenLocalServerConverter?: () => void;
+  onOpenGuide?: () => void;
+  onOpenSetup?: () => void;
 }
 
 const envDetails: Record<
@@ -95,6 +101,9 @@ export default function TopBar({
   onToggleAI,
   onOpenWorkspaceSwitcher,
   onOpenFreeAI,
+  onOpenLocalServerConverter,
+  onOpenGuide,
+  onOpenSetup,
 }: TopBarProps) {
   const [showEnvDropdown, setShowEnvDropdown] = useState(false);
   const [showDeployDropdown, setShowDeployDropdown] = useState(false);
@@ -277,6 +286,43 @@ export default function TopBar({
               onClick={onOpenControlCenter}
             >
               Control Center
+            </Button>
+          )}
+
+          {/* Local to Server Converter */}
+          {onOpenLocalServerConverter && (
+            <Button
+              variant="secondary"
+              size="xs"
+              icon={<Server className="w-3.5 h-3.5 text-purple-400" />}
+              onClick={onOpenLocalServerConverter}
+            >
+              Convert to Server
+            </Button>
+          )}
+
+          {/* Guide & Manual */}
+          {onOpenGuide && (
+            <Button
+              variant="secondary"
+              size="xs"
+              icon={<HelpCircle className="w-3.5 h-3.5 text-indigo-400" />}
+              onClick={onOpenGuide}
+            >
+              Guide
+            </Button>
+          )}
+
+          {/* First-Time Setup & Workspace Config */}
+          {onOpenSetup && (
+            <Button
+              variant="secondary"
+              size="xs"
+              icon={<Settings2 className="w-3.5 h-3.5 text-amber-400" />}
+              onClick={onOpenSetup}
+              title="Workspace Setup & First-Time Installation Wizard"
+            >
+              Setup
             </Button>
           )}
 
