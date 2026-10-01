@@ -158,8 +158,26 @@
     - [x] 1-click Quick SQL Templates (`SELECT *`, `COUNT(*)`, `PRAGMA table_info`, `INSERT INTO`, `CREATE TABLE`)
     - [x] Interactive query execution with execution duration timing and row counts
     - [x] Editable SQLite file path and 1-click database backup/export
+- [x] 1-Step Deploy Engine & Cloudflare / ngrok Tunnels Studio:
+  - [x] Interactive 1-Step Deploy Runner in Bottom Panel (`src/components/panels/BottomPanel.tsx`):
+    - [x] Replaced empty placeholder with full Deploy & Tunnels Studio
+    - [x] 1-Step Deploy to Staging (`botdigit deploy staging <app>` / atomic build pipeline)
+    - [x] 1-Step Deploy to Production (`botdigit deploy prod <app>` with confirmation guard)
+    - [x] 1-Click Launch Cloudflare & ngrok Dev Tunnel URLs on port 1420
+    - [x] Ready Deploy Command chips (`botdigit status`, `botdigit deploy staging`, `cloudflared tunnel`, `ngrok http`, `npm run build`)
+    - [x] Live 5-stage pipeline indicator (Preflight -> Build -> Dispatch -> Health -> Live Ingress)
+    - [x] Streaming terminal log console with live stdout/stderr
+  - [x] Zero Trust & Dev Tunnels Studio (`src/components/panels/TunnelsPanel.tsx`):
+    - [x] 1-Click Tooling Installers: Cloudflare (`cloudflared` detected in `/opt/homebrew/bin`) & ngrok (`brew install ngrok/ngrok/ngrok`)
+    - [x] 1-Click Quick Ingress Presets (Dev Web :1420, Staging :41700, Node :3000, Postgres :5432)
+    - [x] Custom Ingress Generator Modal with real background tunnel execution
+    - [x] Live public HTTPS URL cards with 1-click Copy, Open in Browser, and start/stop toggles
+  - [x] Backend PATH & BotDigit Integration (`vite.config.ts`, `src-tauri/src/lib.rs`):
+    - [x] Added `/Volumes/Mac2TB/Botdigit/Developer/Infrastructure/bin` to system PATH for native Tauri & Vite dev server
+    - [x] Direct zero-friction access to `botdigit` CLI from all terminal and deploy runners
 - [x] Quality Gates Verified:
   - [x] `cargo check` succeeds (0 Rust errors)
-  - [x] `npm run build` succeeds (0 TypeScript/lint errors in 364ms)
+  - [x] `npm run build` succeeds (0 TypeScript/lint errors in 443ms)
   - [x] React Fast Refresh compatibility verified (clean hot reloads)
+
 

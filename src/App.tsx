@@ -740,6 +740,7 @@ export default function App() {
               <TunnelsPanel
                 environment={environment}
                 projectName={projectInfo?.name}
+                projectPath={projectPath}
               />
             ) : activePanel === "billing" ? (
               <BillingPanel environment={environment} />
@@ -829,6 +830,9 @@ export default function App() {
               } catch {}
             }}
             projectPath={projectPath}
+            projectName={projectInfo?.name || "aipanel"}
+            environment={environment}
+            onOpenTunnels={() => setActivePanel("tunnels")}
           />
         </div>
       </div>

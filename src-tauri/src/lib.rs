@@ -1366,6 +1366,14 @@ fn execute_terminal_command(
     let mut cmd = std::process::Command::new("/bin/zsh");
     cmd.current_dir(&target_cwd);
 
+    let home = std::env::var("HOME").unwrap_or_default();
+    let base_path = std::env::var("PATH").unwrap_or_default();
+    let full_path = format!(
+        "/Volumes/Mac2TB/Botdigit/Developer/Infrastructure/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:{}/.cargo/bin:{}",
+        home, base_path
+    );
+    cmd.env("PATH", full_path);
+
     let final_command = if is_root && !command.trim().starts_with("sudo") {
         format!("sudo -n {} 2>&1 || sudo {}", command, command)
     } else {

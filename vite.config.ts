@@ -371,6 +371,7 @@ function devFsPlugin(): Plugin {
 
                 // Construct full system PATH for zsh
                 const fullPath = [
+                  "/Volumes/Mac2TB/Botdigit/Developer/Infrastructure/bin",
                   "/opt/homebrew/bin",
                   "/opt/homebrew/sbin",
                   "/usr/local/bin",

@@ -8,6 +8,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **1-Step Deploy Engine & Cloudflare / ngrok Tunnels Studio (`src/components/panels/BottomPanel.tsx`, `src/components/panels/TunnelsPanel.tsx`)**:
+  - **1-Step Deploy Runner in Bottom Panel**:
+    - Replaced empty placeholder in the `Deploy` tab with a full interactive deployment pipeline and live tunnel generator.
+    - 1-Step Staging Deploy: 1-click trigger to execute pre-flight verification, compile production bundle, dispatch to `botdigit deploy staging`, and verify health cascade.
+    - 1-Step Production Deploy: 1-click trigger for production release with safety gate and live feedback.
+    - 1-Click Dev & Staging Tunnel URL launch: generates instant HTTPS URLs via Cloudflare (`*.trycloudflare.com`) or ngrok (`*.ngrok-free.app`).
+    - Ready Deploy Commands: 1-click chips for `botdigit status`, `botdigit deploy staging <app>`, `cloudflared tunnel`, `ngrok http`, and `npm run build`.
+    - Live 5-stage pipeline indicator with streaming console logs.
+  - **Zero Trust & Dev Tunnels Studio**:
+    - Detection and 1-click installer for Cloudflare Tunnel (`cloudflared`, detected in `/opt/homebrew/bin`) and ngrok (`brew install ngrok/ngrok/ngrok`).
+    - 1-Click Ingress presets for Dev Web (:1420), Staging (:41700), Node (:3000), and Postgres (:5432).
+    - Custom Ingress Generator Modal with real background execution.
+    - Live public URL cards with instant Copy, Open in Browser, and start/stop toggles.
+  - **System PATH & BotDigit CLI Integration (`vite.config.ts`, `src-tauri/src/lib.rs`)**:
+    - Embedded `/Volumes/Mac2TB/Botdigit/Developer/Infrastructure/bin` into execution PATH.
+    - Direct native access to `botdigit` CLI from any terminal or deploy runner without path prefixing.
 - **Multi-Engine Database Studio with SQLite Default in DEV (`src/components/panels/DatabasePanel.tsx`)**:
   - **SQLite Default in DEV Environment**:
     - Automatically selects embedded SQLite engine when operating in `DEV` mode (no external daemon required).
