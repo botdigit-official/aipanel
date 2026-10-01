@@ -46,7 +46,7 @@ export interface AIProviderConfig {
   ratePer1M: number;
 }
 
-export const PROVIDERS: AIProviderConfig[] = [
+const PROVIDERS: AIProviderConfig[] = [
   { id: "aipanel", name: "AIPanel AI (Cloud)", model: "claude-3-5-sonnet", isLocal: false, requiresKey: false, ratePer1M: 3.00 },
   { id: "anthropic", name: "Anthropic Claude (BYOK)", model: "claude-3-7-sonnet", isLocal: false, requiresKey: true, ratePer1M: 3.00 },
   { id: "openai", name: "OpenAI (BYOK)", model: "gpt-4o", isLocal: false, requiresKey: true, ratePer1M: 2.50 },

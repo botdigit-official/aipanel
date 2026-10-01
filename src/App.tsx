@@ -465,7 +465,7 @@ export default function App() {
           <div className="flex-1 flex min-h-0">
             {/* File Explorer Panel */}
             {showExplorer && (
-              <div className="w-56 border-r border-border-default shrink-0 overflow-hidden">
+              <div className="w-64 border-r border-border-default shrink-0 overflow-hidden flex flex-col">
                 <FileExplorer
                   projectPath={projectPath}
                   onFileClick={handleFileClick}

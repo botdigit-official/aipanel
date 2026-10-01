@@ -152,8 +152,33 @@ async function safeInvoke<T>(cmd: string, args?: Record<string, unknown>, fallba
 // ── Tauri Command Wrappers ───────────────────────────────────────
 
 export async function listDirectory(path: string): Promise<FileEntry[]> {
-  return safeInvoke("list_directory", { path }, [
-    { name: "src", path: `${path}/src`, is_dir: true, size: 0, children_count: 8 },
+  if (isTauri()) {
+    return safeInvoke("list_directory", { path });
+  }
+
+  try {
+    const res = await fetch(`/api/fs/list?path=${encodeURIComponent(path)}`);
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (err) {
+    console.warn("Dev FS API listDirectory error:", err);
+  }
+
+  // Hierarchical fallback if API is not reachable
+  if (path.endsWith("/src")) {
+    return [
+      { name: "components", path: `${path}/components`, is_dir: true, size: 0, children_count: 5 },
+      { name: "design-system", path: `${path}/design-system`, is_dir: true, size: 0, children_count: 10 },
+      { name: "lib", path: `${path}/lib`, is_dir: true, size: 0, children_count: 3 },
+      { name: "styles", path: `${path}/styles`, is_dir: true, size: 0, children_count: 1 },
+      { name: "App.tsx", path: `${path}/App.tsx`, is_dir: false, size: 24395 },
+      { name: "main.tsx", path: `${path}/main.tsx`, is_dir: false, size: 380 },
+    ];
+  }
+
+  return [
+    { name: "src", path: `${path}/src`, is_dir: true, size: 0, children_count: 6 },
     { name: "src-tauri", path: `${path}/src-tauri`, is_dir: true, size: 0, children_count: 4 },
     { name: "agent", path: `${path}/agent`, is_dir: true, size: 0, children_count: 3 },
     { name: "cli", path: `${path}/cli`, is_dir: true, size: 0, children_count: 2 },
@@ -162,20 +187,82 @@ export async function listDirectory(path: string): Promise<FileEntry[]> {
     { name: "aipanel.toml", path: `${path}/aipanel.toml`, is_dir: false, size: 720 },
     { name: "README.md", path: `${path}/README.md`, is_dir: false, size: 41411 },
     { name: "TODO.md", path: `${path}/TODO.md`, is_dir: false, size: 10271 },
-  ]);
+  ];
 }
 
 export async function readFile(path: string): Promise<FileContent> {
-  return safeInvoke("read_file", { path }, {
+  if (isTauri()) {
+    return safeInvoke("read_file", { path });
+  }
+
+  try {
+    const res = await fetch(`/api/fs/read?path=${encodeURIComponent(path)}`);
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (err) {
+    console.warn("Dev FS API readFile error:", err);
+  }
+
+  return {
     path,
     content: `// AIPanel File: ${path}\n// Local-first development + deployment IDE\n\nconsole.log("Loaded in AIPanel");\n`,
     language: path.endsWith(".ts") || path.endsWith(".tsx") ? "typescript" : path.endsWith(".rs") ? "rust" : "markdown",
     size: 256,
-  });
+  };
 }
 
 export async function writeFile(path: string, content: string): Promise<void> {
-  return safeInvoke("write_file", { path, content });
+  if (isTauri()) {
+    return safeInvoke("write_file", { path, content });
+  }
+
+  try {
+    const res = await fetch("/api/fs/write", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ path, content }),
+    });
+    if (res.ok) return;
+  } catch (err) {
+    console.warn("Dev FS API writeFile error:", err);
+  }
+}
+
+export async function createFsEntry(path: string, isDir: boolean, content = ""): Promise<boolean> {
+  if (isTauri()) {
+    return safeInvoke("create_file_or_dir", { path, isDir, content }, true);
+  }
+
+  try {
+    const res = await fetch("/api/fs/create", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ path, isDir, content }),
+    });
+    return res.ok;
+  } catch (err) {
+    console.warn("Dev FS API create error:", err);
+    return false;
+  }
+}
+
+export async function deleteFsEntry(path: string): Promise<boolean> {
+  if (isTauri()) {
+    return safeInvoke("delete_file_or_dir", { path }, true);
+  }
+
+  try {
+    const res = await fetch("/api/fs/delete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ path }),
+    });
+    return res.ok;
+  } catch (err) {
+    console.warn("Dev FS API delete error:", err);
+    return false;
+  }
 }
 
 export async function detectProject(path: string): Promise<ProjectInfo> {
