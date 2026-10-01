@@ -213,17 +213,17 @@ export default function TopBar({
         </div>
 
         {/* ── Center: Unified Search / Command Center (⌘K) ── */}
-        <div className="flex-1 max-w-md mx-2 hidden md:block">
+        <div className="flex-1 max-w-xl mx-4 hidden md:block">
           <button
             type="button"
             onClick={onOpenCommandPalette}
-            className="w-full flex items-center justify-between px-3 py-1.5 rounded-lg bg-[#11131A] hover:bg-[#161923] border border-white/8 hover:border-white/16 text-xs text-zinc-400 transition-colors cursor-pointer"
+            className="w-full flex items-center justify-between px-3.5 py-1.5 rounded-lg bg-[#11131A] hover:bg-[#161923] border border-white/10 hover:border-violet-500/30 text-xs text-zinc-400 transition-all cursor-pointer shadow-xs group"
           >
-            <div className="flex items-center gap-2 truncate">
-              <Search className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
-              <span className="truncate">Search commands, files, actions...</span>
+            <div className="flex items-center gap-2.5 truncate">
+              <Search className="w-3.5 h-3.5 text-zinc-400 group-hover:text-violet-400 transition-colors shrink-0" />
+              <span className="truncate text-zinc-400 group-hover:text-zinc-200">Search commands, files, fleet, actions...</span>
             </div>
-            <kbd className="px-1.5 py-0.2 text-[10px] font-mono text-zinc-400 bg-white/5 border border-white/10 rounded shrink-0">
+            <kbd className="px-2 py-0.5 text-[10px] font-mono text-zinc-300 bg-white/5 border border-white/12 rounded shrink-0">
               ⌘K
             </kbd>
           </button>

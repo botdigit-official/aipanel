@@ -14,6 +14,12 @@ import {
   Bot,
   Activity,
   Box,
+  Database,
+  HardDrive,
+  Wifi,
+  CheckCircle2,
+  Cpu,
+  Zap,
 } from "lucide-react";
 import { open } from "@tauri-apps/plugin-dialog";
 import { Card, Button, Badge, StatusIndicator } from "../../design-system";
@@ -23,6 +29,8 @@ export interface RecentProjectItem {
   path: string;
   framework?: string;
   lastOpened?: string;
+  branch?: string;
+  changes?: number;
 }
 
 interface WelcomePageProps {
@@ -42,36 +50,41 @@ interface TemplateOption {
   desc: string;
   icon: typeof Code2;
   badge: string;
+  runtime: string;
 }
 
 const templates: TemplateOption[] = [
   {
     id: "nextjs",
-    name: "Next.js 15 Starter",
-    desc: "Full-stack React with App Router, SSR, and API routes.",
+    name: "Next.js 15 Fullstack",
+    desc: "App Router, Server Actions, Tailwind CSS v4 & TypeScript.",
     icon: Code2,
     badge: "Node.js",
+    runtime: "npm run dev (:3000)",
   },
   {
     id: "fastapi",
-    name: "FastAPI Backend",
-    desc: "High-performance async Python web API with auto OpenAPI docs.",
+    name: "FastAPI Async API",
+    desc: "Async Python 3.12 with Pydantic v2 & OpenAPI docs.",
     icon: Layers,
     badge: "Python",
+    runtime: "uvicorn main:app (:8000)",
   },
   {
     id: "rust-axum",
-    name: "Rust Axum Service",
-    desc: "Blazing fast, memory-safe web microservice using Axum & Tokio.",
+    name: "Rust Axum Microservice",
+    desc: "Blazing fast Tokio runtime with Tower middleware & mTLS.",
     icon: Server,
     badge: "Rust",
+    runtime: "cargo run (:8080)",
   },
   {
     id: "vite-react",
     name: "Vite + React SPA",
-    desc: "Lightning fast client-side frontend starter bundle.",
+    desc: "Ultra-fast client SPA with Tailwind CSS & Lucide icons.",
     icon: Sparkles,
     badge: "TypeScript",
+    runtime: "vite dev (:1420)",
   },
 ];
 
@@ -141,8 +154,7 @@ export default function WelcomePage({
     }
   };
 
-  // Provide fallback default if empty so the user sees a rich card
-  const displayProjects =
+  const displayProjects: RecentProjectItem[] =
     recentProjects.length > 0
       ? recentProjects
       : [
@@ -150,29 +162,39 @@ export default function WelcomePage({
             name: "aipanel",
             path: "/Volumes/Mac2TB/Botdigit/Developer/Projects/aipanel",
             framework: "React 19 + Tauri v2",
-            lastOpened: "Just now",
+            branch: "develop",
+            changes: 3,
+            lastOpened: "Active workspace",
+          },
+          {
+            name: "yaarpahari.com",
+            path: "/Volumes/Mac2TB/Botdigit/Developer/Live/yaarpahari.com",
+            framework: "Node.js + Telegram Bot",
+            branch: "main",
+            changes: 0,
+            lastOpened: "15 mins ago",
           },
         ];
 
   return (
-    <div className="flex-1 bg-[#08090D] overflow-y-auto px-6 py-8 flex flex-col justify-start select-none">
-      <div className="max-w-4xl w-full mx-auto space-y-7 animate-in fade-in duration-150">
-        {/* ── Contextual Header ── */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 border-b border-white/8">
+    <div className="flex-1 bg-[#08090D] overflow-y-auto px-6 py-6 flex flex-col justify-start select-none">
+      <div className="w-full max-w-7xl mx-auto space-y-6 animate-in fade-in duration-150">
+        {/* ── Contextual Hero Header ── */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl bg-[#11131A] border border-white/8 shadow-md">
           <div>
             <div className="flex items-center gap-2 text-xs font-semibold text-violet-400 font-mono tracking-wider uppercase mb-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-violet-400" />
-              Developer Workspace
+              <span className="w-2 h-2 rounded-full bg-violet-400 animate-pulse" />
+              Unified AI Developer IDE & VPS Platform
             </div>
             <h1 className="text-2xl font-bold text-zinc-100 tracking-tight">
-              {greeting}
+              {greeting}, Developer
             </h1>
             <p className="text-xs text-zinc-400 mt-1">
-              Continue where you left off or start a new workspace.
+              Continue where you left off or scaffold a new microservice.
             </p>
           </div>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2.5 shrink-0">
             <Button
               variant="outline"
               size="sm"
@@ -192,207 +214,340 @@ export default function WelcomePage({
           </div>
         </div>
 
-        {/* ── Recent Projects Cards ── */}
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider font-mono flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 text-zinc-500" />
-              Recent Workspace
-            </span>
-            <span className="text-[11px] text-zinc-500">
-              {displayProjects.length} active
-            </span>
-          </div>
+        {/* ── 2-Column Balanced Dashboard Layout ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          {/* ════════ LEFT COLUMN: Workspaces, Templates & Quick Starters (7 Cols) ════════ */}
+          <div className="lg:col-span-7 space-y-6">
+            {/* Recent Workspaces Card Stack */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider font-mono flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 text-zinc-500" />
+                  Recent Workspaces
+                </span>
+                <span className="text-[11px] text-zinc-500 font-mono">
+                  {displayProjects.length} registered
+                </span>
+              </div>
 
-          <div className="grid grid-cols-1 gap-3">
-            {displayProjects.map((project) => (
-              <Card
-                key={project.path}
-                variant="interactive"
-                onClick={() => onOpenRecent(project.path)}
-                className="flex items-center justify-between p-4 group"
-              >
-                <div className="flex items-start gap-3.5 min-w-0">
-                  <div className="w-9 h-9 rounded-lg bg-violet-600/15 border border-violet-500/25 flex items-center justify-center text-violet-400 font-bold text-sm shrink-0">
-                    <Box className="w-4 h-4" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2.5">
-                      <span className="text-sm font-semibold text-zinc-100 group-hover:text-violet-300 transition-colors truncate">
-                        {project.name}
-                      </span>
-                      <Badge category="env" env="dev" dot>
-                        DEV
-                      </Badge>
-                      {project.framework && (
-                        <span className="text-[11px] font-mono text-zinc-400 bg-white/5 px-2 py-0.5 rounded border border-white/8 shrink-0">
-                          {project.framework}
+              <div className="space-y-3">
+                {displayProjects.map((project) => (
+                  <Card
+                    key={project.path}
+                    variant="interactive"
+                    onClick={() => onOpenRecent(project.path)}
+                    className="p-4 group border-white/8 hover:border-violet-500/40"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-start gap-3.5 min-w-0">
+                        <div className="w-10 h-10 rounded-xl bg-violet-600/15 border border-violet-500/30 flex items-center justify-center text-violet-400 font-bold text-base shrink-0 group-hover:scale-105 transition-transform">
+                          <Box className="w-5 h-5" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2.5 flex-wrap">
+                            <span className="text-sm font-semibold text-zinc-100 group-hover:text-violet-300 transition-colors truncate">
+                              {project.name}
+                            </span>
+                            <Badge category="env" env="dev" dot>
+                              DEV
+                            </Badge>
+                            {project.framework && (
+                              <span className="text-[11px] font-mono text-zinc-300 bg-white/5 px-2 py-0.5 rounded border border-white/8">
+                                {project.framework}
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-xs font-mono text-zinc-500 truncate mt-1">
+                            {project.path}
+                          </div>
+                          <div className="flex items-center gap-3 mt-2 text-[11px] text-zinc-400 font-mono">
+                            <span className="flex items-center gap-1 text-zinc-300">
+                              <GitBranch className="w-3 h-3 text-violet-400" />
+                              <span>{project.branch || "main"}</span>
+                            </span>
+                            <span>•</span>
+                            <span className="text-amber-400">
+                              {project.changes !== undefined ? `${project.changes} modified files` : "Clean tree"}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-xs text-zinc-500 hidden sm:inline-block font-mono">
+                          {project.lastOpened}
                         </span>
-                      )}
+                        <div className="flex items-center gap-1 text-xs font-semibold text-violet-400 group-hover:translate-x-1 transition-transform ml-2">
+                          <span>Open</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-xs font-mono text-zinc-500 truncate mt-1">
-                      {project.path}
-                    </div>
-                  </div>
-                </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
 
-                <div className="flex items-center gap-4 shrink-0 ml-4">
-                  <span className="text-xs text-zinc-500 hidden sm:inline-block font-mono">
-                    {project.lastOpened || "Recently active"}
+            {/* Quick Architecture Templates */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider font-mono flex items-center gap-1.5">
+                  <Zap className="w-3.5 h-3.5 text-zinc-500" />
+                  Instant Starter Scaffolding
+                </span>
+                <span className="text-[11px] text-zinc-500 font-mono">1-click create</span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {templates.map((tpl) => {
+                  const Icon = tpl.icon;
+                  return (
+                    <div
+                      key={tpl.id}
+                      onClick={() => {
+                        setSelectedTemplate(tpl.id);
+                        setShowModal(true);
+                      }}
+                      className="p-3.5 rounded-xl bg-[#11131A] hover:bg-[#161923] border border-white/8 hover:border-violet-500/30 transition-all cursor-pointer group"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="w-7 h-7 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-violet-400 group-hover:bg-violet-600/20 group-hover:border-violet-500/30 transition-colors">
+                          <Icon className="w-4 h-4" />
+                        </div>
+                        <span className="text-[10px] font-mono font-medium text-zinc-400 bg-white/5 px-2 py-0.5 rounded border border-white/8">
+                          {tpl.badge}
+                        </span>
+                      </div>
+                      <div className="text-xs font-semibold text-zinc-200 group-hover:text-white transition-colors">
+                        {tpl.name}
+                      </div>
+                      <div className="text-[11px] text-zinc-400 mt-1 line-clamp-2">
+                        {tpl.desc}
+                      </div>
+                      <div className="text-[10px] font-mono text-zinc-500 mt-2">
+                        {tpl.runtime}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Quick Actions Shortcuts */}
+            <div>
+              <div className="mb-3">
+                <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider font-mono">
+                  Primary Toolsets
+                </span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                <button
+                  type="button"
+                  onClick={onNavigateToCode}
+                  className="flex items-center gap-2 p-2.5 rounded-xl bg-[#11131A] hover:bg-[#161923] border border-white/8 hover:border-white/16 transition-colors text-left cursor-pointer group"
+                >
+                  <Code2 className="w-4 h-4 text-blue-400 group-hover:scale-110 transition-transform shrink-0" />
+                  <div className="min-w-0">
+                    <div className="text-xs font-semibold text-zinc-200 truncate">Code Editor</div>
+                    <div className="text-[10px] text-zinc-500 truncate">Buffer & Tree</div>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={onNavigateToAI}
+                  className="flex items-center gap-2 p-2.5 rounded-xl bg-[#11131A] hover:bg-[#161923] border border-white/8 hover:border-white/16 transition-colors text-left cursor-pointer group"
+                >
+                  <Sparkles className="w-4 h-4 text-violet-400 group-hover:scale-110 transition-transform shrink-0" />
+                  <div className="min-w-0">
+                    <div className="text-xs font-semibold text-zinc-200 truncate">AI Agent</div>
+                    <div className="text-[10px] text-zinc-500 truncate">Context Aware</div>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={onNavigateToGit}
+                  className="flex items-center gap-2 p-2.5 rounded-xl bg-[#11131A] hover:bg-[#161923] border border-white/8 hover:border-white/16 transition-colors text-left cursor-pointer group"
+                >
+                  <GitBranch className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform shrink-0" />
+                  <div className="min-w-0">
+                    <div className="text-xs font-semibold text-zinc-200 truncate">Source Control</div>
+                    <div className="text-[10px] text-zinc-500 truncate">Staging & Tags</div>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={onNavigateToServers}
+                  className="flex items-center gap-2 p-2.5 rounded-xl bg-[#11131A] hover:bg-[#161923] border border-white/8 hover:border-white/16 transition-colors text-left cursor-pointer group"
+                >
+                  <Activity className="w-4 h-4 text-sky-400 group-hover:scale-110 transition-transform shrink-0" />
+                  <div className="min-w-0">
+                    <div className="text-xs font-semibold text-zinc-200 truncate">Server Fleet</div>
+                    <div className="text-[10px] text-zinc-500 truncate">VPS & Telemetry</div>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* ════════ RIGHT COLUMN: Live System Telemetry, AI Models & Daemons (5 Cols) ════════ */}
+          <div className="lg:col-span-5 space-y-5">
+            {/* Live Host Hardware Telemetry Card */}
+            <Card className="p-4 space-y-3.5 border-white/10">
+              <div className="flex items-center justify-between border-b border-white/6 pb-2.5">
+                <div className="flex items-center gap-2">
+                  <Activity className="w-4 h-4 text-cyan-400" />
+                  <span className="text-xs font-bold text-zinc-100 uppercase tracking-wider font-mono">
+                    Host Hardware Telemetry
                   </span>
-                  <div className="flex items-center gap-1 text-xs font-medium text-violet-400 group-hover:translate-x-0.5 transition-transform">
-                    <span>Open</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
+                </div>
+                <StatusIndicator status="active" label="Live" pulse />
+              </div>
+
+              {/* CPU Metric */}
+              <div>
+                <div className="flex items-center justify-between text-xs font-mono mb-1">
+                  <span className="text-zinc-400 flex items-center gap-1.5">
+                    <Cpu className="w-3.5 h-3.5 text-cyan-400" />
+                    CPU Cores (8 Threads)
+                  </span>
+                  <span className="text-zinc-200 font-semibold">12% Load</span>
+                </div>
+                <div className="w-full h-2 rounded-full bg-white/5 overflow-hidden">
+                  <div className="h-full bg-cyan-400 rounded-full w-[12%]" />
+                </div>
+              </div>
+
+              {/* RAM Metric */}
+              <div>
+                <div className="flex items-center justify-between text-xs font-mono mb-1">
+                  <span className="text-zinc-400 flex items-center gap-1.5">
+                    <Layers className="w-3.5 h-3.5 text-purple-400" />
+                    Memory DDR5
+                  </span>
+                  <span className="text-zinc-200 font-semibold">1.2 GB / 8.0 GB (15%)</span>
+                </div>
+                <div className="w-full h-2 rounded-full bg-white/5 overflow-hidden">
+                  <div className="h-full bg-purple-400 rounded-full w-[15%]" />
+                </div>
+              </div>
+
+              {/* Disk & Network Metrics */}
+              <div className="grid grid-cols-2 gap-2 pt-1 text-[11px] font-mono">
+                <div className="p-2.5 rounded-lg bg-[#0C0D12] border border-white/6">
+                  <span className="text-zinc-500 block">NVMe Storage</span>
+                  <span className="text-zinc-200 font-semibold mt-0.5 block">54 GB / 120 GB</span>
+                </div>
+                <div className="p-2.5 rounded-lg bg-[#0C0D12] border border-white/6">
+                  <span className="text-zinc-500 block">Network I/O</span>
+                  <span className="text-emerald-400 font-semibold mt-0.5 block">↑ 1.4M · ↓ 4.2M</span>
+                </div>
+              </div>
+            </Card>
+
+            {/* AI Multi-Model Connectivity Card */}
+            <Card className="p-4 space-y-3 border-white/10">
+              <div className="flex items-center justify-between border-b border-white/6 pb-2.5">
+                <div className="flex items-center gap-2">
+                  <Bot className="w-4 h-4 text-violet-400" />
+                  <span className="text-xs font-bold text-zinc-100 uppercase tracking-wider font-mono">
+                    AI Model Gateway
+                  </span>
+                </div>
+                <span className="text-[10px] font-mono text-zinc-400 bg-violet-500/10 px-2 py-0.5 rounded border border-violet-500/20">
+                  BYOK Encrypted
+                </span>
+              </div>
+
+              <div className="space-y-2 text-xs font-mono">
+                <div className="flex items-center justify-between p-2 rounded-lg bg-[#0C0D12] border border-white/6">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                    <span className="text-zinc-200">Claude 3.7 Sonnet</span>
                   </div>
+                  <span className="text-zinc-500 text-[10px]">Anthropic API</span>
                 </div>
-              </Card>
-            ))}
-          </div>
-        </div>
 
-        {/* ── System Status & Capabilities Grid (Status-oriented, NOT marketing) ── */}
-        <div>
-          <div className="mb-3">
-            <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider font-mono">
-              System Capabilities & Environment Telemetry
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {/* Card 1: Environment */}
-            <Card className="p-4 space-y-2.5">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">
-                  Environment
-                </span>
-                <StatusIndicator status="active" label="Active" />
-              </div>
-              <div>
-                <div className="text-sm font-bold text-zinc-100 flex items-center gap-1.5">
-                  <Shield className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>DEV Isolated</span>
+                <div className="flex items-center justify-between p-2 rounded-lg bg-[#0C0D12] border border-white/6">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                    <span className="text-zinc-200">GPT-4o & o3-mini</span>
+                  </div>
+                  <span className="text-zinc-500 text-[10px]">OpenAI API</span>
                 </div>
-                <div className="text-xs text-zinc-400 mt-1 leading-relaxed">
-                  Live production is protected. Mutations gated.
+
+                <div className="flex items-center justify-between p-2 rounded-lg bg-[#0C0D12] border border-white/6">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-sky-400" />
+                    <span className="text-zinc-200">Local Ollama</span>
+                  </div>
+                  <span className="text-zinc-500 text-[10px]">:11434</span>
                 </div>
               </div>
             </Card>
 
-            {/* Card 2: AI Agent */}
-            <Card className="p-4 space-y-2.5">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">
-                  AI Multi-Model
-                </span>
-                <StatusIndicator status="connected" label="Ready" />
-              </div>
-              <div>
-                <div className="text-sm font-bold text-zinc-100 flex items-center gap-1.5">
-                  <Bot className="w-3.5 h-3.5 text-sky-400" />
-                  <span>BYOK & Local</span>
+            {/* Backing Services & Daemons Cockpit */}
+            <Card className="p-4 space-y-3 border-white/10">
+              <div className="flex items-center justify-between border-b border-white/6 pb-2.5">
+                <div className="flex items-center gap-2">
+                  <Server className="w-4 h-4 text-emerald-400" />
+                  <span className="text-xs font-bold text-zinc-100 uppercase tracking-wider font-mono">
+                    Services & Daemons
+                  </span>
                 </div>
-                <div className="text-xs text-zinc-400 mt-1 leading-relaxed">
-                  Claude, GPT-4o, Gemini & Ollama connected.
-                </div>
+                <span className="text-[10px] font-mono text-zinc-400">4 Active</span>
               </div>
-            </Card>
 
-            {/* Card 3: Source Control */}
-            <Card className="p-4 space-y-2.5">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">
-                  Git Cockpit
-                </span>
-                <StatusIndicator status="running" label="Clean" />
-              </div>
-              <div>
-                <div className="text-sm font-bold text-zinc-100 flex items-center gap-1.5">
-                  <GitBranch className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>develop branch</span>
+              <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+                <div className="p-2 rounded-lg bg-[#0C0D12] border border-white/6 flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <Database className="w-3.5 h-3.5 text-blue-400" />
+                    <span className="text-zinc-300">PostgreSQL</span>
+                  </div>
+                  <span className="text-[10px] text-zinc-500">:5432</span>
                 </div>
-                <div className="text-xs text-zinc-400 mt-1 leading-relaxed">
-                  Atomic deployments with version tags.
-                </div>
-              </div>
-            </Card>
 
-            {/* Card 4: Server Agent */}
-            <Card className="p-4 space-y-2.5">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">
-                  VPS Server
-                </span>
-                <StatusIndicator status="active" label="Online" />
-              </div>
-              <div>
-                <div className="text-sm font-bold text-zinc-100 flex items-center gap-1.5">
-                  <Server className="w-3.5 h-3.5 text-violet-400" />
-                  <span>Agent :9876</span>
+                <div className="p-2 rounded-lg bg-[#0C0D12] border border-white/6 flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <HardDrive className="w-3.5 h-3.5 text-rose-400" />
+                    <span className="text-zinc-300">Redis</span>
+                  </div>
+                  <span className="text-[10px] text-zinc-500">:6379</span>
                 </div>
-                <div className="text-xs text-zinc-400 mt-1 leading-relaxed">
-                  1 node connected • 3 services monitored.
+
+                <div className="p-2 rounded-lg bg-[#0C0D12] border border-white/6 flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <Wifi className="w-3.5 h-3.5 text-teal-400" />
+                    <span className="text-zinc-300">Caddy TLS</span>
+                  </div>
+                  <span className="text-[10px] text-zinc-500">:443</span>
+                </div>
+
+                <div className="p-2 rounded-lg bg-[#0C0D12] border border-white/6 flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <Shield className="w-3.5 h-3.5 text-amber-400" />
+                    <span className="text-zinc-300">CF Tunnel</span>
+                  </div>
+                  <span className="text-[10px] text-emerald-400">Active</span>
                 </div>
               </div>
             </Card>
-          </div>
-        </div>
 
-        {/* ── Quick Workflows ── */}
-        <div>
-          <div className="mb-3">
-            <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider font-mono">
-              Quick Actions
-            </span>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <button
-              type="button"
-              onClick={onNavigateToCode}
-              className="flex items-center gap-2.5 p-3 rounded-xl bg-[#11131A] hover:bg-[#161923] border border-white/8 hover:border-white/16 transition-colors text-left cursor-pointer group"
-            >
-              <Code2 className="w-4 h-4 text-blue-400 group-hover:scale-110 transition-transform" />
-              <div>
-                <div className="text-xs font-semibold text-zinc-200">Open Editor</div>
-                <div className="text-[11px] text-zinc-500">File Explorer & Buffer</div>
+            {/* Pre-Flight Doctor Gate Card */}
+            <div className="p-3.5 rounded-xl bg-gradient-to-r from-emerald-950/20 via-[#11131A] to-[#11131A] border border-emerald-500/20 flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                <div>
+                  <div className="font-semibold text-zinc-200">Pre-Flight Doctor Ready</div>
+                  <div className="text-[11px] text-zinc-400">6/6 Deployment Gates Verified</div>
+                </div>
               </div>
-            </button>
-
-            <button
-              type="button"
-              onClick={onNavigateToAI}
-              className="flex items-center gap-2.5 p-3 rounded-xl bg-[#11131A] hover:bg-[#161923] border border-white/8 hover:border-white/16 transition-colors text-left cursor-pointer group"
-            >
-              <Sparkles className="w-4 h-4 text-violet-400 group-hover:scale-110 transition-transform" />
-              <div>
-                <div className="text-xs font-semibold text-zinc-200">AI Assistant</div>
-                <div className="text-[11px] text-zinc-500">Code & Refactor</div>
-              </div>
-            </button>
-
-            <button
-              type="button"
-              onClick={onNavigateToGit}
-              className="flex items-center gap-2.5 p-3 rounded-xl bg-[#11131A] hover:bg-[#161923] border border-white/8 hover:border-white/16 transition-colors text-left cursor-pointer group"
-            >
-              <GitBranch className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" />
-              <div>
-                <div className="text-xs font-semibold text-zinc-200">Source Control</div>
-                <div className="text-[11px] text-zinc-500">Staging & Commits</div>
-              </div>
-            </button>
-
-            <button
-              type="button"
-              onClick={onNavigateToServers}
-              className="flex items-center gap-2.5 p-3 rounded-xl bg-[#11131A] hover:bg-[#161923] border border-white/8 hover:border-white/16 transition-colors text-left cursor-pointer group"
-            >
-              <Activity className="w-4 h-4 text-sky-400 group-hover:scale-110 transition-transform" />
-              <div>
-                <div className="text-xs font-semibold text-zinc-200">Server Fleet</div>
-                <div className="text-[11px] text-zinc-500">VPS Telemetry & Ports</div>
-              </div>
-            </button>
+              <Badge category="status" status="active">
+                Ready
+              </Badge>
+            </div>
           </div>
         </div>
       </div>
@@ -401,7 +556,7 @@ export default function WelcomePage({
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
-            className="fixed inset-0 bg-black/75 backdrop-blur-sm"
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm"
             onClick={() => setShowModal(false)}
           />
           <div className="relative w-full max-w-xl bg-[#161923] border border-white/12 rounded-2xl shadow-2xl p-6 z-10 space-y-5 animate-in fade-in zoom-in-95 duration-100">

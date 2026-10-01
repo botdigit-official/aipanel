@@ -156,20 +156,22 @@ export default function Sidebar({
   return (
     <aside
       className={`h-full bg-[#0C0D12] border-r border-white/8 flex flex-col shrink-0 transition-all duration-200 select-none z-20 ${
-        collapsed ? "w-16" : "w-60"
+        collapsed ? "w-14" : "w-64"
       }`}
     >
       {/* Sidebar Header */}
-      <div className="h-10 px-3 flex items-center justify-between border-b border-white/6 shrink-0">
-        {!collapsed && (
-          <span className="text-[11px] font-bold tracking-wider text-zinc-500 uppercase font-mono">
-            Navigation
-          </span>
-        )}
+      <div className="h-11 px-3 flex items-center justify-between border-b border-white/6 shrink-0">
+        {!collapsed ? (
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-bold tracking-wider text-zinc-400 uppercase font-mono">
+              WORKSPACE
+            </span>
+          </div>
+        ) : null}
         <button
           onClick={onToggleCollapse}
-          title={collapsed ? "Expand Sidebar (240px)" : "Collapse Sidebar (64px)"}
-          className="p-1.5 rounded-md text-zinc-400 hover:text-zinc-200 hover:bg-white/5 transition-colors cursor-pointer ml-auto"
+          title={collapsed ? "Expand Sidebar (256px)" : "Collapse Sidebar (56px)"}
+          className="p-1 rounded-md text-zinc-400 hover:text-zinc-200 hover:bg-white/5 transition-colors cursor-pointer ml-auto"
         >
           {collapsed ? <PanelLeft className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
         </button>
