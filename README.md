@@ -42,6 +42,26 @@ Instead of running separate software for coding, server management, and deployme
 
 ---
 
+## 📸 Screenshots & Architecture in Action
+
+<div align="center">
+
+### 1. Modern Autonomous AI Development Hub & Code Editor
+*Featuring autonomous auto-save, zero-click auto-apply, multi-model BYOK selector, and line-by-line visual diff.*
+
+![AIPanel AI-Powered Development Hub](docs/assets/aipanel-developer-hub.png)
+
+<br/>
+
+### 2. Unified Developer Control Center & Server Fleet
+*Real-time server telemetry, container orchestration, Caddy reverse proxy, Cloudflare tunnels, and database studio.*
+
+![AIPanel Unified Developer Control Center](docs/assets/aipanel-control-center.png)
+
+</div>
+
+---
+
 ## ⚡ Core Features
 
 ### 1. Dual Operating Modes + Hybrid Remote Connect
@@ -235,8 +255,19 @@ AIPanel is engineered for production safety:
 
 ---
 
-## 🤝 Contributing & License
+## 🤝 Contributing & Developer Community
 
-Contributions are welcome! Please feel free to submit pull requests, report issues, or suggest new plugins.
+We welcome contributions from both **human software engineers** and **autonomous AI coding agents** (Cursor, Claude, Devin, Antigravity, Copilot)!
+
+* 📖 **Read the Contributor Guide**: See [CONTRIBUTING.md](CONTRIBUTING.md) for local setup, tech stack details, and coding conventions.
+* 📋 **Explore the Roadmap & Tasks**: Check [TODO.md](TODO.md) to find **Good First Issues**, intermediate features, and advanced infrastructure backlog items.
+* 🌿 **Git Branching Policy**: Always create semantic feature branches from `develop` (`feat/<name>`, `fix/<name>`, `chore/<name>`). Never push directly to `main` or `develop`.
+* 🧪 **Verification**: Ensure `npm run build` succeeds with 0 errors before submitting a pull request.
+* 📝 **Audit Trail**: Always append your changes to [CHANGELOG.md](CHANGELOG.md) under `## [Unreleased]`.
+
+---
+
+## 📄 License & Attribution
 
 Licensed under the **MIT License**. Created with ❤️ by **BotDigit**.
+For commercial enterprise cloud licensing or fleet support, visit [botdigit.site](https://botdigit.site).

@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added & Enhanced
+- **High-Resolution Architecture Screenshots & Media Assets (`docs/assets/`, `README.md`)**:
+  - Embedded high-resolution screenshots into `README.md` showcasing the **Autonomous AI Development Hub & Code Editor** (`aipanel-developer-hub.png`) and the **Unified Developer Control Center & VPS Server Fleet** (`aipanel-control-center.png`).
+- **Comprehensive Developer & LLM Contribution Guidelines (`CONTRIBUTING.md`)**:
+  - Authored a dedicated root `CONTRIBUTING.md` welcoming both human software engineers and autonomous AI coding agents (Cursor, Claude, Devin, Antigravity, Copilot).
+  - Outlined 3-minute quickstart setup, design system tokens, strict semantic git branching rules, and PR verification standards.
+- **Categorized Contributor Roadmap & Backlog Matrix (`TODO.md`)**:
+  - Restructured `TODO.md` with explicit distinction between **Shipped Features** and **Pending Backlog**.
+  - Categorized roadmap into Beginner-friendly **Good First Issues**, Intermediate Core Features, and Advanced Systems Infrastructure with file paths to guide contributors.
 - **Autonomous Auto-Save & Debounced Disk Synchronization (`src/stores/editor.ts`, `src/components/editor/EditorPanel.tsx`)**:
   - Implemented automatic file saving to disk (`writeFile`) on both AI modifications and direct typing (debounced 800ms), eliminating manual `⌘S` / `Accept & Save` requirements.
   - Enabled Auto-Save by default (`aipanel_autosave` in `localStorage`) with a 1-click `⚡ Auto-Save` toggle in the tab toolbar.
