@@ -134,9 +134,9 @@ export default function TopBar({
       )}
 
       {/* Main Top Bar */}
-      <header className="h-12 bg-[#0B0C11] border-b border-white/8 px-3 flex items-center justify-between select-none z-30 shrink-0 gap-3">
+      <header className="h-12 bg-[#141622] border-b border-[#222736] px-3.5 flex items-center justify-between select-none z-30 shrink-0 gap-3 font-sans">
         {/* ── Left: Brand, Project & Environment ── */}
-        <div className="flex items-center gap-2.5 shrink-0">
+        <div className="flex items-center gap-3 shrink-0">
           <IconButton
             variant="ghost"
             size="sm"
@@ -146,11 +146,11 @@ export default function TopBar({
           />
 
           {/* Brand & Project Badge */}
-          <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-[#11131A] border border-white/8">
-            <div className="w-5 h-5 rounded-md bg-violet-600/20 border border-violet-500/30 flex items-center justify-center text-xs font-bold text-violet-400">
+          <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg bg-[#0e1019] border border-[#222736]">
+            <div className="w-5 h-5 rounded-md bg-gradient-to-br from-violet-600 to-indigo-600 border border-violet-400/30 flex items-center justify-center text-xs font-bold text-white shadow-xs font-sans">
               {projectName.charAt(0).toUpperCase()}
             </div>
-            <span className="text-xs font-semibold text-zinc-100 truncate max-w-36">
+            <span className="text-xs font-semibold text-zinc-100 truncate max-w-36 font-sans">
               {projectName}
             </span>
             {projectPath && onCloseProject && (
@@ -170,7 +170,7 @@ export default function TopBar({
             <button
               type="button"
               onClick={() => setShowEnvDropdown(!showEnvDropdown)}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold border transition-colors cursor-pointer ${currentEnv.bg} ${currentEnv.border} ${currentEnv.text}`}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors cursor-pointer font-sans ${currentEnv.bg} ${currentEnv.border} ${currentEnv.text}`}
               title="Switch Target Environment"
             >
               <span className={`w-1.5 h-1.5 rounded-full ${currentEnv.dot}`} />
@@ -180,8 +180,8 @@ export default function TopBar({
             </button>
 
             {showEnvDropdown && (
-              <div className="absolute top-full left-0 mt-1.5 w-56 p-1 bg-[#161923] border border-white/12 rounded-xl shadow-xl z-50 animate-in fade-in zoom-in-95 duration-100">
-                <div className="px-2.5 py-1 text-[10px] font-bold text-zinc-500 uppercase tracking-wider border-b border-white/6 font-mono">
+              <div className="absolute top-full left-0 mt-1.5 w-56 p-1.5 bg-[#141622] border border-[#252c40] rounded-xl shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-100">
+                <div className="px-3 py-1.5 text-[10px] font-semibold text-zinc-400 uppercase tracking-wider border-b border-[#202538] font-sans">
                   Select Environment
                 </div>
                 {(["dev", "staging", "production"] as Environment[]).map((envKey) => {
@@ -195,7 +195,7 @@ export default function TopBar({
                         onEnvironmentChange(envKey);
                         setShowEnvDropdown(false);
                       }}
-                      className={`w-full flex items-center justify-between px-2.5 py-2 text-xs rounded-lg transition-colors cursor-pointer text-left ${
+                      className={`w-full flex items-center justify-between px-3 py-2 text-xs rounded-lg transition-colors cursor-pointer text-left font-sans ${
                         isActive ? `${meta.bg} ${meta.text}` : "hover:bg-white/5 text-zinc-300"
                       }`}
                     >
@@ -217,13 +217,13 @@ export default function TopBar({
           <button
             type="button"
             onClick={onOpenCommandPalette}
-            className="w-full flex items-center justify-between px-3.5 py-1.5 rounded-lg bg-[#11131A] hover:bg-[#161923] border border-white/10 hover:border-violet-500/30 text-xs text-zinc-400 transition-all cursor-pointer shadow-xs group"
+            className="w-full flex items-center justify-between px-4 py-1.5 rounded-lg bg-[#0e1019] hover:bg-[#161a28] border border-[#222736] hover:border-violet-500/40 text-xs text-zinc-400 transition-all cursor-pointer shadow-xs group"
           >
             <div className="flex items-center gap-2.5 truncate">
               <Search className="w-3.5 h-3.5 text-zinc-400 group-hover:text-violet-400 transition-colors shrink-0" />
-              <span className="truncate text-zinc-400 group-hover:text-zinc-200">Search commands, files, fleet, actions...</span>
+              <span className="truncate text-zinc-400 group-hover:text-zinc-200 font-sans">Search commands, files, fleet, actions...</span>
             </div>
-            <kbd className="px-2 py-0.5 text-[10px] font-mono text-zinc-300 bg-white/5 border border-white/12 rounded shrink-0">
+            <kbd className="px-2 py-0.5 text-[10px] font-mono text-zinc-300 bg-white/5 border border-white/10 rounded shrink-0">
               ⌘K
             </kbd>
           </button>

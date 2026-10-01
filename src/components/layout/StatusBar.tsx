@@ -66,9 +66,9 @@ export default function StatusBar({
   const envMeta = envBadgeConfig[environment] || envBadgeConfig.dev;
 
   return (
-    <footer className="h-7 bg-[#0B0C11] border-t border-white/8 px-2 flex items-center justify-between text-xs select-none z-30 shrink-0 font-mono">
+    <footer className="h-6.5 bg-[#141622] border-t border-[#222736] px-2.5 flex items-center justify-between text-xs select-none z-30 shrink-0 font-sans">
       {/* ── Left Interactive Status Modules ── */}
-      <div className="flex items-center divide-x divide-white/8">
+      <div className="flex items-center divide-x divide-[#222736]">
         {/* Environment Button */}
         <button
           type="button"

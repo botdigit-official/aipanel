@@ -173,22 +173,22 @@ export default function Sidebar({
 
   return (
     <aside
-      className={`h-full bg-[#0c0e16] border-r border-[#1e2437] flex flex-col shrink-0 transition-all duration-200 select-none z-20 ${
-        collapsed ? "w-14" : "w-64"
+      className={`h-full bg-[#0d0f17] border-r border-[#222736] flex flex-col shrink-0 transition-all duration-200 select-none z-20 ${
+        collapsed ? "w-14" : "w-60"
       }`}
     >
       {/* Sidebar Header */}
-      <div className="h-11 px-3 flex items-center justify-between border-b border-[#1b2030] shrink-0 bg-[#0a0c13]/50">
+      <div className="h-11 px-3 flex items-center justify-between border-b border-[#202535] shrink-0 bg-[#0a0c13]/40">
         {!collapsed ? (
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-extrabold tracking-widest text-zinc-400 uppercase font-mono">
+            <span className="text-[11px] font-semibold tracking-wider text-zinc-400 uppercase font-sans">
               WORKSPACE EXPLORER
             </span>
           </div>
         ) : null}
         <button
           onClick={onToggleCollapse}
-          title={collapsed ? "Expand Sidebar (256px)" : "Collapse Sidebar (56px)"}
+          title={collapsed ? "Expand Sidebar (240px)" : "Collapse Sidebar (56px)"}
           className="p-1 rounded-md text-zinc-400 hover:text-zinc-200 hover:bg-white/5 transition-colors cursor-pointer ml-auto"
         >
           {collapsed ? <PanelLeft className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
@@ -196,30 +196,30 @@ export default function Sidebar({
       </div>
 
       {/* Nav Groups Container */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden py-2 px-2 space-y-3">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden py-3 px-2 space-y-3">
         {navGroups.map((group) => {
           const expanded = isGroupExpanded(group.key, group.items);
 
           return (
-            <div key={group.key} className="space-y-0.5">
+            <div key={group.key} className="space-y-1">
               {/* Group Header (only when expanded) */}
               {!collapsed ? (
                 <button
                   type="button"
                   onClick={() => toggleGroup(group.key)}
-                  className="w-full flex items-center justify-between px-2.5 py-1 text-[10px] font-extrabold text-zinc-400 tracking-widest hover:text-zinc-200 rounded group cursor-pointer transition-colors"
+                  className="w-full flex items-center justify-between px-2.5 py-1 text-[11px] font-semibold text-zinc-400 tracking-wider hover:text-zinc-200 rounded group cursor-pointer transition-colors"
                 >
-                  <span className="font-mono">{group.label}</span>
+                  <span className="font-sans uppercase">{group.label}</span>
                   <span className="text-zinc-500 group-hover:text-zinc-400">
                     {!expanded ? (
-                      <ChevronRight className="w-3 h-3" />
+                      <ChevronRight className="w-3.5 h-3.5" />
                     ) : (
-                      <ChevronDown className="w-3 h-3" />
+                      <ChevronDown className="w-3.5 h-3.5" />
                     )}
                   </span>
                 </button>
               ) : (
-                <div className="h-px border-t border-[#1e2437] mx-2 my-1.5" />
+                <div className="h-px border-t border-[#202535] mx-2 my-1.5" />
               )}
 
               {/* Group Items */}
@@ -235,11 +235,11 @@ export default function Sidebar({
                         type="button"
                         onClick={() => handleSelect(item.id)}
                         title={collapsed ? item.label : undefined}
-                        className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+                        className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-medium transition-colors cursor-pointer ${
                           isActive
-                            ? "bg-violet-600/15 text-violet-300 font-semibold border border-violet-500/25 shadow-sm"
-                            : "text-zinc-300 hover:text-white hover:bg-white/5 border border-transparent"
-                        } ${collapsed ? "justify-center px-0 py-2" : ""}`}
+                            ? "bg-[#202538] text-white font-semibold border-l-2 border-violet-500 shadow-sm"
+                            : "text-zinc-300 hover:text-white hover:bg-white/[0.04] border-l-2 border-transparent"
+                        } ${collapsed ? "justify-center px-0 py-2.5" : ""}`}
                       >
                         <Icon
                           className={`w-4 h-4 shrink-0 ${
@@ -248,7 +248,7 @@ export default function Sidebar({
                         />
                         {!collapsed && (
                           <>
-                            <span className="truncate flex-1 text-left text-[13px] leading-tight">
+                            <span className="truncate flex-1 text-left font-sans leading-tight">
                               {item.label}
                             </span>
                             {item.badge && (
