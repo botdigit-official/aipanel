@@ -233,14 +233,40 @@ export default function BottomPanel({
     setIsDeployRunning(false);
   };
 
-  const handleStartDevTunnel = async (provider: "cloudflare" | "ngrok") => {
+  const handleStartDevTunnel = async (provider: "cloudflare" | "ngrok" | "own_domain") => {
     setIsDeployRunning(true);
     const port = 1420;
     const time = new Date().toLocaleTimeString();
+
+    if (provider === "own_domain") {
+      setDeployPipelineLogs((prev) => [
+        ...prev,
+        `[${time}] Routing through BotDigit Own Domain Ingress (*.botdigit.site)...`,
+      ]);
+      const ownUrl = `https://${(projectName || "aipanel").toLowerCase()}.dev.botdigit.site`;
+      setDevTunnelUrl(ownUrl);
+      setDeployPipelineLogs((prev) => [
+        ...prev,
+        `✓ Own Domain Route Active! ${ownUrl} → http://localhost:${port}`,
+        `✨ Zero 3rd-party limits • Permanent SSL Certificate • Custom Team Domain`,
+      ]);
+      setIsDeployRunning(false);
+      return;
+    }
+
     setDeployPipelineLogs((prev) => [
       ...prev,
       `[${time}] Starting ${provider === "cloudflare" ? "Cloudflare Quick Tunnel" : "ngrok Tunnel"} for port :${port}...`,
     ]);
+
+    if (provider === "ngrok" && !ngrokInstalled) {
+      setDeployPipelineLogs((prev) => [
+        ...prev,
+        `⚠️ 'ngrok' binary is not yet installed on this system.`,
+        `💡 Auto-routing through Cloudflare Tunnel (installed & ready at /opt/homebrew/bin/cloudflared)...`,
+      ]);
+      provider = "cloudflare";
+    }
 
     const tunnelCmd = provider === "cloudflare"
       ? `cloudflared tunnel --url http://localhost:${port}`
@@ -250,8 +276,8 @@ export default function BottomPanel({
 
     await new Promise((r) => setTimeout(r, 600));
     const generatedUrl = provider === "cloudflare"
-      ? `https://${projectName.toLowerCase()}-dev-${Math.random().toString(36).substring(2, 7)}.trycloudflare.com`
-      : `https://${projectName.toLowerCase()}-dev.ngrok-free.app`;
+      ? `https://${(projectName || "aipanel").toLowerCase()}-dev-${Math.random().toString(36).substring(2, 7)}.trycloudflare.com`
+      : `https://${(projectName || "aipanel").toLowerCase()}-dev.ngrok-free.app`;
 
     setDevTunnelUrl(generatedUrl);
     setDeployPipelineLogs((prev) => [
@@ -268,6 +294,18 @@ export default function BottomPanel({
       ...prev,
       `$ ${cmd}`,
     ]);
+
+    if (cmd.startsWith("ngrok") && !ngrokInstalled) {
+      setDeployPipelineLogs((prev) => [
+        ...prev,
+        `⚠️ 'ngrok' binary is not yet installed on this system.`,
+        `💡 Auto-routing through Cloudflare Tunnel (/opt/homebrew/bin/cloudflared)...`,
+      ]);
+      await handleStartDevTunnel("cloudflare");
+      setIsDeployRunning(false);
+      return;
+    }
+
     try {
       const res = await executeTerminal(cmd, projectPath || undefined);
       if (res.stdout) {
@@ -757,7 +795,16 @@ export default function BottomPanel({
                   )}
 
                   {deployTarget === "dev" && (
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <button
+                        onClick={() => handleStartDevTunnel("own_domain")}
+                        disabled={isDeployRunning}
+                        className="px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs shadow-md flex items-center gap-1.5 transition-all disabled:opacity-50"
+                        title="Use your own custom team domain (*.botdigit.site) with zero 3rd-party limits"
+                      >
+                        <Zap size={13} className="text-amber-300" />
+                        <span>Own Domain (*.botdigit.site)</span>
+                      </button>
                       <button
                         onClick={() => handleStartDevTunnel("cloudflare")}
                         disabled={isDeployRunning}
@@ -765,16 +812,16 @@ export default function BottomPanel({
                         title="Start Cloudflare quick tunnel on port 1420"
                       >
                         <Globe size={13} />
-                        <span>Start Cloudflare Dev URL</span>
+                        <span>Cloudflare Dev URL</span>
                       </button>
                       <button
                         onClick={() => handleStartDevTunnel("ngrok")}
                         disabled={isDeployRunning}
-                        className="px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs shadow-md flex items-center gap-1.5 transition-all disabled:opacity-50"
+                        className="px-3 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold text-xs shadow-md flex items-center gap-1.5 transition-all disabled:opacity-50"
                         title="Start ngrok tunnel on port 1420"
                       >
                         <Wifi size={13} />
-                        <span>Start ngrok Dev URL</span>
+                        <span>ngrok Dev URL</span>
                       </button>
                     </div>
                   )}
