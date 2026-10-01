@@ -4,7 +4,8 @@ import { Sparkles, X } from "lucide-react";
 
 import Sidebar from "./components/layout/Sidebar";
 import TopBar, { type Environment } from "./components/layout/TopBar";
-import StatusBar, { defaultDevServices, type ServiceStatus } from "./components/layout/StatusBar";
+import StatusBar from "./components/layout/StatusBar";
+import { defaultDevServices, type ServiceStatus } from "./lib/services";
 import FileExplorer from "./components/explorer/FileExplorer";
 import EditorPanel, { type EditorTab } from "./components/editor/EditorPanel";
 import AIPanel from "./components/ai/AIPanel";

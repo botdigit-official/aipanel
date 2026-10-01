@@ -1,21 +1,13 @@
 import {
-  Database,
-  Wifi,
-  HardDrive,
   GitBranch,
   Cpu,
   Layers,
   Lock,
-  type LucideIcon,
 } from "lucide-react";
 import type { Environment } from "./TopBar";
+import type { ServiceStatus } from "../../lib/services";
 
-export interface ServiceStatus {
-  name: string;
-  icon: LucideIcon;
-  status: "running" | "stopped" | "error";
-  port?: number;
-}
+export type { ServiceStatus };
 
 interface StatusBarProps {
   environment: Environment;
@@ -158,8 +150,3 @@ export default function StatusBar({
   );
 }
 
-export const defaultDevServices: ServiceStatus[] = [
-  { name: "PostgreSQL", icon: Database, status: "stopped", port: 5432 },
-  { name: "Redis", icon: HardDrive, status: "stopped", port: 6379 },
-  { name: "Tunnel", icon: Wifi, status: "stopped" },
-];
