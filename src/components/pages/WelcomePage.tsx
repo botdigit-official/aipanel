@@ -20,6 +20,11 @@ import {
   CheckCircle2,
   Cpu,
   Zap,
+  Play,
+  Terminal,
+  RefreshCw,
+  Lock,
+  GitCommit,
 } from "lucide-react";
 import { open } from "@tauri-apps/plugin-dialog";
 import { Card, Button, Badge, StatusIndicator } from "../../design-system";
@@ -72,7 +77,7 @@ const templates: TemplateOption[] = [
   },
   {
     id: "rust-axum",
-    name: "Rust Axum Microservice",
+    name: "Rust Axum Service",
     desc: "Blazing fast Tokio runtime with Tower middleware & mTLS.",
     icon: Server,
     badge: "Rust",
@@ -174,34 +179,44 @@ export default function WelcomePage({
             changes: 0,
             lastOpened: "15 mins ago",
           },
+          {
+            name: "botdigit-ai-council",
+            path: "/Volumes/Mac2TB/Botdigit/Developer/Projects/botdigit-ai-council",
+            framework: "Python + Fastify",
+            branch: "feat/council",
+            changes: 1,
+            lastOpened: "2 hours ago",
+          },
         ];
 
   return (
-    <div className="flex-1 bg-[#08090D] overflow-y-auto px-6 py-6 flex flex-col justify-start select-none">
-      <div className="w-full max-w-7xl mx-auto space-y-6 animate-in fade-in duration-150">
-        {/* ── Contextual Hero Header ── */}
+    <div className="flex-1 bg-[#08090D] overflow-y-auto px-6 lg:px-8 py-6 select-none w-full">
+      <div className="w-full space-y-6 animate-in fade-in duration-150">
+        {/* ── Top Header Banner (Full Width) ── */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl bg-[#11131A] border border-white/8 shadow-md">
-          <div>
-            <div className="flex items-center gap-2 text-xs font-semibold text-violet-400 font-mono tracking-wider uppercase mb-1">
-              <span className="w-2 h-2 rounded-full bg-violet-400 animate-pulse" />
-              Unified AI Developer IDE & VPS Platform
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-violet-600/20 border border-violet-500/35 flex items-center justify-center text-violet-400 font-extrabold text-xl shrink-0 shadow-sm">
+              A
             </div>
-            <h1 className="text-2xl font-bold text-zinc-100 tracking-tight">
-              {greeting}, Developer
-            </h1>
-            <p className="text-xs text-zinc-400 mt-1">
-              Continue where you left off or scaffold a new microservice.
-            </p>
+            <div>
+              <div className="flex items-center gap-2 text-xs font-semibold text-violet-400 font-mono tracking-wider uppercase mb-0.5">
+                <span className="w-2 h-2 rounded-full bg-violet-400 animate-pulse" />
+                Unified AI Developer IDE & VPS Control Plane
+              </div>
+              <h1 className="text-xl sm:text-2xl font-bold text-zinc-100 tracking-tight">
+                {greeting}, Developer
+              </h1>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2.5 shrink-0">
+          <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
             <Button
               variant="outline"
               size="sm"
               icon={<FolderOpen className="w-4 h-4 text-zinc-400" />}
               onClick={onOpenProject}
             >
-              Open Project
+              Open Project (⌘O)
             </Button>
             <Button
               variant="primary"
@@ -214,73 +229,63 @@ export default function WelcomePage({
           </div>
         </div>
 
-        {/* ── 2-Column Balanced Dashboard Layout ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* ════════ LEFT COLUMN: Workspaces, Templates & Quick Starters (7 Cols) ════════ */}
-          <div className="lg:col-span-7 space-y-6">
+        {/* ── 3-Column Powerhouse Dashboard Grid (Fills 100% of the display width) ── */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-12 gap-6 items-start w-full">
+          {/* ════════ COLUMN 1: Workspaces & Architecture Templates (4 Columns) ════════ */}
+          <div className="xl:col-span-4 space-y-5">
             {/* Recent Workspaces Card Stack */}
             <div>
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center justify-between mb-2.5">
                 <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider font-mono flex items-center gap-1.5">
                   <Clock className="w-3.5 h-3.5 text-zinc-500" />
                   Recent Workspaces
                 </span>
                 <span className="text-[11px] text-zinc-500 font-mono">
-                  {displayProjects.length} registered
+                  {displayProjects.length} active
                 </span>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 {displayProjects.map((project) => (
                   <Card
                     key={project.path}
                     variant="interactive"
                     onClick={() => onOpenRecent(project.path)}
-                    className="p-4 group border-white/8 hover:border-violet-500/40"
+                    className="p-3.5 group border-white/8 hover:border-violet-500/40"
                   >
                     <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-start gap-3.5 min-w-0">
-                        <div className="w-10 h-10 rounded-xl bg-violet-600/15 border border-violet-500/30 flex items-center justify-center text-violet-400 font-bold text-base shrink-0 group-hover:scale-105 transition-transform">
-                          <Box className="w-5 h-5" />
+                      <div className="flex items-start gap-3 min-w-0">
+                        <div className="w-9 h-9 rounded-lg bg-violet-600/15 border border-violet-500/30 flex items-center justify-center text-violet-400 font-bold shrink-0 group-hover:scale-105 transition-transform">
+                          <Box className="w-4 h-4" />
                         </div>
                         <div className="min-w-0">
-                          <div className="flex items-center gap-2.5 flex-wrap">
-                            <span className="text-sm font-semibold text-zinc-100 group-hover:text-violet-300 transition-colors truncate">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-xs font-semibold text-zinc-100 group-hover:text-violet-300 transition-colors truncate">
                               {project.name}
                             </span>
                             <Badge category="env" env="dev" dot>
                               DEV
                             </Badge>
-                            {project.framework && (
-                              <span className="text-[11px] font-mono text-zinc-300 bg-white/5 px-2 py-0.5 rounded border border-white/8">
-                                {project.framework}
-                              </span>
-                            )}
                           </div>
-                          <div className="text-xs font-mono text-zinc-500 truncate mt-1">
+                          <div className="text-[11px] font-mono text-zinc-500 truncate mt-0.5">
                             {project.path}
                           </div>
-                          <div className="flex items-center gap-3 mt-2 text-[11px] text-zinc-400 font-mono">
+                          <div className="flex items-center gap-2.5 mt-1.5 text-[10px] text-zinc-400 font-mono">
                             <span className="flex items-center gap-1 text-zinc-300">
                               <GitBranch className="w-3 h-3 text-violet-400" />
                               <span>{project.branch || "main"}</span>
                             </span>
                             <span>•</span>
                             <span className="text-amber-400">
-                              {project.changes !== undefined ? `${project.changes} modified files` : "Clean tree"}
+                              {project.changes !== undefined ? `${project.changes} modified` : "Clean"}
                             </span>
                           </div>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2 shrink-0">
-                        <span className="text-xs text-zinc-500 hidden sm:inline-block font-mono">
-                          {project.lastOpened}
-                        </span>
-                        <div className="flex items-center gap-1 text-xs font-semibold text-violet-400 group-hover:translate-x-1 transition-transform ml-2">
-                          <span>Open</span>
-                          <ArrowRight className="w-3.5 h-3.5" />
-                        </div>
+                      <div className="flex items-center gap-1 text-xs font-semibold text-violet-400 group-hover:translate-x-1 transition-transform shrink-0">
+                        <span>Open</span>
+                        <ArrowRight className="w-3 h-3" />
                       </div>
                     </div>
                   </Card>
@@ -288,17 +293,17 @@ export default function WelcomePage({
               </div>
             </div>
 
-            {/* Quick Architecture Templates */}
+            {/* Architecture Starter Templates */}
             <div>
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center justify-between mb-2.5">
                 <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider font-mono flex items-center gap-1.5">
                   <Zap className="w-3.5 h-3.5 text-zinc-500" />
-                  Instant Starter Scaffolding
+                  Instant Starter Templates
                 </span>
-                <span className="text-[11px] text-zinc-500 font-mono">1-click create</span>
+                <span className="text-[11px] text-zinc-500 font-mono">Scaffold</span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 {templates.map((tpl) => {
                   const Icon = tpl.icon;
                   return (
@@ -308,24 +313,21 @@ export default function WelcomePage({
                         setSelectedTemplate(tpl.id);
                         setShowModal(true);
                       }}
-                      className="p-3.5 rounded-xl bg-[#11131A] hover:bg-[#161923] border border-white/8 hover:border-violet-500/30 transition-all cursor-pointer group"
+                      className="p-3 rounded-xl bg-[#11131A] hover:bg-[#161923] border border-white/8 hover:border-violet-500/30 transition-all cursor-pointer group"
                     >
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="w-7 h-7 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-violet-400 group-hover:bg-violet-600/20 group-hover:border-violet-500/30 transition-colors">
-                          <Icon className="w-4 h-4" />
+                      <div className="flex items-center justify-between mb-1.5">
+                        <div className="w-6 h-6 rounded-md bg-white/5 border border-white/10 flex items-center justify-center text-violet-400 group-hover:bg-violet-600/20 transition-colors">
+                          <Icon className="w-3.5 h-3.5" />
                         </div>
-                        <span className="text-[10px] font-mono font-medium text-zinc-400 bg-white/5 px-2 py-0.5 rounded border border-white/8">
+                        <span className="text-[9px] font-mono text-zinc-400 bg-white/5 px-1.5 py-0.2 rounded border border-white/8">
                           {tpl.badge}
                         </span>
                       </div>
-                      <div className="text-xs font-semibold text-zinc-200 group-hover:text-white transition-colors">
+                      <div className="text-xs font-semibold text-zinc-200 group-hover:text-white transition-colors truncate">
                         {tpl.name}
                       </div>
-                      <div className="text-[11px] text-zinc-400 mt-1 line-clamp-2">
+                      <div className="text-[10px] text-zinc-400 mt-1 line-clamp-1">
                         {tpl.desc}
-                      </div>
-                      <div className="text-[10px] font-mono text-zinc-500 mt-2">
-                        {tpl.runtime}
                       </div>
                     </div>
                   );
@@ -335,18 +337,18 @@ export default function WelcomePage({
 
             {/* Quick Actions Shortcuts */}
             <div>
-              <div className="mb-3">
+              <div className="mb-2.5">
                 <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider font-mono">
                   Primary Toolsets
                 </span>
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
                   onClick={onNavigateToCode}
-                  className="flex items-center gap-2 p-2.5 rounded-xl bg-[#11131A] hover:bg-[#161923] border border-white/8 hover:border-white/16 transition-colors text-left cursor-pointer group"
+                  className="flex items-center gap-2 p-2 rounded-xl bg-[#11131A] hover:bg-[#161923] border border-white/8 hover:border-white/16 transition-colors text-left cursor-pointer group"
                 >
-                  <Code2 className="w-4 h-4 text-blue-400 group-hover:scale-110 transition-transform shrink-0" />
+                  <Code2 className="w-4 h-4 text-blue-400 shrink-0" />
                   <div className="min-w-0">
                     <div className="text-xs font-semibold text-zinc-200 truncate">Code Editor</div>
                     <div className="text-[10px] text-zinc-500 truncate">Buffer & Tree</div>
@@ -356,35 +358,35 @@ export default function WelcomePage({
                 <button
                   type="button"
                   onClick={onNavigateToAI}
-                  className="flex items-center gap-2 p-2.5 rounded-xl bg-[#11131A] hover:bg-[#161923] border border-white/8 hover:border-white/16 transition-colors text-left cursor-pointer group"
+                  className="flex items-center gap-2 p-2 rounded-xl bg-[#11131A] hover:bg-[#161923] border border-white/8 hover:border-white/16 transition-colors text-left cursor-pointer group"
                 >
-                  <Sparkles className="w-4 h-4 text-violet-400 group-hover:scale-110 transition-transform shrink-0" />
+                  <Sparkles className="w-4 h-4 text-violet-400 shrink-0" />
                   <div className="min-w-0">
                     <div className="text-xs font-semibold text-zinc-200 truncate">AI Agent</div>
-                    <div className="text-[10px] text-zinc-500 truncate">Context Aware</div>
+                    <div className="text-[10px] text-zinc-500 truncate">Context Engine</div>
                   </div>
                 </button>
 
                 <button
                   type="button"
                   onClick={onNavigateToGit}
-                  className="flex items-center gap-2 p-2.5 rounded-xl bg-[#11131A] hover:bg-[#161923] border border-white/8 hover:border-white/16 transition-colors text-left cursor-pointer group"
+                  className="flex items-center gap-2 p-2 rounded-xl bg-[#11131A] hover:bg-[#161923] border border-white/8 hover:border-white/16 transition-colors text-left cursor-pointer group"
                 >
-                  <GitBranch className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform shrink-0" />
+                  <GitBranch className="w-4 h-4 text-emerald-400 shrink-0" />
                   <div className="min-w-0">
-                    <div className="text-xs font-semibold text-zinc-200 truncate">Source Control</div>
-                    <div className="text-[10px] text-zinc-500 truncate">Staging & Tags</div>
+                    <div className="text-xs font-semibold text-zinc-200 truncate">Git Cockpit</div>
+                    <div className="text-[10px] text-zinc-500 truncate">Commits & Diff</div>
                   </div>
                 </button>
 
                 <button
                   type="button"
                   onClick={onNavigateToServers}
-                  className="flex items-center gap-2 p-2.5 rounded-xl bg-[#11131A] hover:bg-[#161923] border border-white/8 hover:border-white/16 transition-colors text-left cursor-pointer group"
+                  className="flex items-center gap-2 p-2 rounded-xl bg-[#11131A] hover:bg-[#161923] border border-white/8 hover:border-white/16 transition-colors text-left cursor-pointer group"
                 >
-                  <Activity className="w-4 h-4 text-sky-400 group-hover:scale-110 transition-transform shrink-0" />
+                  <Activity className="w-4 h-4 text-sky-400 shrink-0" />
                   <div className="min-w-0">
-                    <div className="text-xs font-semibold text-zinc-200 truncate">Server Fleet</div>
+                    <div className="text-xs font-semibold text-zinc-200 truncate">Fleet Control</div>
                     <div className="text-[10px] text-zinc-500 truncate">VPS & Telemetry</div>
                   </div>
                 </button>
@@ -392,8 +394,151 @@ export default function WelcomePage({
             </div>
           </div>
 
-          {/* ════════ RIGHT COLUMN: Live System Telemetry, AI Models & Daemons (5 Cols) ════════ */}
-          <div className="lg:col-span-5 space-y-5">
+          {/* ════════ COLUMN 2: Workspace Activity, Local Daemons & CLI Runners (4 Columns) ════════ */}
+          <div className="xl:col-span-4 space-y-5">
+            {/* Active Backing Services & Daemons Cockpit */}
+            <Card className="p-4 space-y-3.5 border-white/10">
+              <div className="flex items-center justify-between border-b border-white/6 pb-2.5">
+                <div className="flex items-center gap-2">
+                  <Server className="w-4 h-4 text-emerald-400" />
+                  <span className="text-xs font-bold text-zinc-100 uppercase tracking-wider font-mono">
+                    Local Dev Daemons
+                  </span>
+                </div>
+                <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                  4 Active
+                </span>
+              </div>
+
+              <div className="space-y-2 text-xs font-mono">
+                <div className="flex items-center justify-between p-2.5 rounded-lg bg-[#0C0D12] border border-white/6">
+                  <div className="flex items-center gap-2">
+                    <Database className="w-3.5 h-3.5 text-blue-400" />
+                    <div>
+                      <span className="text-zinc-200 font-semibold block">PostgreSQL 16</span>
+                      <span className="text-[10px] text-zinc-500">127.0.0.1:5432</span>
+                    </div>
+                  </div>
+                  <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded">
+                    Running (4 conn)
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between p-2.5 rounded-lg bg-[#0C0D12] border border-white/6">
+                  <div className="flex items-center gap-2">
+                    <HardDrive className="w-3.5 h-3.5 text-rose-400" />
+                    <div>
+                      <span className="text-zinc-200 font-semibold block">Redis 7.2 Cache</span>
+                      <span className="text-[10px] text-zinc-500">127.0.0.1:6379</span>
+                    </div>
+                  </div>
+                  <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded">
+                    Running (2.4MB)
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between p-2.5 rounded-lg bg-[#0C0D12] border border-white/6">
+                  <div className="flex items-center gap-2">
+                    <Wifi className="w-3.5 h-3.5 text-teal-400" />
+                    <div>
+                      <span className="text-zinc-200 font-semibold block">Caddy v2.8 Proxy</span>
+                      <span className="text-[10px] text-zinc-500">Ports 80 / 443</span>
+                    </div>
+                  </div>
+                  <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded">
+                    TLS 1.3 Active
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between p-2.5 rounded-lg bg-[#0C0D12] border border-white/6">
+                  <div className="flex items-center gap-2">
+                    <Shield className="w-3.5 h-3.5 text-amber-400" />
+                    <div>
+                      <span className="text-zinc-200 font-semibold block">CF Zero Trust Tunnel</span>
+                      <span className="text-[10px] text-zinc-500">*.botdigit.site</span>
+                    </div>
+                  </div>
+                  <span className="text-[10px] text-sky-400 bg-sky-500/10 px-1.5 py-0.5 rounded">
+                    Edge Synced
+                  </span>
+                </div>
+              </div>
+            </Card>
+
+            {/* Recent Git Activity Stream */}
+            <Card className="p-4 space-y-3 border-white/10">
+              <div className="flex items-center justify-between border-b border-white/6 pb-2.5">
+                <div className="flex items-center gap-2">
+                  <GitCommit className="w-4 h-4 text-violet-400" />
+                  <span className="text-xs font-bold text-zinc-100 uppercase tracking-wider font-mono">
+                    Workspace Git Stream
+                  </span>
+                </div>
+                <span className="text-[10px] font-mono text-zinc-400">develop</span>
+              </div>
+
+              <div className="space-y-2 text-xs font-mono">
+                <div className="p-2 rounded-lg bg-[#0C0D12] border border-white/6 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-violet-400 font-semibold truncate">
+                      feat(ui): establish design system
+                    </span>
+                    <span className="text-[10px] text-zinc-500">Just now</span>
+                  </div>
+                  <p className="text-[11px] text-zinc-400 font-sans line-clamp-1">
+                    Layered surfaces, tokens, command center and balanced cockpit.
+                  </p>
+                </div>
+
+                <div className="p-2 rounded-lg bg-[#0C0D12] border border-white/6 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-zinc-300 font-semibold truncate">
+                      feat(installer): 1-click server setup
+                    </span>
+                    <span className="text-[10px] text-zinc-500">30m ago</span>
+                  </div>
+                  <p className="text-[11px] text-zinc-400 font-sans line-clamp-1">
+                    Zero-prompt hardware audit, swap provisioning and firewall rules.
+                  </p>
+                </div>
+              </div>
+            </Card>
+
+            {/* Quick Command CLI Runners */}
+            <div className="p-3.5 rounded-xl bg-[#11131A] border border-white/8 space-y-2">
+              <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider font-mono flex items-center gap-1.5">
+                <Terminal className="w-3.5 h-3.5 text-zinc-500" />
+                Quick Terminal Tasks
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+                <button
+                  type="button"
+                  onClick={onNavigateToCode}
+                  className="flex items-center justify-between p-2 rounded-lg bg-[#0C0D12] border border-white/6 hover:border-violet-500/30 text-zinc-300 hover:text-white transition-colors cursor-pointer"
+                >
+                  <span className="flex items-center gap-1">
+                    <Play className="w-3 h-3 text-emerald-400" />
+                    aipanel dev
+                  </span>
+                  <span className="text-[10px] text-zinc-500">Run</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={onNavigateToCode}
+                  className="flex items-center justify-between p-2 rounded-lg bg-[#0C0D12] border border-white/6 hover:border-violet-500/30 text-zinc-300 hover:text-white transition-colors cursor-pointer"
+                >
+                  <span className="flex items-center gap-1">
+                    <RefreshCw className="w-3 h-3 text-cyan-400" />
+                    aipanel build
+                  </span>
+                  <span className="text-[10px] text-zinc-500">Run</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* ════════ COLUMN 3: Live Hardware Telemetry & Fleet Cloud (4 Columns) ════════ */}
+          <div className="xl:col-span-4 space-y-5">
             {/* Live Host Hardware Telemetry Card */}
             <Card className="p-4 space-y-3.5 border-white/10">
               <div className="flex items-center justify-between border-b border-white/6 pb-2.5">
@@ -411,9 +556,9 @@ export default function WelcomePage({
                 <div className="flex items-center justify-between text-xs font-mono mb-1">
                   <span className="text-zinc-400 flex items-center gap-1.5">
                     <Cpu className="w-3.5 h-3.5 text-cyan-400" />
-                    CPU Cores (8 Threads)
+                    CPU Load (8 Cores)
                   </span>
-                  <span className="text-zinc-200 font-semibold">12% Load</span>
+                  <span className="text-zinc-200 font-semibold">12%</span>
                 </div>
                 <div className="w-full h-2 rounded-full bg-white/5 overflow-hidden">
                   <div className="h-full bg-cyan-400 rounded-full w-[12%]" />
@@ -437,17 +582,59 @@ export default function WelcomePage({
               {/* Disk & Network Metrics */}
               <div className="grid grid-cols-2 gap-2 pt-1 text-[11px] font-mono">
                 <div className="p-2.5 rounded-lg bg-[#0C0D12] border border-white/6">
-                  <span className="text-zinc-500 block">NVMe Storage</span>
+                  <span className="text-zinc-500 block">NVMe Pool</span>
                   <span className="text-zinc-200 font-semibold mt-0.5 block">54 GB / 120 GB</span>
                 </div>
                 <div className="p-2.5 rounded-lg bg-[#0C0D12] border border-white/6">
-                  <span className="text-zinc-500 block">Network I/O</span>
+                  <span className="text-zinc-500 block">10Gbps Network</span>
                   <span className="text-emerald-400 font-semibold mt-0.5 block">↑ 1.4M · ↓ 4.2M</span>
                 </div>
               </div>
             </Card>
 
-            {/* AI Multi-Model Connectivity Card */}
+            {/* Server Fleet Management Card */}
+            <Card className="p-4 space-y-3 border-white/10">
+              <div className="flex items-center justify-between border-b border-white/6 pb-2.5">
+                <div className="flex items-center gap-2">
+                  <Server className="w-4 h-4 text-purple-400" />
+                  <span className="text-xs font-bold text-zinc-100 uppercase tracking-wider font-mono">
+                    Managed Server Fleet
+                  </span>
+                </div>
+                <span className="text-[10px] font-mono text-zinc-400">2 Nodes</span>
+              </div>
+
+              <div className="space-y-2 text-xs font-mono">
+                <div className="p-2.5 rounded-lg bg-[#0C0D12] border border-white/6 flex items-center justify-between">
+                  <div>
+                    <div className="flex items-center gap-1.5 font-semibold text-zinc-200">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                      <span>srv-staging-01</span>
+                    </div>
+                    <span className="text-[10px] text-zinc-500">US-East • 24ms • 3 services</span>
+                  </div>
+                  <Badge category="env" env="staging">
+                    STAGING
+                  </Badge>
+                </div>
+
+                <div className="p-2.5 rounded-lg bg-[#0C0D12] border border-white/6 flex items-center justify-between">
+                  <div>
+                    <div className="flex items-center gap-1.5 font-semibold text-zinc-200">
+                      <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
+                      <span>srv-prod-01</span>
+                      <Lock className="w-3 h-3 text-rose-400" />
+                    </div>
+                    <span className="text-[10px] text-zinc-500">EU-Central • 68ms • 5 services</span>
+                  </div>
+                  <Badge category="env" env="production">
+                    PROD
+                  </Badge>
+                </div>
+              </div>
+            </Card>
+
+            {/* AI Multi-Model Gateway Card */}
             <Card className="p-4 space-y-3 border-white/10">
               <div className="flex items-center justify-between border-b border-white/6 pb-2.5">
                 <div className="flex items-center gap-2">
@@ -457,80 +644,26 @@ export default function WelcomePage({
                   </span>
                 </div>
                 <span className="text-[10px] font-mono text-zinc-400 bg-violet-500/10 px-2 py-0.5 rounded border border-violet-500/20">
-                  BYOK Encrypted
+                  BYOK
                 </span>
               </div>
 
-              <div className="space-y-2 text-xs font-mono">
-                <div className="flex items-center justify-between p-2 rounded-lg bg-[#0C0D12] border border-white/6">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                    <span className="text-zinc-200">Claude 3.7 Sonnet</span>
-                  </div>
-                  <span className="text-zinc-500 text-[10px]">Anthropic API</span>
-                </div>
-
-                <div className="flex items-center justify-between p-2 rounded-lg bg-[#0C0D12] border border-white/6">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                    <span className="text-zinc-200">GPT-4o & o3-mini</span>
-                  </div>
-                  <span className="text-zinc-500 text-[10px]">OpenAI API</span>
-                </div>
-
-                <div className="flex items-center justify-between p-2 rounded-lg bg-[#0C0D12] border border-white/6">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-sky-400" />
-                    <span className="text-zinc-200">Local Ollama</span>
-                  </div>
-                  <span className="text-zinc-500 text-[10px]">:11434</span>
-                </div>
-              </div>
-            </Card>
-
-            {/* Backing Services & Daemons Cockpit */}
-            <Card className="p-4 space-y-3 border-white/10">
-              <div className="flex items-center justify-between border-b border-white/6 pb-2.5">
-                <div className="flex items-center gap-2">
-                  <Server className="w-4 h-4 text-emerald-400" />
-                  <span className="text-xs font-bold text-zinc-100 uppercase tracking-wider font-mono">
-                    Services & Daemons
-                  </span>
-                </div>
-                <span className="text-[10px] font-mono text-zinc-400">4 Active</span>
-              </div>
-
               <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-                <div className="p-2 rounded-lg bg-[#0C0D12] border border-white/6 flex items-center justify-between">
-                  <div className="flex items-center gap-1.5">
-                    <Database className="w-3.5 h-3.5 text-blue-400" />
-                    <span className="text-zinc-300">PostgreSQL</span>
-                  </div>
-                  <span className="text-[10px] text-zinc-500">:5432</span>
+                <div className="p-2 rounded-lg bg-[#0C0D12] border border-white/6">
+                  <span className="text-zinc-200 font-semibold block truncate">Claude 3.7</span>
+                  <span className="text-[10px] text-emerald-400">● Connected</span>
                 </div>
-
-                <div className="p-2 rounded-lg bg-[#0C0D12] border border-white/6 flex items-center justify-between">
-                  <div className="flex items-center gap-1.5">
-                    <HardDrive className="w-3.5 h-3.5 text-rose-400" />
-                    <span className="text-zinc-300">Redis</span>
-                  </div>
-                  <span className="text-[10px] text-zinc-500">:6379</span>
+                <div className="p-2 rounded-lg bg-[#0C0D12] border border-white/6">
+                  <span className="text-zinc-200 font-semibold block truncate">GPT-4o</span>
+                  <span className="text-[10px] text-emerald-400">● Connected</span>
                 </div>
-
-                <div className="p-2 rounded-lg bg-[#0C0D12] border border-white/6 flex items-center justify-between">
-                  <div className="flex items-center gap-1.5">
-                    <Wifi className="w-3.5 h-3.5 text-teal-400" />
-                    <span className="text-zinc-300">Caddy TLS</span>
-                  </div>
-                  <span className="text-[10px] text-zinc-500">:443</span>
+                <div className="p-2 rounded-lg bg-[#0C0D12] border border-white/6">
+                  <span className="text-zinc-200 font-semibold block truncate">Gemini 2.5</span>
+                  <span className="text-[10px] text-emerald-400">● Connected</span>
                 </div>
-
-                <div className="p-2 rounded-lg bg-[#0C0D12] border border-white/6 flex items-center justify-between">
-                  <div className="flex items-center gap-1.5">
-                    <Shield className="w-3.5 h-3.5 text-amber-400" />
-                    <span className="text-zinc-300">CF Tunnel</span>
-                  </div>
-                  <span className="text-[10px] text-emerald-400">Active</span>
+                <div className="p-2 rounded-lg bg-[#0C0D12] border border-white/6">
+                  <span className="text-zinc-200 font-semibold block truncate">Ollama Local</span>
+                  <span className="text-[10px] text-sky-400">:11434</span>
                 </div>
               </div>
             </Card>
@@ -545,7 +678,7 @@ export default function WelcomePage({
                 </div>
               </div>
               <Badge category="status" status="active">
-                Ready
+                Passed
               </Badge>
             </div>
           </div>
