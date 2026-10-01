@@ -53,4 +53,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Editor Locking & Navigation Bug**:
   - Fixed condition in `src/App.tsx` where `!projectPath` forced the app to always render the Welcome dashboard when clicking "Code" (`activePanel === "explorer"`).
   - Configured current workspace path `/Volumes/Mac2TB/Botdigit/Developer/Projects/aipanel` as the active project, and automatically opens the file tree and `README.md` in Monaco upon clicking "Code".
+- **Antigravity IDE Typography & Spacing Alignment**:
+  - Replaced pervasive terminal monospace fonts on headings, cards, descriptions, and list items with clean `Inter` sans-serif typography matching the Antigravity IDE standard.
+  - Restricted monospace font strictly to code commands, endpoints, and port numbers.
+  - Increased card padding (`p-5`, `p-6`) and row heights (`h-9 px-3 py-2`), providing comfortable line-heights and margins across the entire layout.
 

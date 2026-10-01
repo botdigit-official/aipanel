@@ -43,7 +43,12 @@
   - [x] Clicking 'Code' immediately activates Monaco Editor and File Tree
 - [x] Structured Interactive Status Bar (`StatusBar.tsx`):
   - [x] Environment status pill, Git branch button, interactive service indicators, CPU/RAM metrics
+- [x] Antigravity IDE Typography & Spacing Standard:
+  - [x] Adopted `Inter` font-sans as primary UI typography across all cards, titles, headers, and descriptions
+  - [x] Stripped out monospace font from labels, cards, and titles (confined font-mono strictly to ports, paths, and code)
+  - [x] Relaxed card padding (`p-5`, `p-6`) and list item gaps (`gap-3.5`, `space-y-3`) for breathable IDE layout
+  - [x] Upgraded TopBar (`h-12`) and Sidebar (`w-60`) heights, widths, and row padding (`h-9 px-3 py-2`)
 - [x] Quality Gates Verified:
-  - [x] `npm run build` succeeds (0 TypeScript/lint errors in 271ms)
+  - [x] `npm run build` succeeds (0 TypeScript/lint errors in 277ms)
   - [x] `cargo check` in `src-tauri` passes
 
