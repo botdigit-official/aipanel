@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { open } from "@tauri-apps/plugin-dialog";
 import { Sparkles, X } from "lucide-react";
 
@@ -25,6 +25,7 @@ import ServerDashboard from "./components/server/ServerDashboard";
 import HostingPanel from "./components/hosting/HostingPanel";
 import ClientCRMPanel from "./components/hosting/ClientCRMPanel";
 import ModeSelectorModal from "./components/layout/ModeSelectorModal";
+import { CommandPalette } from "./design-system";
 import { initialPlugins } from "./lib/plugins";
 import type { OperatingMode, AIPanelPlugin } from "./lib/types";
 
@@ -90,10 +91,23 @@ export default function App() {
 
   // Layout state
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [activePanel, setActivePanel] = useState("explorer");
+  const [activePanel, setActivePanel] = useState("dashboard");
   const [bottomExpanded, setBottomExpanded] = useState(false);
   const [showAI, setShowAI] = useState(false);
   const [showDevOpsDock, setShowDevOpsDock] = useState(false);
+  const [showCommandPalette, setShowCommandPalette] = useState(false);
+
+  // Global ⌘K / Ctrl+K Shortcut
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setShowCommandPalette((prev) => !prev);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   // Project state
   const [projectPath, setProjectPath] = useState<string | null>(null);
@@ -349,7 +363,11 @@ export default function App() {
         operatingMode={operatingMode}
         onOpenModeSelector={() => setShowModeModal(true)}
         onOpenControlCenter={() => setActivePanel("control-center")}
-        onDeployClick={() => setActivePanel("releases")}
+        onDeployClick={(targetEnv) => {
+          if (targetEnv) setEnvironment(targetEnv);
+          setActivePanel("releases");
+        }}
+        onOpenCommandPalette={() => setShowCommandPalette(true)}
         onCloseProject={() => {
           setProjectPath(null);
           setProjectInfo(null);
@@ -439,6 +457,13 @@ export default function App() {
                 recentProjects={recentProjects}
                 onOpenRecent={(path) => openProject(path)}
                 onCreateProject={handleCreateProject}
+                onNavigateToCode={() => setActivePanel("explorer")}
+                onNavigateToAI={() => {
+                  setActivePanel("explorer");
+                  setShowAI(true);
+                }}
+                onNavigateToGit={() => setActivePanel("git")}
+                onNavigateToServers={() => setActivePanel("servers")}
               />
             ) : activePanel === "control-center" ? (
               <ControlCenter
@@ -569,6 +594,11 @@ export default function App() {
         activeFile={activeTab || undefined}
         cursorPosition={activeTab ? { line: 1, col: 1 } : undefined}
         gitBranch={currentBranch}
+        onSelectService={(name) =>
+          setActivePanel(name === "PostgreSQL" || name === "Redis" ? "database" : "docker")
+        }
+        onSelectBranch={() => setActivePanel("git")}
+        onSelectEnvironment={() => setActivePanel("releases")}
       />
 
       {/* Mode Selector Modal */}
@@ -577,6 +607,22 @@ export default function App() {
         currentMode={operatingMode}
         onSelectMode={handleSelectMode}
         onClose={() => setShowModeModal(false)}
+      />
+
+      {/* Global Command Palette (⌘K) */}
+      <CommandPalette
+        isOpen={showCommandPalette}
+        onClose={() => setShowCommandPalette(false)}
+        onNavigate={(panel) => setActivePanel(panel)}
+        onTriggerAI={() => {
+          setActivePanel("explorer");
+          setShowAI(true);
+        }}
+        onOpenProject={() => openProject()}
+        onDeploy={(env) => {
+          setEnvironment(env as Environment);
+          setActivePanel("releases");
+        }}
       />
     </div>
   );

@@ -1,17 +1,36 @@
-# Active Tasks — Intelligent Server Auto-Installer
+# Active Tasks — AIPanel Master UI/UX Professionalization
 
-- [x] Analyze server installer requirements & eliminate manual user prompts
-- [x] Implement multi-distro hardware & OS detection (Ubuntu, Debian, RHEL, CentOS, Rocky, Alma, Alpine, macOS)
-- [x] Implement intelligent auto-tuning:
-  - [x] Auto-provision 2GB swap space for low-memory VPS (<2GB RAM)
-  - [x] Configure sysctl swappiness & cache pressure
-  - [x] Apply standard and high-performance server tuning profiles
-- [x] Implement automated dependency installation (Docker Engine, Caddy, core tools)
-- [x] Implement port probing & conflict avoidance for control port 9876
-- [x] Implement zero-friction automated firewall setup (UFW, Firewalld, iptables)
-- [x] Implement aaPanel-style security entrance, strong credentials & token generation
-- [x] Implement `/usr/local/bin/aipanel` server management CLI companion
-- [x] Implement aaPanel-style completion banner with external/LAN URLs and credentials
-- [x] Provide 1-line root proxy installer `install.sh`
-- [x] Update living documentation (`README.md`, `docs/getting-started/installation.md`)
-- [x] Record changelog in `CHANGELOG.md`
+- [x] Establish permanent UI/UX Standard specification document (`docs/UI_UX_STANDARD.md`)
+- [x] Build centralized Design System (`src/design-system/`):
+  - [x] Layered dark surface palette (`#08090D`, `#0C0D12`, `#0B0C11`, `#11131A`, `#161923`, `#1B1E28`)
+  - [x] 4-pixel grid spacing system (4, 8, 12, 16, 20, 24, 32, 40, 48)
+  - [x] Rigorous typography tokens (Display, Page Title, Heading, Section Label, Body, Secondary, Caption, Metadata)
+  - [x] Standardized border radius tokens (xs, sm, md, lg, xl, full)
+  - [x] Standard elevation & glow shadows
+  - [x] Base components: `Button`, `IconButton`, `Badge`, `StatusIndicator`, `Card`, `Input`, `Dialog`, `EmptyState`, `Skeleton`, `DangerConfirmDialog`
+- [x] Progressive Disclosure Sidebar (`Sidebar.tsx`):
+  - [x] Reorganized groups: WORKSPACE, DEVELOPMENT, DELIVERY, INFRASTRUCTURE, CLIENTS, CONTROL
+  - [x] Collapsible groups with persistent state memory (`localStorage`)
+  - [x] Responsive 240px expanded vs 64px collapsed icon-only rail
+  - [x] Consistent 16px Lucide iconography and standard badges
+- [x] Hierarchy TopBar (`TopBar.tsx`):
+  - [x] Clean brand & project selector
+  - [x] Environment selector with active indicators
+  - [x] Centered ⌘K Command Palette search trigger
+  - [x] Action-oriented `[ Deploy ▾ ]` split button with target selection (DEV, STAGING, PRODUCTION)
+  - [x] Production Safe Mode gating modal
+- [x] Global Command Palette (`CommandPalette.tsx`):
+  - [x] Global keyboard shortcut (`⌘K` / `Ctrl+K`)
+  - [x] Unified search across commands, actions, navigation, and AI queries
+  - [x] Keyboard navigation (`ArrowUp`, `ArrowDown`, `Enter`, `Escape`)
+- [x] High-Density Dashboard (`WelcomePage.tsx`):
+  - [x] Eliminated excessive empty space
+  - [x] Contextual time-aware greeting
+  - [x] Real Recent Projects cards with framework badges and 1-click open
+  - [x] System Capabilities telemetry status grid (Environment, AI, Source Control, Server Fleet)
+  - [x] Fast workflow triggers (Editor, AI, Git, Servers)
+- [x] Structured Interactive Status Bar (`StatusBar.tsx`):
+  - [x] Environment status pill, Git branch button, interactive service indicators, CPU/RAM metrics
+- [x] Quality Gates Verified:
+  - [x] `npm run build` succeeds (0 TypeScript/lint errors)
+  - [x] `cargo check` in `src-tauri` passes

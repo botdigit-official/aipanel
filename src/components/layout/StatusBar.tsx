@@ -1,16 +1,14 @@
-import { Database, Wifi, HardDrive, GitBranch, type LucideIcon } from "lucide-react";
+import {
+  Database,
+  Wifi,
+  HardDrive,
+  GitBranch,
+  Cpu,
+  Layers,
+  Lock,
+  type LucideIcon,
+} from "lucide-react";
 import type { Environment } from "./TopBar";
-
-// ── Types ────────────────────────────────────────────────────────
-
-interface StatusBarProps {
-  environment: Environment;
-  services: ServiceStatus[];
-  activeFile?: string;
-  cursorPosition?: { line: number; col: number };
-  fileCount?: number;
-  gitBranch?: string;
-}
 
 export interface ServiceStatus {
   name: string;
@@ -19,110 +17,149 @@ export interface ServiceStatus {
   port?: number;
 }
 
-// ── Env Colors ───────────────────────────────────────────────────
+interface StatusBarProps {
+  environment: Environment;
+  services: ServiceStatus[];
+  activeFile?: string;
+  cursorPosition?: { line: number; col: number };
+  fileCount?: number;
+  gitBranch?: string;
+  onSelectService?: (name: string) => void;
+  onSelectBranch?: () => void;
+  onSelectEnvironment?: () => void;
+}
 
-const envColors: Record<Environment, string> = {
-  dev: "bg-status-success",
-  staging: "bg-status-warning",
-  production: "bg-status-error",
+const envBadgeConfig: Record<
+  Environment,
+  { label: string; dot: string; text: string; bg: string }
+> = {
+  dev: {
+    label: "DEV",
+    dot: "bg-emerald-400",
+    text: "text-emerald-400",
+    bg: "hover:bg-emerald-500/10",
+  },
+  staging: {
+    label: "STAGING",
+    dot: "bg-amber-400",
+    text: "text-amber-400",
+    bg: "hover:bg-amber-500/10",
+  },
+  production: {
+    label: "PRODUCTION",
+    dot: "bg-rose-500",
+    text: "text-rose-400",
+    bg: "hover:bg-rose-500/15",
+  },
 };
-
-const envLabels: Record<Environment, string> = {
-  dev: "DEV",
-  staging: "STAGING",
-  production: "PRODUCTION",
-};
-
-// ── Component ────────────────────────────────────────────────────
 
 export default function StatusBar({
   environment,
   services,
   activeFile,
   cursorPosition,
-  fileCount,
   gitBranch,
+  onSelectService,
+  onSelectBranch,
+  onSelectEnvironment,
 }: StatusBarProps) {
+  const envMeta = envBadgeConfig[environment] || envBadgeConfig.dev;
+
   return (
-    <footer
-      className={`
-        flex items-center h-6.5 px-3 text-[11px] select-none
-        border-t border-zinc-800/80 shrink-0
-        ${environment === "production"
-          ? "bg-rose-950/30 border-t-rose-500/30 text-rose-300"
-          : "bg-zinc-950 text-zinc-400"
-        }
-      `}
-    >
-      {/* Environment */}
-      <div className="flex items-center gap-1.5 pr-3 border-r border-zinc-800/70">
-        <span className={`w-1.5 h-1.5 rounded-full ${envColors[environment]} animate-pulse`} />
-        <span className="font-semibold text-zinc-300 tracking-tight">{envLabels[environment]}</span>
+    <footer className="h-7 bg-[#0B0C11] border-t border-white/8 px-2 flex items-center justify-between text-xs select-none z-30 shrink-0 font-mono">
+      {/* ── Left Interactive Status Modules ── */}
+      <div className="flex items-center divide-x divide-white/8">
+        {/* Environment Button */}
+        <button
+          type="button"
+          onClick={onSelectEnvironment}
+          className={`flex items-center gap-1.5 px-2.5 py-1 transition-colors cursor-pointer ${envMeta.bg}`}
+          title={`Active Environment: ${envMeta.label} (Click to manage)`}
+        >
+          <span className={`w-1.5 h-1.5 rounded-full ${envMeta.dot} shrink-0`} />
+          <span className={`font-bold text-[11px] ${envMeta.text}`}>
+            {envMeta.label}
+          </span>
+          {environment === "production" && (
+            <Lock className="w-3 h-3 text-rose-400 shrink-0 ml-0.5" />
+          )}
+        </button>
+
+        {/* Git Branch */}
+        <button
+          type="button"
+          onClick={onSelectBranch}
+          className="flex items-center gap-1.5 px-2.5 py-1 text-zinc-300 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+          title={`Git Branch: ${gitBranch || "main"} (Click to view source control)`}
+        >
+          <GitBranch className="w-3.5 h-3.5 text-violet-400 shrink-0" />
+          <span className="text-[11px] font-medium">{gitBranch || "main"}</span>
+        </button>
+
+        {/* Services Status */}
+        <div className="hidden sm:flex items-center divide-x divide-white/6">
+          {services.map((srv) => {
+            const Icon = srv.icon;
+            const isOnline = srv.status === "running";
+
+            return (
+              <button
+                key={srv.name}
+                type="button"
+                onClick={() => onSelectService?.(srv.name)}
+                className="flex items-center gap-1.5 px-2.5 py-1 text-zinc-400 hover:text-zinc-200 hover:bg-white/5 transition-colors cursor-pointer text-[11px]"
+                title={`${srv.name}: ${srv.status}${srv.port ? ` on port ${srv.port}` : ""}`}
+              >
+                <Icon
+                  className={`w-3 h-3 shrink-0 ${
+                    isOnline ? "text-emerald-400" : "text-zinc-500"
+                  }`}
+                />
+                <span className={isOnline ? "text-zinc-200" : "text-zinc-500"}>
+                  {srv.name}
+                </span>
+                {srv.port && (
+                  <span className="text-[10px] text-zinc-500">:{srv.port}</span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Live Host Telemetry Metrics */}
+        <div className="hidden md:flex items-center gap-3 px-2.5 py-1 text-[11px] text-zinc-400">
+          <span className="flex items-center gap-1 text-zinc-400">
+            <Cpu className="w-3 h-3 text-cyan-400 shrink-0" />
+            <span>CPU 3%</span>
+          </span>
+          <span className="text-zinc-600">•</span>
+          <span className="flex items-center gap-1 text-zinc-400">
+            <Layers className="w-3 h-3 text-purple-400 shrink-0" />
+            <span>RAM 1.2 GB</span>
+          </span>
+        </div>
       </div>
 
-      {/* Git Branch */}
-      <div className="flex items-center gap-1.5 px-3 border-r border-zinc-800/70 text-zinc-400 font-mono text-[11px]">
-        <GitBranch size={11} className="text-indigo-400" />
-        <span className="text-zinc-300">{gitBranch || "main"}</span>
-      </div>
-
-      {/* Services */}
-      <div className="flex items-center gap-3 px-3 border-r border-zinc-800/70">
-        {services.map((service) => {
-          const Icon = service.icon;
-          const isRunning = service.status === "running";
-          return (
-            <div
-              key={service.name}
-              className="flex items-center gap-1.5"
-              title={`${service.name}: ${service.status}${service.port ? ` (port ${service.port})` : ""}`}
-            >
-              <Icon size={11} className={isRunning ? "text-emerald-400" : "text-zinc-500"} />
-              <span className={`font-medium text-[11px] ${isRunning ? "text-emerald-400" : "text-zinc-400"}`}>
-                {service.name}
-              </span>
-              {service.port && (
-                <span className="text-zinc-500 font-mono text-[10px]">:{service.port}</span>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Telemetry quick metrics */}
-      <div className="hidden md:flex items-center gap-2 px-3 border-r border-zinc-800/70 text-[10px] font-mono text-zinc-500">
-        <span>RAM 1.2 GB</span>
-        <span>•</span>
-        <span>CPU 3%</span>
-      </div>
-
-      {/* Spacer */}
-      <div className="flex-1" />
-
-      {/* File info & Encoding */}
-      <div className="flex items-center gap-3 text-zinc-400 text-[11px]">
+      {/* ── Right Buffer & Coordinate Info ── */}
+      <div className="flex items-center gap-3 text-[11px] text-zinc-400 pr-1">
         {cursorPosition && (
-          <span className="font-mono text-zinc-300">
+          <span className="text-zinc-300">
             Ln {cursorPosition.line}, Col {cursorPosition.col}
           </span>
         )}
-        <span className="hidden sm:inline font-mono text-[10px] text-zinc-500 uppercase">UTF-8</span>
+        <span className="text-zinc-500 uppercase hidden lg:inline">UTF-8</span>
         {activeFile && (
-          <span className="truncate max-w-48 text-zinc-300 font-medium">
+          <span className="text-zinc-200 font-medium truncate max-w-44">
             {activeFile.split("/").pop()}
           </span>
-        )}
-        {fileCount !== undefined && (
-          <span className="text-zinc-500">{fileCount} files</span>
         )}
       </div>
     </footer>
   );
 }
 
-// Default services for development
 export const defaultDevServices: ServiceStatus[] = [
-  { name: "PostgreSQL", icon: Database, status: "stopped" },
-  { name: "Redis", icon: HardDrive, status: "stopped" },
+  { name: "PostgreSQL", icon: Database, status: "stopped", port: 5432 },
+  { name: "Redis", icon: HardDrive, status: "stopped", port: 6379 },
   { name: "Tunnel", icon: Wifi, status: "stopped" },
 ];
