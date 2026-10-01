@@ -837,7 +837,7 @@ export default function WelcomePage({
                             isSelected ? "text-violet-400" : "text-zinc-400"
                           }`}
                         />
-                        <span className="text-[10px] font-mono text-zinc-400 bg-white/5 px-1.5 py-0.2 rounded border border-white/8">
+                        <span className="text-[10px] font-mono text-zinc-400 bg-white/5 px-2 py-0.5 rounded border border-white/8">
                           {tpl.badge}
                         </span>
                       </div>

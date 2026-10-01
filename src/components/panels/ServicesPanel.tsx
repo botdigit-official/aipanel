@@ -168,30 +168,30 @@ export default function ServicesPanel({ environment, projectName = "Project" }: 
   return (
     <div className="flex-1 flex flex-col bg-zinc-950 text-zinc-100 overflow-hidden font-sans">
       {/* Header bar */}
-      <div className="h-12 border-b border-zinc-800 px-4 flex items-center justify-between shrink-0 bg-zinc-900/60">
-        <div className="flex items-center gap-3">
-          <div className="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-400">
+      <div className="h-13 border-b border-[#222736] px-5 flex items-center justify-between shrink-0 bg-[#0f111a]">
+        <div className="flex items-center gap-3.5">
+          <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
             <Container size={18} />
           </div>
           <div>
-            <h2 className="text-sm font-semibold text-zinc-100 flex items-center gap-2">
+            <h2 className="text-sm font-semibold text-zinc-100 flex items-center gap-3">
               <span>Environment Engine</span>
-              <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <span className="text-[10px] font-mono uppercase font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 tracking-wider">
                 {environment} Stack
               </span>
             </h2>
-            <p className="text-[11px] text-zinc-500">
+            <p className="text-[11px] text-zinc-400 mt-0.5">
               Docker compose services, background workers, and secrets isolation
             </p>
           </div>
         </div>
 
         {/* Action buttons */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           {allRunning ? (
             <button
               onClick={stopAll}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-750 text-xs font-medium text-rose-300 border border-rose-500/20 transition-all"
+              className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-zinc-850 hover:bg-zinc-800 text-xs font-medium text-rose-300 border border-rose-500/20 transition-all cursor-pointer"
             >
               <Square size={12} className="fill-rose-400 text-rose-400" />
               <span>Stop All Services</span>
@@ -199,7 +199,7 @@ export default function ServicesPanel({ environment, projectName = "Project" }: 
           ) : (
             <button
               onClick={startAll}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-medium text-white shadow-sm transition-all"
+              className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-medium text-white shadow-sm transition-all cursor-pointer"
             >
               <Play size={12} className="fill-white" />
               <span>Start All Services</span>
@@ -209,10 +209,10 @@ export default function ServicesPanel({ environment, projectName = "Project" }: 
       </div>
 
       {/* Sub-nav Tabs */}
-      <div className="flex items-center gap-1 px-4 border-b border-zinc-850 bg-zinc-900/30 text-xs shrink-0 h-9">
+      <div className="flex items-center gap-3 px-5 border-b border-[#202535] bg-[#0c0e15] text-xs shrink-0 h-10">
         <button
           onClick={() => setActiveTab("services")}
-          className={`flex items-center gap-1.5 px-3 h-full border-b-2 font-medium transition-colors ${
+          className={`flex items-center gap-2 px-3 h-full border-b-2 font-medium transition-colors cursor-pointer ${
             activeTab === "services"
               ? "border-indigo-500 text-zinc-100"
               : "border-transparent text-zinc-400 hover:text-zinc-200"
@@ -223,7 +223,7 @@ export default function ServicesPanel({ environment, projectName = "Project" }: 
         </button>
         <button
           onClick={() => setActiveTab("workers")}
-          className={`flex items-center gap-1.5 px-3 h-full border-b-2 font-medium transition-colors ${
+          className={`flex items-center gap-2 px-3 h-full border-b-2 font-medium transition-colors cursor-pointer ${
             activeTab === "workers"
               ? "border-indigo-500 text-zinc-100"
               : "border-transparent text-zinc-400 hover:text-zinc-200"
@@ -234,7 +234,7 @@ export default function ServicesPanel({ environment, projectName = "Project" }: 
         </button>
         <button
           onClick={() => setActiveTab("vault")}
-          className={`flex items-center gap-1.5 px-3 h-full border-b-2 font-medium transition-colors ${
+          className={`flex items-center gap-2 px-3 h-full border-b-2 font-medium transition-colors cursor-pointer ${
             activeTab === "vault"
               ? "border-indigo-500 text-zinc-100"
               : "border-transparent text-zinc-400 hover:text-zinc-200"
@@ -320,24 +320,38 @@ export default function ServicesPanel({ environment, projectName = "Project" }: 
                           )}
                         </div>
                         <div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-semibold text-zinc-100">
+                          <div className="flex items-center gap-3">
+                            <span className="text-sm font-semibold text-zinc-100 font-sans">
                               {service.name}
                             </span>
                             <span
-                              className={`text-[10px] font-mono px-1.5 py-0.2 rounded ${
+                              className={`text-[10px] font-mono font-medium px-2 py-0.5 rounded-full border ${
                                 isRunning
-                                  ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                                  : "bg-zinc-800 text-zinc-400"
+                                  ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                                  : "bg-zinc-800 text-zinc-400 border-zinc-700"
                               }`}
                             >
                               {service.status}
                             </span>
                           </div>
-                          <div className="flex items-center gap-3 text-[11px] text-zinc-500 font-mono mt-0.5">
-                            {service.port && <span>Port: :{service.port}</span>}
-                            {service.containerId && <span>Container: {service.containerId}</span>}
-                            {service.uptime && isRunning && <span>Uptime: {service.uptime}</span>}
+                          <div className="flex items-center gap-3 text-[11px] text-zinc-400 font-mono mt-1">
+                            {service.port && (
+                              <span>
+                                Port: <span className="text-zinc-200">{service.port}</span>
+                              </span>
+                            )}
+                            {service.containerId && (
+                              <>
+                                <span className="text-zinc-600">•</span>
+                                <span>Container: {service.containerId}</span>
+                              </>
+                            )}
+                            {service.uptime && isRunning && (
+                              <>
+                                <span className="text-zinc-600">•</span>
+                                <span>Uptime: {service.uptime}</span>
+                              </>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -402,13 +416,13 @@ export default function ServicesPanel({ environment, projectName = "Project" }: 
                     className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-zinc-850/40 transition-colors"
                   >
                     <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-sm font-semibold text-zinc-100">{worker.name}</span>
+                      <div className="flex items-center gap-3 mb-1">
+                        <span className="text-sm font-semibold text-zinc-100 font-sans">{worker.name}</span>
                         <span
-                          className={`text-[10px] font-mono px-1.5 py-0.2 rounded ${
+                          className={`text-[10px] font-mono font-medium px-2 py-0.5 rounded-full border ${
                             isRunning
-                              ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                              : "bg-zinc-800 text-zinc-400"
+                              ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                              : "bg-zinc-800 text-zinc-400 border-zinc-700"
                           }`}
                         >
                           {worker.status}

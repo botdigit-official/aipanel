@@ -510,7 +510,7 @@ export default function DeployPanel({
               <div className="flex items-center justify-between">
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-2">
                   <span>DEPLOYMENT HISTORY & RELEASES</span>
-                  <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-zinc-800 text-zinc-400">
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-800 text-zinc-400">
                     {deployments.length} total
                   </span>
                 </h3>
@@ -561,7 +561,7 @@ export default function DeployPanel({
                             >
                               {dep.status}
                             </span>
-                            <span className="text-[11px] text-zinc-400 font-mono bg-zinc-800/60 px-1.5 py-0.2 rounded border border-zinc-700/40">
+                            <span className="text-[11px] text-zinc-400 font-mono bg-zinc-800/60 px-2 py-0.5 rounded border border-zinc-700/40">
                               {dep.commit_hash}
                             </span>
                           </div>
@@ -999,7 +999,7 @@ export default function DeployPanel({
                     <div className="flex items-center gap-2">
                       <h3 className="text-sm font-semibold text-zinc-100">{srv.name}</h3>
                       <span
-                        className={`text-[9px] font-mono px-1.5 py-0.2 rounded font-bold uppercase ${
+                        className={`text-[9px] font-mono px-2 py-0.5 rounded font-bold uppercase ${
                           srv.environment === "production"
                             ? "bg-rose-500/15 text-rose-300 border border-rose-500/20"
                             : "bg-amber-500/15 text-amber-300 border border-amber-500/20"

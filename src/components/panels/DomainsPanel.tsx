@@ -284,11 +284,11 @@ export default function DomainsPanel({
               {domains.map((dom) => (
                 <tr key={dom.id} className="hover:bg-zinc-800/30 transition-colors">
                   <td className="py-3.5 px-4">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2.5">
                       <Globe size={13} className="text-indigo-400 shrink-0" />
                       <span className="font-bold text-zinc-100">{dom.domain}</span>
                       {dom.isCustom && (
-                        <span className="px-1.5 py-0.2 rounded bg-indigo-500/15 text-[9px] text-indigo-300 border border-indigo-500/20">
+                        <span className="px-2 py-0.5 rounded bg-indigo-500/15 text-[9px] text-indigo-300 border border-indigo-500/20">
                           Custom
                         </span>
                       )}

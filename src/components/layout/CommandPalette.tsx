@@ -357,7 +357,7 @@ export default function CommandPalette({
                     </span>
                     {cmd.shortcut && (
                       <kbd
-                        className={`text-[10px] font-mono px-1.5 py-0.2 rounded border ${
+                        className={`text-[10px] font-mono px-2 py-0.5 rounded border ${
                           isSelected
                             ? "bg-white/20 border-white/30 text-white"
                             : "bg-zinc-800 border-zinc-700 text-zinc-400"

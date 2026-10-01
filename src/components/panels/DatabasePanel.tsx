@@ -125,7 +125,7 @@ export default function DatabasePanel({ environment, projectName }: DatabasePane
             </span>
           </div>
           <span
-            className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded uppercase ${
+            className={`text-[9px] font-mono font-bold px-2 py-0.5 rounded uppercase ${
               environment === "production"
                 ? "bg-rose-500/15 text-rose-300 border border-rose-500/20"
                 : environment === "staging"

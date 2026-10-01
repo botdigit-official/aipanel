@@ -134,9 +134,9 @@ export default function SettingsPanel({ environment: _environment }: SettingsPan
 
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
-            <div className="text-xs font-medium text-zinc-200 flex items-center gap-1.5">
+            <div className="text-xs font-medium text-zinc-200 flex items-center gap-2.5">
               <span>Strict Production Release Gating</span>
-              <span className="px-1.5 py-0.2 rounded bg-rose-500/10 border border-rose-500/20 text-[9px] font-mono text-rose-400">
+              <span className="px-2 py-0.5 rounded bg-rose-500/10 border border-rose-500/20 text-[9px] font-mono text-rose-400">
                 RECOMMENDED
               </span>
             </div>

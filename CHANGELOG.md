@@ -53,8 +53,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Editor Locking & Navigation Bug**:
   - Fixed condition in `src/App.tsx` where `!projectPath` forced the app to always render the Welcome dashboard when clicking "Code" (`activePanel === "explorer"`).
   - Configured current workspace path `/Volumes/Mac2TB/Botdigit/Developer/Projects/aipanel` as the active project, and automatically opens the file tree and `README.md` in Monaco upon clicking "Code".
-- **Antigravity IDE Typography & Spacing Alignment**:
-  - Replaced pervasive terminal monospace fonts on headings, cards, descriptions, and list items with clean `Inter` sans-serif typography matching the Antigravity IDE standard.
-  - Restricted monospace font strictly to code commands, endpoints, and port numbers.
-  - Increased card padding (`p-5`, `p-6`) and row heights (`h-9 px-3 py-2`), providing comfortable line-heights and margins across the entire layout.
+- **Spacing & Badge Collision Resolution ("Kissing" Elements Bug)**:
+  - Fixed badges kissing and colliding with labels (`Domains & SSL SSL`, `AI Agent PRO`, `Source Control 3`) by expanding sidebar width from 240px to standard 256px (`w-64`) and docking badges to the far right using `ml-auto shrink-0` and an explicit `gap-2`.
+  - Shortened sidebar header from `WORKSPACE EXPLORER` to `EXPLORER` with `px-3.5`, preventing collisions with the collapse toggle button.
+  - Eliminated squished badges across the application by auditing and replacing invalid Tailwind `py-0.2` classes with valid `py-0.5` across `ServicesPanel`, `DatabasePanel`, `GitPanel`, `SettingsPanel`, `DomainsPanel`, `CommandPalette`, `DeployPanel`, and `WelcomePage`.
+  - Polished `ServicesPanel.tsx`: gave `Environment Engine` header badge a pill shape with `gap-3`, expanded sub-nav tabs to `h-10 px-5 gap-3`, styled service and worker status badges with `rounded-full border px-2 py-0.5`, and removed the duplicate colon bug (`Port: :5432` -> `Port: 5432`).
 
