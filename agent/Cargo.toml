@@ -1,0 +1,23 @@
+[package]
+name = "aipanel-agent"
+version = "0.1.0"
+description = "AIPanel Remote Server Agent Daemon (mTLS, Atomic Deployments, Health Cascades)"
+authors = ["BotDigit"]
+edition = "2021"
+
+[[bin]]
+name = "aipanel-agent"
+path = "src/main.rs"
+
+[dependencies]
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1", features = ["v4"] }
+
+[profile.release]
+opt-level = 3
+lto = true
+panic = "abort"
+strip = true

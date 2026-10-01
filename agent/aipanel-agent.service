@@ -1,0 +1,24 @@
+[Unit]
+Description=AIPanel Remote Server Agent Daemon
+Documentation=https://aipanel.dev/docs/architecture/agent-protocol
+After=network.target docker.service caddy.service
+Requires=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/aipanel
+ExecStart=/opt/aipanel/agent/aipanel-agent
+Restart=always
+RestartSec=5s
+LimitNOFILE=65535
+StandardOutput=journal
+StandardError=journal
+
+# Security Sandboxing
+ProtectSystem=full
+ProtectHome=read-only
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

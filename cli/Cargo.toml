@@ -1,0 +1,22 @@
+[package]
+name = "aipanel-cli"
+version = "0.1.0"
+description = "AIPanel Command-Line Companion (dev, build, doctor, deploy, rollback)"
+authors = ["BotDigit"]
+edition = "2021"
+
+[[bin]]
+name = "aipanel"
+path = "src/main.rs"
+
+[dependencies]
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+chrono = { version = "0.4", features = ["serde"] }
+
+[profile.release]
+opt-level = 3
+lto = true
+panic = "abort"
+strip = true
