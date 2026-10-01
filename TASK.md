@@ -49,12 +49,13 @@
   - [x] Relaxed card padding (`p-5`, `p-6`) and list item gaps (`gap-3.5`, `space-y-3`) for breathable IDE layout
   - [x] Upgraded TopBar (`h-12`) and Sidebar (`w-60`) heights, widths, and row padding (`h-9 px-3 py-2`)
 - [x] Permanent Badge, Sidebar & Card Spacing Overhaul:
+  - [x] Resolved CSS Cascade Layer collision: removed unlayered `* { margin: 0; padding: 0; }` in `globals.css` that was stripping out all Tailwind v4 utilities
   - [x] Expanded Sidebar width to standard 288px (`w-72`) with `px-3 py-3.5` container padding and `px-3.5 py-2.5` item padding
   - [x] Added `mr-1` to all sidebar badges and accordion chevrons, securing a full 30px buffer from the sidebar border
   - [x] Redesigned core Design System `Badge.tsx` with `px-2.5 py-1 text-[10.5px] leading-tight tracking-wide rounded-md`, permanently eliminating choking/kissing borders on all badges
   - [x] Upgraded starter template cards in `WelcomePage.tsx` to `p-5 space-y-3` with generous `w-8 h-8` icon containers and breathable `px-2.5 py-1` language tags
   - [x] Upgraded Local Dev Daemons, AI Gateway, and modal template badges with `px-2.5 py-1 rounded-md`
 - [x] Quality Gates Verified:
-  - [x] `npm run build` succeeds (0 TypeScript/lint errors in 285ms)
+  - [x] `npm run build` succeeds (0 TypeScript/lint errors in 260ms)
   - [x] `cargo check` in `src-tauri` passes
 

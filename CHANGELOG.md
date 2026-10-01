@@ -54,6 +54,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fixed condition in `src/App.tsx` where `!projectPath` forced the app to always render the Welcome dashboard when clicking "Code" (`activePanel === "explorer"`).
   - Configured current workspace path `/Volumes/Mac2TB/Botdigit/Developer/Projects/aipanel` as the active project, and automatically opens the file tree and `README.md` in Monaco upon clicking "Code".
 - **Permanent Badge, Sidebar & Card Spacing Overhaul**:
+  - Fixed root CSS Cascade Layer collision: removed unlayered `* { margin: 0; padding: 0; }` in `globals.css` which was overriding all Tailwind v4 `@layer utilities` padding/margins, restoring full box model spacing application-wide.
   - Expanded Sidebar width to standard 288px (`w-72`) with `px-3 py-3.5` container padding and `px-3.5 py-2.5` item padding, giving labels and badges ample horizontal space.
   - Added `mr-1` to sidebar badges and accordion chevrons, securing a full 30px buffer from the sidebar right border so nothing touches the edge.
   - Overhauled core `Badge.tsx` design tokens with `px-2.5 py-1 text-[10.5px] leading-tight tracking-wide rounded-md`, permanently preventing text from hitting the borders across all badges.
