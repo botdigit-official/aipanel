@@ -51,12 +51,14 @@
   --font-mono: "JetBrains Mono", "SF Mono", Monaco, "Courier New", monospace;
 }
 
-/* ── Base Styles ──────────────────────────────────────────────── */
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@layer base {
+  *, ::before, ::after {
+    box-sizing: border-box;
+  }
+  html, body {
+    margin: 0;
+    padding: 0;
+  }
 }
 
 html, body, #root {
