@@ -35,7 +35,8 @@ export type AIProvider =
   | "deepseek"
   | "groq"
   | "ollama"
-  | "openrouter";
+  | "openrouter"
+  | "kilocode";
 
 export interface AIProviderConfig {
   id: AIProvider;
@@ -48,12 +49,13 @@ export interface AIProviderConfig {
 
 const PROVIDERS: AIProviderConfig[] = [
   { id: "aipanel", name: "AIPanel AI (Cloud)", model: "claude-3-5-sonnet", isLocal: false, requiresKey: false, ratePer1M: 3.00 },
+  { id: "gemini", name: "Google Gemini (Free Tier)", model: "gemini-2.0-flash", isLocal: false, requiresKey: true, ratePer1M: 0.00 },
+  { id: "kilocode", name: "Kilo Code (Free Models)", model: "deepseek-r1:free", isLocal: false, requiresKey: false, ratePer1M: 0.00 },
+  { id: "ollama", name: "Ollama (Local Offline)", model: "qwen2.5-coder:7b", isLocal: true, requiresKey: false, ratePer1M: 0.00 },
   { id: "anthropic", name: "Anthropic Claude (BYOK)", model: "claude-3-7-sonnet", isLocal: false, requiresKey: true, ratePer1M: 3.00 },
   { id: "openai", name: "OpenAI (BYOK)", model: "gpt-4o", isLocal: false, requiresKey: true, ratePer1M: 2.50 },
-  { id: "gemini", name: "Google Gemini (BYOK)", model: "gemini-2.0-flash", isLocal: false, requiresKey: true, ratePer1M: 0.10 },
   { id: "deepseek", name: "DeepSeek (BYOK)", model: "deepseek-chat", isLocal: false, requiresKey: true, ratePer1M: 0.14 },
   { id: "groq", name: "Groq LPU (BYOK)", model: "llama-3.3-70b", isLocal: false, requiresKey: true, ratePer1M: 0.59 },
-  { id: "ollama", name: "Ollama (Local Private)", model: "qwen2.5-coder:7b", isLocal: true, requiresKey: false, ratePer1M: 0.00 },
   { id: "openrouter", name: "OpenRouter Gateway", model: "claude-3.5-sonnet", isLocal: false, requiresKey: true, ratePer1M: 1.00 },
 ];
 
@@ -76,6 +78,7 @@ interface AIPanelProps {
   activeFilePath?: string;
   onApplyCode?: (code: string) => void;
   onOpenBilling?: () => void;
+  onOpenFreeAI?: () => void;
 }
 
 export default function AIPanel({
@@ -85,6 +88,7 @@ export default function AIPanel({
   activeFilePath,
   onApplyCode,
   onOpenBilling,
+  onOpenFreeAI,
 }: AIPanelProps) {
   // Provider state
   const [provider, setProvider] = useState<AIProvider>(() => {
@@ -319,6 +323,17 @@ CMD ["node", "dist/index.js"]`,
         </div>
 
         <div className="flex items-center gap-1.5">
+          {onOpenFreeAI && (
+            <button
+              onClick={onOpenFreeAI}
+              className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/25 text-[10.5px] font-sans font-semibold text-emerald-400 transition-colors cursor-pointer"
+              title="Google Gemini Free API & Kilo Code Setup"
+            >
+              <Sparkles size={10} />
+              <span>Free AI</span>
+            </button>
+          )}
+
           {/* Live Token/Cost Meter Pill */}
           <button
             onClick={onOpenBilling}

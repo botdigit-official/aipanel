@@ -41,6 +41,7 @@ interface TopBarProps {
   onToggleAI?: () => void;
   onOpenDomains?: () => void;
   onOpenWorkspaceSwitcher?: () => void;
+  onOpenFreeAI?: () => void;
 }
 
 const envDetails: Record<
@@ -93,6 +94,7 @@ export default function TopBar({
   showAI,
   onToggleAI,
   onOpenWorkspaceSwitcher,
+  onOpenFreeAI,
 }: TopBarProps) {
   const [showEnvDropdown, setShowEnvDropdown] = useState(false);
   const [showDeployDropdown, setShowDeployDropdown] = useState(false);
@@ -241,6 +243,19 @@ export default function TopBar({
 
         {/* ── Right Actions: AI, Control Center, Deploy Dropdown ── */}
         <div className="flex items-center gap-2 shrink-0">
+          {/* Free AI Models Setup */}
+          {onOpenFreeAI && (
+            <button
+              type="button"
+              onClick={onOpenFreeAI}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 hover:bg-emerald-500/20 transition-colors cursor-pointer font-sans"
+              title="Google Gemini Free API, Kilo Code, and Local Ollama"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Free AI</span>
+            </button>
+          )}
+
           {/* AI Toggle */}
           {onToggleAI && (
             <Button

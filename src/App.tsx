@@ -27,6 +27,7 @@ import HostingPanel from "./components/hosting/HostingPanel";
 import ClientCRMPanel from "./components/hosting/ClientCRMPanel";
 import ModeSelectorModal from "./components/layout/ModeSelectorModal";
 import WorkspaceSwitcherModal from "./components/modals/WorkspaceSwitcherModal";
+import FreeAIModal from "./components/modals/FreeAIModal";
 import { CommandPalette } from "./design-system";
 import { initialPlugins } from "./lib/plugins";
 import type { OperatingMode, AIPanelPlugin } from "./lib/types";
@@ -100,6 +101,7 @@ export default function App() {
   const [showDevOpsDock, setShowDevOpsDock] = useState(false);
   const [showCommandPalette, setShowCommandPalette] = useState(false);
   const [showWorkspaceSwitcher, setShowWorkspaceSwitcher] = useState(false);
+  const [showFreeAIModal, setShowFreeAIModal] = useState(false);
 
   // Global ⌘K / Ctrl+K Shortcut
   useEffect(() => {
@@ -428,6 +430,7 @@ export default function App() {
         }}
         onOpenCommandPalette={() => setShowCommandPalette(true)}
         onOpenWorkspaceSwitcher={() => setShowWorkspaceSwitcher(true)}
+        onOpenFreeAI={() => setShowFreeAIModal(true)}
         onCloseProject={() => {
           setProjectPath(null);
           setProjectInfo(null);
@@ -636,6 +639,7 @@ export default function App() {
                   projectPath={projectPath}
                   activeFilePath={activeTab || undefined}
                   onOpenBilling={() => setActivePanel("billing")}
+                  onOpenFreeAI={() => setShowFreeAIModal(true)}
                   onApplyCode={(code) => {
                     if (activeTab) {
                       handleContentChange(activeTab, code);
@@ -714,6 +718,16 @@ export default function App() {
         currentPath={projectPath}
         onSelectWorkspace={(path) => openProject(path)}
         recentProjects={recentProjects}
+      />
+
+      {/* Free AI Models & Kilo Code Setup Modal */}
+      <FreeAIModal
+        isOpen={showFreeAIModal}
+        onClose={() => setShowFreeAIModal(false)}
+        onSelectProvider={(p) => {
+          localStorage.setItem("aipanel_ai_provider", p);
+          setShowAI(true);
+        }}
       />
     </div>
   );
