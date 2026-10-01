@@ -1,13 +1,11 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# AIPanel Server Agent Bootstrap & Installer
-# Delegates to the unified intelligent installer at scripts/install.sh
+# 🚀 AIPanel — Fast 1-Click Server & VPS Installer
+# curl -fsSL https://raw.githubusercontent.com/botdigit-official/aipanel/develop/install.sh | sudo bash
 # ==============================================================================
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
-REPO_ROOT="$(dirname "$(dirname "$SCRIPT_DIR")")"
-
-if [[ -f "${REPO_ROOT}/scripts/install.sh" ]]; then
-    exec bash "${REPO_ROOT}/scripts/install.sh" "$@"
+if [[ -f "${SCRIPT_DIR}/scripts/install.sh" ]]; then
+    exec bash "${SCRIPT_DIR}/scripts/install.sh" "$@"
 fi
 
 # Fallback: if downloaded standalone via curl

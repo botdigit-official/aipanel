@@ -32,6 +32,21 @@ curl -LO https://github.com/botdigit/aipanel/releases/latest/download/aipanel_am
 sudo dpkg -i aipanel_amd64.deb
 ```
 
+### Linux VPS Server (1-Click Auto-Installer)
+
+Install the AIPanel Control Plane and Agent on any cloud VPS (Ubuntu, Debian, CentOS, RHEL, AlmaLinux, Rocky):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/botdigit-official/aipanel/develop/install.sh | sudo bash
+```
+
+The installer runs fully automatically without asking questions:
+- Analyzes CPU, RAM, Disk, and IP addresses
+- Automatically provisions swap space on low-memory droplets (<2GB)
+- Configures firewall rules for UFW and firewalld
+- Generates random security entrance URL and strong admin credentials
+- Sets up systemd service and the `aipanel` CLI management utility
+
 ### CLI Companion Only
 
 If you only want the headless command-line interface:

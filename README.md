@@ -125,22 +125,35 @@ The desktop app runs locally on `http://localhost:1420`.
 
 ---
 
-### B. Install on VPS Server (Server Mode)
+### B. Install on VPS Server (Intelligent 1-Click Auto-Installer)
 
-Install the lightweight, single-binary AIPanel Server Agent on your cloud VPS (Ubuntu 22.04 / 24.04, Debian 12):
+Install the lightweight, unified AIPanel Server Control Plane on any Linux cloud VPS (Ubuntu, Debian, CentOS, RHEL, AlmaLinux, Rocky Linux, Alpine):
 
 ```bash
-curl -fsSL https://get.aipanel.dev/install.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/botdigit-official/aipanel/develop/install.sh | sudo bash
+```
+*or via wget:*
+```bash
+wget -O install.sh https://raw.githubusercontent.com/botdigit-official/aipanel/develop/install.sh && sudo bash install.sh
 ```
 
-Once installed, access your Server Web Control Panel at:
-```
-https://<YOUR_VPS_IP>:9876
-```
+#### ⚡ What the Auto-Installer Does (Zero User Questions):
+1. **Host Hardware & OS Audit**: Detects CPU cores, RAM size, root disk storage, and public/LAN IP addresses.
+2. **Intelligent Hardware Auto-Tuning**:
+   - **Low-Memory (<2GB RAM)**: Auto-creates a 2GB swapfile to prevent OOM errors, applies conservative kernel buffers.
+   - **Standard Cloud VPS (2GB–8GB RAM)**: Configures balanced high-throughput container & proxy limits.
+   - **High-Performance Fleet (>8GB RAM)**: Unlocks high-concurrency network backlogs and max worker queues.
+3. **Automated Firewall Configuration**: Automatically detects and whitelists control port (`9876`), HTTP (`80`), and HTTPS (`443`) in `ufw`, `firewalld`, or `iptables`.
+4. **aaPanel-Grade Security Credentials**: Generates a private security entrance (e.g. `/aipanel_a8f2`), random strong password, and auth token saved in `/etc/aipanel/credentials.txt`.
+5. **Systemd Service & CLI Companion**: Registers `aipanel-agent.service` and installs the `/usr/local/bin/aipanel` management CLI tool.
 
-Your initial admin authorization key will be stored securely in:
-```
-/etc/aipanel/admin_token.key
+#### 💡 Post-Install CLI Commands:
+```bash
+aipanel info            # Re-display panel URLs, username & password
+aipanel status          # Check daemon health & telemetry
+aipanel restart         # Restart control plane daemon
+aipanel reset-password  # Instantly generate a new admin password
+aipanel logs            # Stream real-time agent logs
 ```
 
 ---
