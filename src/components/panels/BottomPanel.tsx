@@ -10,6 +10,8 @@ import {
   ChevronUp,
   ChevronDown,
   Trash2,
+  Maximize2,
+  Minimize2,
 } from "lucide-react";
 
 // ── Types ────────────────────────────────────────────────────────
@@ -40,6 +42,7 @@ const tabs: { id: BottomTab; label: string; icon: typeof Terminal }[] = [
 export default function BottomPanel({ expanded, onToggle }: BottomPanelProps) {
   const [activeTab, setActiveTab] = useState<BottomTab>("terminal");
   const [inputVal, setInputVal] = useState("");
+  const [isMaximized, setIsMaximized] = useState(false);
   const [historyIndex, setHistoryIndex] = useState<number | null>(null);
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
   const terminalEndRef = useRef<HTMLDivElement>(null);
@@ -150,7 +153,7 @@ export default function BottomPanel({ expanded, onToggle }: BottomPanelProps) {
       className={`
         flex flex-col bg-zinc-950 border-t border-zinc-800/80 select-none
         transition-all duration-200 ease-out
-        ${expanded ? "h-72" : "h-9"}
+        ${expanded ? (isMaximized ? "h-[60vh]" : "h-56") : "h-9"}
       `}
     >
       {/* Tab bar */}
@@ -209,6 +212,17 @@ export default function BottomPanel({ expanded, onToggle }: BottomPanelProps) {
               <Trash2 size={13} />
             </button>
           )}
+
+          {expanded && (
+            <button
+              onClick={() => setIsMaximized((prev) => !prev)}
+              className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors cursor-pointer"
+              title={isMaximized ? "Restore Height" : "Maximize Panel"}
+            >
+              {isMaximized ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
+            </button>
+          )}
+
           <button
             onClick={onToggle}
             className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors cursor-pointer"

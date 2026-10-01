@@ -133,12 +133,30 @@ export default function App() {
   // Services
   const [services] = useState<ServiceStatus[]>(defaultDevServices);
 
-  // Auto-detect project on startup
+  // Auto-detect project on startup and open primary file
   useEffect(() => {
     const defaultPath = "/Volumes/Mac2TB/Botdigit/Developer/Projects/aipanel";
     detectProject(defaultPath)
-      .then((info) => {
+      .then(async (info) => {
         setProjectInfo(info);
+        // Automatically open the primary project file so Code Studio is ready
+        const fileToOpen = info.suggested_file || `${defaultPath}/README.md`;
+        try {
+          const file = await readFile(fileToOpen);
+          const fileName = fileToOpen.split("/").pop() || "README.md";
+          const newTab: EditorTab = {
+            path: file.path,
+            name: fileName,
+            language: file.language,
+            content: file.content,
+            originalContent: file.content,
+            isDirty: false,
+          };
+          setTabs([newTab]);
+          setActiveTab(file.path);
+        } catch (readErr) {
+          console.warn("Could not auto-open primary file on startup:", readErr);
+        }
       })
       .catch((e) => console.warn("Initial detect project:", e));
   }, []);
@@ -315,6 +333,38 @@ export default function App() {
       }
     },
     [tabs]
+  );
+
+  const handleOpenFileByPath = useCallback(
+    async (relativePath: string) => {
+      const fullPath = relativePath.startsWith("/")
+        ? relativePath
+        : `${projectPath}/${relativePath}`;
+      const fileName = fullPath.split("/").pop() || "file";
+
+      const existingTab = tabs.find((t) => t.path === fullPath);
+      if (existingTab) {
+        setActiveTab(fullPath);
+        return;
+      }
+
+      try {
+        const file = await readFile(fullPath);
+        const newTab: EditorTab = {
+          path: file.path,
+          name: fileName,
+          language: file.language,
+          content: file.content,
+          originalContent: file.content,
+          isDirty: false,
+        };
+        setTabs((prev) => [...prev, newTab]);
+        setActiveTab(fullPath);
+      } catch (err) {
+        console.error("Failed to open file by path:", err);
+      }
+    },
+    [projectPath, tabs]
   );
 
   const handleTabClose = useCallback(
@@ -495,7 +545,7 @@ export default function App() {
           <div className="flex-1 flex min-h-0">
             {/* File Explorer Panel */}
             {showExplorer && (
-              <div className="w-64 border-r border-border-default shrink-0 overflow-hidden flex flex-col">
+              <div className="w-72 border-r border-border-default shrink-0 overflow-hidden flex flex-col">
                 <FileExplorer
                   projectPath={projectPath}
                   onFileClick={handleFileClick}
@@ -627,6 +677,11 @@ export default function App() {
                 onTabClose={handleTabClose}
                 onContentChange={handleContentChange}
                 onSave={handleSave}
+                projectName={projectInfo?.name || "aipanel"}
+                projectPath={projectPath}
+                projectFramework={projectInfo?.framework || "React 19 (Vite + Tauri)"}
+                onOpenFileByPath={handleOpenFileByPath}
+                onOpenWorkspaceSwitcher={() => setShowWorkspaceSwitcher(true)}
               />
             )}
 

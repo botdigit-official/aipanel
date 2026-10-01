@@ -21,6 +21,10 @@ import {
   ChevronDown,
   WrapText,
   Sparkles,
+  FolderOpen,
+  FileText,
+  ArrowRight,
+  BookOpen,
 } from "lucide-react";
 
 // ── Types ────────────────────────────────────────────────────────
@@ -41,6 +45,11 @@ interface EditorPanelProps {
   onTabClose: (path: string) => void;
   onContentChange: (path: string, content: string) => void;
   onSave: (path: string) => void;
+  projectPath?: string | null;
+  projectName?: string;
+  projectFramework?: string | null;
+  onOpenFileByPath?: (path: string) => void;
+  onOpenWorkspaceSwitcher?: () => void;
 }
 
 // ── Syntax Highlighter ───────────────────────────────────────────
@@ -184,6 +193,11 @@ export default function EditorPanel({
   onTabClose,
   onContentChange,
   onSave,
+  projectPath,
+  projectName,
+  projectFramework,
+  onOpenFileByPath,
+  onOpenWorkspaceSwitcher,
 }: EditorPanelProps) {
   const currentTab = tabs.find((t) => t.path === activeTab);
   const [viewMode, setViewMode] = useState<"edit" | "preview">("edit");
@@ -375,35 +389,100 @@ export default function EditorPanel({
     setTimeout(() => setJustSaved(false), 2000);
   };
 
-  // If no tabs are open, show an elegant IDE welcome state
+  // If no tabs are open, show an elegant Code Studio Launchpad
   if (tabs.length === 0) {
+    const quickFiles = [
+      { name: "README.md", path: `${projectPath || ""}/README.md`, desc: "Project documentation & guides", icon: BookOpen, color: "text-sky-400" },
+      { name: "package.json", path: `${projectPath || ""}/package.json`, desc: "Dependencies, scripts & manifests", icon: FileCode2, color: "text-amber-400" },
+      { name: "src/App.tsx", path: `${projectPath || ""}/src/App.tsx`, desc: "Main application component", icon: Code, color: "text-blue-400" },
+      { name: "vite.config.ts", path: `${projectPath || ""}/vite.config.ts`, desc: "Vite build & dev server config", icon: Sparkles, color: "text-purple-400" },
+      { name: "TASK.md", path: `${projectPath || ""}/TASK.md`, desc: "Active engineering sprint tasks", icon: FileText, color: "text-emerald-400" },
+    ];
+
     return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-zinc-950 p-6 select-none border-t border-zinc-800/80">
-        <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center shadow-lg shadow-indigo-500/5 mb-4 animate-in fade-in zoom-in-95 duration-200">
-          <Sparkles size={28} className="text-indigo-400" />
-        </div>
-        <div className="text-center max-w-sm">
-          <h2 className="text-base font-semibold text-zinc-100 mb-1">AIPanel Code Editor</h2>
-          <p className="text-xs text-zinc-400 leading-relaxed">
-            Click any file in the Explorer on the left to inspect, edit, or search code with live disk sync.
-          </p>
+      <div className="flex-1 flex flex-col items-center justify-center bg-zinc-950 p-6 select-none border-t border-zinc-800/80 overflow-y-auto custom-scrollbar">
+        {/* Project Header */}
+        <div className="flex flex-col items-center text-center max-w-lg mb-6">
+          <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/25 flex items-center justify-center shadow-lg shadow-indigo-500/10 mb-3 animate-in fade-in zoom-in-95 duration-200">
+            <Sparkles size={24} className="text-indigo-400" />
+          </div>
+          <h2 className="text-lg font-semibold text-zinc-100 font-sans tracking-tight">
+            {projectName || "AIPanel"} Code Studio
+          </h2>
+          <div className="flex items-center gap-2 mt-1.5 flex-wrap justify-center">
+            {projectFramework && (
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 font-medium">
+                {projectFramework}
+              </span>
+            )}
+            <span className="text-xs text-zinc-400 font-mono truncate max-w-xs">
+              {projectPath}
+            </span>
+            {onOpenWorkspaceSwitcher && (
+              <button
+                type="button"
+                onClick={onOpenWorkspaceSwitcher}
+                className="inline-flex items-center gap-1 text-[10.5px] px-2 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700/60 font-sans transition-colors cursor-pointer"
+              >
+                <FolderOpen size={11} className="text-indigo-400" />
+                Switch Workspace
+              </button>
+            )}
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 mt-6 w-full max-w-md text-[11px] font-mono">
-          <div className="p-2.5 rounded-lg bg-zinc-900/60 border border-zinc-800/80 flex items-center justify-between">
-            <span className="text-zinc-400">Save Active File</span>
+        {/* 1-Click Quick Open Core Files */}
+        {projectPath && onOpenFileByPath && (
+          <div className="w-full max-w-xl mb-6">
+            <div className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider font-sans mb-2.5 px-1">
+              Quick Open Core Files
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              {quickFiles.map((f) => {
+                const Icon = f.icon;
+                return (
+                  <div
+                    key={f.name}
+                    onClick={() => onOpenFileByPath(f.path)}
+                    className="group flex items-center justify-between p-3 rounded-xl bg-[#0e1019] hover:bg-[#141724] border border-[#23293d] hover:border-indigo-500/40 cursor-pointer transition-all shadow-xs"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0 pr-2">
+                      <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                        <Icon size={14} className={f.color} />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-xs font-semibold text-zinc-200 group-hover:text-indigo-300 font-mono truncate transition-colors">
+                          {f.name}
+                        </div>
+                        <div className="text-[10.5px] text-zinc-400 font-sans truncate mt-0.5">
+                          {f.desc}
+                        </div>
+                      </div>
+                    </div>
+                    <ArrowRight size={13} className="text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Keyboard Shortcuts Bar */}
+        <div className="w-full max-w-xl grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] font-mono">
+          <div className="p-2.5 rounded-lg bg-[#0e1019] border border-zinc-800/80 flex items-center justify-between">
+            <span className="text-zinc-400">Save File</span>
             <kbd className="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300 text-[10px] border border-zinc-700/60">⌘S</kbd>
           </div>
-          <div className="p-2.5 rounded-lg bg-zinc-900/60 border border-zinc-800/80 flex items-center justify-between">
-            <span className="text-zinc-400">Find in Buffer</span>
+          <div className="p-2.5 rounded-lg bg-[#0e1019] border border-zinc-800/80 flex items-center justify-between">
+            <span className="text-zinc-400">Find</span>
             <kbd className="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300 text-[10px] border border-zinc-700/60">⌘F</kbd>
           </div>
-          <div className="p-2.5 rounded-lg bg-zinc-900/60 border border-zinc-800/80 flex items-center justify-between">
-            <span className="text-zinc-400">Quick Palette</span>
+          <div className="p-2.5 rounded-lg bg-[#0e1019] border border-zinc-800/80 flex items-center justify-between">
+            <span className="text-zinc-400">Commands</span>
             <kbd className="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300 text-[10px] border border-zinc-700/60">⌘K</kbd>
           </div>
-          <div className="p-2.5 rounded-lg bg-zinc-900/60 border border-zinc-800/80 flex items-center justify-between">
-            <span className="text-zinc-400">Tab Indentation</span>
+          <div className="p-2.5 rounded-lg bg-[#0e1019] border border-zinc-800/80 flex items-center justify-between">
+            <span className="text-zinc-400">Indent</span>
             <kbd className="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300 text-[10px] border border-zinc-700/60">Tab (2sp)</kbd>
           </div>
         </div>

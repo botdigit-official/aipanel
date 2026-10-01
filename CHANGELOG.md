@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Free AI Engine Hub & Zero-Cost Integrations**:
+  - **Free AI Modal (`src/components/modals/FreeAIModal.tsx`)**:
+    - Google Gemini Free API tab: 15 RPM / 1M TPM / 1500 RPD zero-cost setup, direct link to Google AI Studio, and API key tester & storage.
+    - Kilo Code & OpenRouter tab: free tier models (`deepseek-r1:free`, `gemini-2.0-flash-exp:free`, `llama-3.3-70b:free`), VS Code extension install instructions, and API key configuration.
+    - Local Ollama tab: 100% offline free models for Apple Silicon (`qwen2.5-coder:7b`, `deepseek-r1:8b`).
+  - **Code Studio UI/UX & Responsive Layout Enhancements**:
+    - **File Explorer Header & Width Fix**: Eliminated `AI..` header truncation by granting the project title `min-w-0 flex-1 mr-2`, removing redundant folder icons, and widening the container to `w-72` (288px) so long file names fit comfortably.
+    - **Code Studio Launchpad (`src/components/editor/EditorPanel.tsx`)**: Replaced empty state with an interactive Launchpad featuring 1-click Quick Open cards (`README.md`, `package.json`, `src/App.tsx`, `vite.config.ts`, `TASK.md`), project metadata hero, and keyboard shortcut chips.
+    - **Startup Auto-Open**: Auto-opens the primary project file (`README.md` or `package.json`) on startup so Code Studio is immediately populated with active syntax-highlighted code.
+    - **Responsive Bottom Terminal (`src/components/panels/BottomPanel.tsx`)**: Compacted default height to `h-56` (224px) for maximized editor canvas; added `Maximize2`/`Minimize2` toggle for expanding to `h-[60vh]` when needed, plus `h-9` collapsed mode.
 - **Workspace & Folder Switcher System**:
   - **Dynamic Workspace Switcher Modal (`src/components/modals/WorkspaceSwitcherModal.tsx`)**:
     - Discovers and lists all workspaces across `Projects/` (e.g. `aipanel`, `agent-blueprint`, `botdigit-ai-council`, `tenderwatch`) and `Live/` (e.g. `yaarpahari.com`, `botdigit.site`, `botdigit.com`).

@@ -402,7 +402,7 @@ export default function FileExplorer({
       <div className="flex items-center justify-between px-3 h-9 border-b border-zinc-800/80 shrink-0 bg-zinc-900/40">
         <div
           onClick={onOpenWorkspaceSwitcher}
-          className={`flex items-center gap-1.5 overflow-hidden rounded px-1 py-0.5 -ml-1 ${
+          className={`flex items-center gap-1.5 min-w-0 flex-1 mr-2 rounded px-1.5 py-1 -ml-1 ${
             onOpenWorkspaceSwitcher
               ? "cursor-pointer hover:bg-zinc-800/60 text-zinc-300 hover:text-indigo-300 transition-colors"
               : "text-zinc-300"
@@ -410,7 +410,7 @@ export default function FileExplorer({
           title={onOpenWorkspaceSwitcher ? "Switch Workspace / Open Folder" : undefined}
         >
           <FolderOpen size={13} className="text-indigo-400 shrink-0" />
-          <span className="text-[11px] font-semibold tracking-wider uppercase font-mono truncate">
+          <span className="text-[11.5px] font-semibold tracking-wider uppercase font-mono truncate">
             {projectName}
           </span>
           {onOpenWorkspaceSwitcher && (
@@ -419,16 +419,7 @@ export default function FileExplorer({
         </div>
 
         {/* Action icons */}
-        <div className="flex items-center gap-0.5 text-zinc-400">
-          {onOpenWorkspaceSwitcher && (
-            <button
-              onClick={onOpenWorkspaceSwitcher}
-              className="p-1 rounded hover:bg-zinc-800 hover:text-indigo-300 transition-colors"
-              title="Switch Workspace / Open Folder"
-            >
-              <FolderOpen size={13} />
-            </button>
-          )}
+        <div className="flex items-center gap-0.5 text-zinc-400 shrink-0">
           <button
             onClick={() => setShowSearch((prev) => !prev)}
             className={`p-1 rounded hover:bg-zinc-800 hover:text-zinc-200 transition-colors ${

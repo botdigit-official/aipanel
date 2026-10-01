@@ -95,7 +95,29 @@
     - [x] `/api/fs/detect` real framework, package name, git status, and `suggested_file`
     - [x] Auto-opens entry file (`package.json`, `README.md`, `App.tsx`, `page.tsx`) upon switching
     - [x] Re-scans and renders the exact file tree for the chosen folder
+- [x] Free AI Engine Hub & Zero-Cost Integrations:
+  - [x] Dedicated Free AI Modal (`src/components/modals/FreeAIModal.tsx`):
+    - [x] Google Gemini Free API tab (15 RPM / 1M TPM / 1500 RPD, setup instructions, key test & save)
+    - [x] Kilo Code & OpenRouter Free tab (`deepseek-r1:free`, `gemini-2.0-flash:free`, `llama-3.3-70b:free`, VS Code extension guide)
+    - [x] Local Ollama Apple Silicon tab (100% offline free models `qwen2.5-coder:7b`, `deepseek-r1:8b`)
+  - [x] Free AI triggers:
+    - [x] TopBar `Sparkles` "Free AI" button
+    - [x] AIPanel Free AI provider badges & setup trigger
+- [x] Code Studio UI/UX & Canvas Optimization:
+  - [x] File Explorer Header & Width:
+    - [x] Fixed header truncation (`AI..` -> clean `aipanel` title with `min-w-0 flex-1 mr-2`)
+    - [x] Expanded explorer width to `w-72` (288px) to eliminate filename ellipses
+    - [x] De-duplicated action buttons and preserved right-side tool cluster
+  - [x] Code Studio Launchpad & Instant File Opening:
+    - [x] Replaced empty placeholder with high-density Code Studio Launchpad
+    - [x] 1-Click Quick Open Core Files (`README.md`, `package.json`, `src/App.tsx`, `vite.config.ts`, `TASK.md`)
+    - [x] Workspace metadata card with framework pill, full path, and switcher button
+    - [x] Auto-opened `README.md` on initial application mount so Code Studio starts with live code
+  - [x] Responsive Bottom Terminal:
+    - [x] Compact default height (`h-56` / 224px) leaving 70%+ vertical space for code editing
+    - [x] Maximize/Restore button (`Maximize2` / `Minimize2`) toggling to `h-[60vh]` for deep logging
+    - [x] Collapsible to `h-9` status bar for 100% editor canvas
 - [x] Quality Gates Verified:
-  - [x] `npm run build` succeeds (0 TypeScript/lint errors in 269ms)
+  - [x] `npm run build` succeeds (0 TypeScript/lint errors in 301ms)
   - [x] React Fast Refresh compatibility verified (clean hot reloads)
 
