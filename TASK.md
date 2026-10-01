@@ -81,7 +81,21 @@
     - [x] Keyboard shortcuts: `⌘S` (Save with pulse animation & "Saved" feedback), `⌘F` (Find), `Tab` (2-space indent)
     - [x] Editor action toolbar: Word Wrap toggle, Copy full buffer, Syntax Preview toggle, Save button
     - [x] Editor status bar: Cursor Ln/Col, selection character count, total lines/chars, UTF-8, Spaces: 2, and live save status
+- [x] Workspace & Folder Switcher System:
+  - [x] Workspace & Folder Switcher Modal (`src/components/modals/WorkspaceSwitcherModal.tsx`):
+    - [x] Real disk scanner discovering all projects in `Projects/`, `Live/`, `Clients/`, `Tools/`, etc.
+    - [x] Real-time search filter with keyboard navigation
+    - [x] Category tabs (All, Recent, Projects, Live)
+    - [x] Custom folder path input with 1-click open
+  - [x] Interactive Triggers:
+    - [x] TopBar project badge with clickable folder indicator & dropdown chevron
+    - [x] FileExplorer header project title & folder switcher button
+    - [x] WelcomePage "Open Project" and "Open Code Studio"
+  - [x] Auto-Detection & Primary File Auto-Opening:
+    - [x] `/api/fs/detect` real framework, package name, git status, and `suggested_file`
+    - [x] Auto-opens entry file (`package.json`, `README.md`, `App.tsx`, `page.tsx`) upon switching
+    - [x] Re-scans and renders the exact file tree for the chosen folder
 - [x] Quality Gates Verified:
-  - [x] `npm run build` succeeds (0 TypeScript/lint errors in 273ms)
+  - [x] `npm run build` succeeds (0 TypeScript/lint errors in 269ms)
   - [x] React Fast Refresh compatibility verified (clean hot reloads)
 

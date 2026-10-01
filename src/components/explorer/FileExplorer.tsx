@@ -308,12 +308,14 @@ interface FileExplorerProps {
   projectPath: string | null;
   onFileClick: (entry: FileEntry) => void;
   activeFilePath?: string;
+  onOpenWorkspaceSwitcher?: () => void;
 }
 
 export default function FileExplorer({
   projectPath,
   onFileClick,
   activeFilePath,
+  onOpenWorkspaceSwitcher,
 }: FileExplorerProps) {
   const [rootEntries, setRootEntries] = useState<FileEntry[]>([]);
   const [loading, setLoading] = useState(false);
@@ -398,14 +400,35 @@ export default function FileExplorer({
     <div className="h-full flex flex-col bg-zinc-950/80 select-none border-r border-zinc-800/80">
       {/* Header Bar */}
       <div className="flex items-center justify-between px-3 h-9 border-b border-zinc-800/80 shrink-0 bg-zinc-900/40">
-        <div className="flex items-center gap-2 overflow-hidden">
-          <span className="text-[11px] font-semibold text-zinc-300 tracking-wider uppercase font-mono truncate">
+        <div
+          onClick={onOpenWorkspaceSwitcher}
+          className={`flex items-center gap-1.5 overflow-hidden rounded px-1 py-0.5 -ml-1 ${
+            onOpenWorkspaceSwitcher
+              ? "cursor-pointer hover:bg-zinc-800/60 text-zinc-300 hover:text-indigo-300 transition-colors"
+              : "text-zinc-300"
+          }`}
+          title={onOpenWorkspaceSwitcher ? "Switch Workspace / Open Folder" : undefined}
+        >
+          <FolderOpen size={13} className="text-indigo-400 shrink-0" />
+          <span className="text-[11px] font-semibold tracking-wider uppercase font-mono truncate">
             {projectName}
           </span>
+          {onOpenWorkspaceSwitcher && (
+            <ChevronDown size={11} className="text-zinc-500 shrink-0" />
+          )}
         </div>
 
         {/* Action icons */}
         <div className="flex items-center gap-0.5 text-zinc-400">
+          {onOpenWorkspaceSwitcher && (
+            <button
+              onClick={onOpenWorkspaceSwitcher}
+              className="p-1 rounded hover:bg-zinc-800 hover:text-indigo-300 transition-colors"
+              title="Switch Workspace / Open Folder"
+            >
+              <FolderOpen size={13} />
+            </button>
+          )}
           <button
             onClick={() => setShowSearch((prev) => !prev)}
             className={`p-1 rounded hover:bg-zinc-800 hover:text-zinc-200 transition-colors ${

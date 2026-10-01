@@ -26,11 +26,13 @@ import ServerDashboard from "./components/server/ServerDashboard";
 import HostingPanel from "./components/hosting/HostingPanel";
 import ClientCRMPanel from "./components/hosting/ClientCRMPanel";
 import ModeSelectorModal from "./components/layout/ModeSelectorModal";
+import WorkspaceSwitcherModal from "./components/modals/WorkspaceSwitcherModal";
 import { CommandPalette } from "./design-system";
 import { initialPlugins } from "./lib/plugins";
 import type { OperatingMode, AIPanelPlugin } from "./lib/types";
 
 import {
+  isTauri,
   readFile,
   writeFile,
   detectProject,
@@ -97,6 +99,7 @@ export default function App() {
   const [showAI, setShowAI] = useState(false);
   const [showDevOpsDock, setShowDevOpsDock] = useState(false);
   const [showCommandPalette, setShowCommandPalette] = useState(false);
+  const [showWorkspaceSwitcher, setShowWorkspaceSwitcher] = useState(false);
 
   // Global ⌘K / Ctrl+K Shortcut
   useEffect(() => {
@@ -195,6 +198,11 @@ export default function App() {
       let selectedPath = path;
 
       if (!selectedPath) {
+        if (!isTauri()) {
+          setShowWorkspaceSwitcher(true);
+          return;
+        }
+
         try {
           const result = await open({
             directory: true,
@@ -207,14 +215,13 @@ export default function App() {
             selectedPath = result[0];
           }
         } catch (dialogErr) {
-          console.warn("Native file picker unavailable, opening workspace:", dialogErr);
-          selectedPath = "/Volumes/Mac2TB/Botdigit/Developer/Projects/aipanel";
+          console.warn("Native file picker unavailable, opening workspace switcher:", dialogErr);
+          setShowWorkspaceSwitcher(true);
+          return;
         }
       }
 
-      if (!selectedPath) {
-        selectedPath = "/Volumes/Mac2TB/Botdigit/Developer/Projects/aipanel";
-      }
+      if (!selectedPath) return;
 
       try {
         const info = await detectProject(selectedPath);
@@ -222,8 +229,27 @@ export default function App() {
         setProjectInfo(info);
         setShowDetectionBanner(!info.has_aipanel_toml);
         setActivePanel("explorer");
-        setTabs([]);
-        setActiveTab(null);
+
+        // Automatically open the primary project file so Code Studio is ready
+        const fileToOpen = info.suggested_file || `${selectedPath}/package.json`;
+        try {
+          const file = await readFile(fileToOpen);
+          const fileName = fileToOpen.split("/").pop() || "file";
+          const newTab: EditorTab = {
+            path: file.path,
+            name: fileName,
+            language: file.language,
+            content: file.content,
+            originalContent: file.content,
+            isDirty: false,
+          };
+          setTabs([newTab]);
+          setActiveTab(file.path);
+        } catch {
+          setTabs([]);
+          setActiveTab(null);
+        }
+
         saveRecentProject(info);
       } catch (err) {
         console.error("Failed to open project:", err);
@@ -401,6 +427,7 @@ export default function App() {
           setActivePanel("releases");
         }}
         onOpenCommandPalette={() => setShowCommandPalette(true)}
+        onOpenWorkspaceSwitcher={() => setShowWorkspaceSwitcher(true)}
         onCloseProject={() => {
           setProjectPath(null);
           setProjectInfo(null);
@@ -470,6 +497,7 @@ export default function App() {
                   projectPath={projectPath}
                   onFileClick={handleFileClick}
                   activeFilePath={activeTab || undefined}
+                  onOpenWorkspaceSwitcher={() => setShowWorkspaceSwitcher(true)}
                 />
               </div>
             )}
@@ -486,11 +514,32 @@ export default function App() {
               />
             ) : showDashboard ? (
               <WelcomePage
-                onOpenProject={() => openProject()}
+                onOpenProject={() => setShowWorkspaceSwitcher(true)}
                 recentProjects={recentProjects}
                 onOpenRecent={(path) => openProject(path)}
                 onCreateProject={handleCreateProject}
-                onNavigateToCode={() => setActivePanel("explorer")}
+                onNavigateToCode={async () => {
+                  setActivePanel("explorer");
+                  if (tabs.length === 0 && projectPath) {
+                    const info = projectInfo || (await detectProject(projectPath));
+                    const fileToOpen = info.suggested_file || `${projectPath}/package.json`;
+                    try {
+                      const file = await readFile(fileToOpen);
+                      const fileName = fileToOpen.split("/").pop() || "file";
+                      setTabs([{
+                        path: file.path,
+                        name: fileName,
+                        language: file.language,
+                        content: file.content,
+                        originalContent: file.content,
+                        isDirty: false,
+                      }]);
+                      setActiveTab(file.path);
+                    } catch {
+                      // ignore
+                    }
+                  }
+                }}
                 onNavigateToAI={() => {
                   setActivePanel("explorer");
                   setShowAI(true);
@@ -656,6 +705,15 @@ export default function App() {
           setEnvironment(env as Environment);
           setActivePanel("releases");
         }}
+      />
+
+      {/* Workspace & Folder Switcher Modal */}
+      <WorkspaceSwitcherModal
+        isOpen={showWorkspaceSwitcher}
+        onClose={() => setShowWorkspaceSwitcher(false)}
+        currentPath={projectPath}
+        onSelectWorkspace={(path) => openProject(path)}
+        recentProjects={recentProjects}
       />
     </div>
   );

@@ -30,6 +30,7 @@ export interface ProjectInfo {
   suggested_dev_command?: string;
   suggested_build_command?: string;
   suggested_port: number;
+  suggested_file?: string;
 }
 
 export interface GitFileChange {
@@ -265,21 +266,56 @@ export async function deleteFsEntry(path: string): Promise<boolean> {
   }
 }
 
+export interface QuickFolder {
+  name: string;
+  path: string;
+  category: string;
+}
+
+export async function getQuickFolders(): Promise<QuickFolder[]> {
+  try {
+    const res = await fetch("/api/fs/quick-folders");
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (err) {
+    console.warn("Dev FS API quick-folders error:", err);
+  }
+  return [
+    { name: "aipanel", path: "/Volumes/Mac2TB/Botdigit/Developer/Projects/aipanel", category: "Projects" },
+    { name: "yaarpahari.com", path: "/Volumes/Mac2TB/Botdigit/Developer/Live/yaarpahari.com", category: "Live" },
+  ];
+}
+
 export async function detectProject(path: string): Promise<ProjectInfo> {
-  return safeInvoke("detect_project", { path }, {
-    name: "aipanel",
+  if (isTauri()) {
+    return safeInvoke("detect_project", { path });
+  }
+
+  try {
+    const res = await fetch(`/api/fs/detect?path=${encodeURIComponent(path)}`);
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (err) {
+    console.warn("Dev FS API detect error:", err);
+  }
+
+  const folderName = path.split("/").filter(Boolean).pop() || "project";
+  return {
+    name: folderName,
     path,
-    framework: "React 19 (Vite + Tauri)",
+    framework: "Generic Project",
     runtime: "node",
     has_git: true,
-    has_docker: true,
-    has_aipanel_toml: true,
+    has_docker: false,
+    has_aipanel_toml: false,
     detected_services: ["PostgreSQL 16", "Redis 7.2", "Caddy"],
-    detected_workers: ["queue-worker"],
+    detected_workers: [],
     suggested_dev_command: "npm run dev",
     suggested_build_command: "npm run build",
-    suggested_port: 1420,
-  });
+    suggested_port: 3000,
+  };
 }
 
 export async function generateAIPanelConfig(path: string): Promise<string> {

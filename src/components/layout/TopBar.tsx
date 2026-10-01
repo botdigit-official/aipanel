@@ -40,6 +40,7 @@ interface TopBarProps {
   showAI?: boolean;
   onToggleAI?: () => void;
   onOpenDomains?: () => void;
+  onOpenWorkspaceSwitcher?: () => void;
 }
 
 const envDetails: Record<
@@ -91,6 +92,7 @@ export default function TopBar({
   onToggleFocusMode: _onToggleFocusMode,
   showAI,
   onToggleAI,
+  onOpenWorkspaceSwitcher,
 }: TopBarProps) {
   const [showEnvDropdown, setShowEnvDropdown] = useState(false);
   const [showDeployDropdown, setShowDeployDropdown] = useState(false);
@@ -145,19 +147,27 @@ export default function TopBar({
             onClick={onToggleSidebar}
           />
 
-          {/* Brand & Project Badge */}
-          <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg bg-[#0e1019] border border-[#222736]">
-            <div className="w-5 h-5 rounded-md bg-gradient-to-br from-violet-600 to-indigo-600 border border-violet-400/30 flex items-center justify-center text-xs font-bold text-white shadow-xs font-sans">
+          {/* Brand & Project Badge (Interactive Workspace Switcher) */}
+          <div
+            onClick={onOpenWorkspaceSwitcher}
+            className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg bg-[#0e1019] border border-[#222736] hover:border-violet-500/40 hover:bg-[#141724] transition-all cursor-pointer group"
+            title="Switch Workspace / Open Folder"
+          >
+            <div className="w-5 h-5 rounded-md bg-gradient-to-br from-violet-600 to-indigo-600 border border-violet-400/30 flex items-center justify-center text-xs font-bold text-white shadow-xs font-sans group-hover:scale-105 transition-transform">
               {projectName.charAt(0).toUpperCase()}
             </div>
-            <span className="text-xs font-semibold text-zinc-100 truncate max-w-36 font-sans">
+            <span className="text-xs font-semibold text-zinc-100 group-hover:text-violet-300 truncate max-w-36 font-sans">
               {projectName}
             </span>
+            <ChevronDown className="w-3 h-3 text-zinc-400 group-hover:text-violet-400 transition-colors" />
             {projectPath && onCloseProject && (
               <button
                 type="button"
-                onClick={onCloseProject}
-                className="text-zinc-500 hover:text-rose-400 transition-colors ml-1 p-0.5 cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onCloseProject();
+                }}
+                className="text-zinc-500 hover:text-rose-400 transition-colors ml-0.5 p-0.5 cursor-pointer"
                 title="Close Project Workspace"
               >
                 <X className="w-3 h-3" />

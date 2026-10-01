@@ -8,6 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Workspace & Folder Switcher System**:
+  - **Dynamic Workspace Switcher Modal (`src/components/modals/WorkspaceSwitcherModal.tsx`)**:
+    - Discovers and lists all workspaces across `Projects/` (e.g. `aipanel`, `agent-blueprint`, `botdigit-ai-council`, `tenderwatch`) and `Live/` (e.g. `yaarpahari.com`, `botdigit.site`, `botdigit.com`).
+    - Filterable by keyword with instant match search, category tabs (All, Recent, Projects, Live), and custom path input.
+  - **Interactive TopBar & FileExplorer Triggers**:
+    - Transformed TopBar project badge into an interactive dropdown trigger displaying the project name, icon, and chevron.
+    - Added workspace switcher trigger directly to FileExplorer header (`FolderOpen` icon and clickable project title).
+    - Clicking "Open Project" in WelcomePage opens the switcher modal in browser mode instead of silently falling back to a fixed path.
+  - **Dynamic Project Detection & Entry File Auto-Opening**:
+    - Added `/api/fs/detect` and `/api/fs/quick-folders` endpoints in `vite.config.ts` to inspect real `package.json`, framework, runtime, and identify entry files (`package.json`, `README.md`, `src/App.tsx`, `app/page.tsx`).
+    - Upon switching folders, Code Studio immediately mounts the selected directory tree, updates the project name and telemetry, and auto-opens the primary file in the editor.
 - **Best Editor & File Explorer Professionalization**:
   - **Real Local Filesystem Middleware (`vite.config.ts`, `tauri.ts`)**:
     - Created Node.js-based Vite dev plugin providing `/api/fs/list`, `/api/fs/read`, `/api/fs/write`, `/api/fs/create`, and `/api/fs/delete` endpoints.

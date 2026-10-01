@@ -177,6 +177,113 @@ function devFsPlugin(): Plugin {
             return;
           }
 
+          if (pathname === "/api/fs/detect") {
+            const targetPath = parsedUrl.searchParams.get("path") || process.cwd();
+            const folderName = path.basename(targetPath) || "project";
+            let name = folderName;
+            let framework = "Generic Workspace";
+            let runtime = "node";
+            let has_git = false;
+            let has_docker = false;
+            let has_aipanel_toml = false;
+            let suggested_file: string | null = null;
+
+            try {
+              const entries = await fs.readdir(targetPath);
+              const entrySet = new Set(entries);
+              has_git = entrySet.has(".git");
+              has_docker = entrySet.has("Dockerfile") || entrySet.has("docker-compose.yml");
+              has_aipanel_toml = entrySet.has("aipanel.toml");
+
+              if (entrySet.has("package.json")) {
+                try {
+                  const pkgContent = await fs.readFile(path.join(targetPath, "package.json"), "utf-8");
+                  const pkg = JSON.parse(pkgContent);
+                  if (pkg.name) name = pkg.name;
+                  const deps = { ...pkg.dependencies, ...pkg.devDependencies };
+                  if (deps.next) framework = "Next.js";
+                  else if (deps.react) framework = "React 19";
+                  else if (deps.vue) framework = "Vue";
+                  else if (deps.svelte) framework = "Svelte";
+                  else if (deps.express || deps.fastify) framework = "Node.js Server";
+                  else framework = "Node.js";
+                } catch {
+                  // ignore
+                }
+              } else if (entrySet.has("Cargo.toml")) {
+                framework = "Rust (Cargo)";
+                runtime = "rust";
+              } else if (entrySet.has("requirements.txt") || entrySet.has("pyproject.toml")) {
+                framework = "Python";
+                runtime = "python";
+              } else if (entrySet.has("go.mod")) {
+                framework = "Go";
+                runtime = "go";
+              }
+
+              // Pick suggested starting file
+              const candidates = ["package.json", "README.md", "src/App.tsx", "app/page.tsx", "src/main.tsx", "src/main.rs", "index.html", "TASK.md"];
+              for (const cand of candidates) {
+                try {
+                  const p = path.join(targetPath, cand);
+                  await fs.access(p);
+                  suggested_file = p;
+                  break;
+                } catch {
+                  // continue
+                }
+              }
+            } catch (err: any) {
+              // ignore
+            }
+
+            res.setHeader("Content-Type", "application/json");
+            res.end(
+              JSON.stringify({
+                name,
+                path: targetPath,
+                framework,
+                runtime,
+                has_git,
+                has_docker,
+                has_aipanel_toml,
+                suggested_file,
+                detected_services: ["PostgreSQL 16", "Redis 7.2", "Caddy"],
+                detected_workers: [],
+                suggested_dev_command: "npm run dev",
+                suggested_build_command: "npm run build",
+                suggested_port: 3000,
+              })
+            );
+            return;
+          }
+
+          if (pathname === "/api/fs/quick-folders") {
+            const baseDir = "/Volumes/Mac2TB/Botdigit/Developer";
+            const folders: { name: string; path: string; category: string }[] = [];
+            const subCategories = ["Projects", "Live", "Clients", "Tools", "Infrastructure"];
+            for (const cat of subCategories) {
+              const catPath = path.join(baseDir, cat);
+              try {
+                const subDirs = await fs.readdir(catPath, { withFileTypes: true });
+                for (const d of subDirs) {
+                  if (d.isDirectory() && !d.name.startsWith(".")) {
+                    folders.push({
+                      name: d.name,
+                      path: path.join(catPath, d.name),
+                      category: cat,
+                    });
+                  }
+                }
+              } catch {
+                // ignore
+              }
+            }
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify(folders));
+            return;
+          }
+
           next();
         } catch (err: any) {
           res.statusCode = 500;
