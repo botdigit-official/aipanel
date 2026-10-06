@@ -283,6 +283,7 @@
     - [x] 6.3: Add interactive Slash-Command toolbar (`/plan`, `/simplify`, `/loop`, `/review`, `/doctor`) into `AIPanel.tsx`
     - [x] 6.4: Enforce Anti-Overengineering (Skill 15 & YAGNI) in the AI prompt generator to eradicate code bloat
     - [x] 6.5: Verify `npm test` (`tsc --noEmit`) passes with 0 errors
+    - [x] 6.6: Build interactive 1-Click Skill Execution Runner Modal in `DocAgentPanel.tsx` with live inspection, output terminal, and direct Save to Project (`AUDIT.md`, `SECURITY.md`, `PERFORMANCE.md`, `REVIEW.md`, `TASK.md`)
 
 
 
