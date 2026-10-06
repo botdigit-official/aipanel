@@ -409,6 +409,7 @@ export default function App() {
           setActivePanel("dashboard");
         }}
         onOpenDomains={() => setActivePanel("domains")}
+        onOpenDoctor={() => setActivePanel("doc-agent")}
         showDevOpsDock={showDevOpsDock}
         onToggleDevOps={toggleDevOpsDock}
         showAI={showAI}

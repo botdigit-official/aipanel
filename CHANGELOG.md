@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added & Enhanced
+- **Open-Source Fork & PR Contribution Infrastructure (`.github/`, `CONTRIBUTING.md`)**:
+  - Established a zero-permission-block contribution model using the GitHub Fork & Pull Request pattern, eliminating the need to manually invite external contributors as direct repository collaborators.
+  - Implemented automated GitHub Actions CI workflow (`.github/workflows/ci.yml`) executing TypeScript type-checking (`npm test`) and production builds (`npm run build`) on every push and pull request.
+  - Added structured Pull Request template (`.github/PULL_REQUEST_TEMPLATE.md`) with verification checklist (YAGNI, 6 Anti-Bloat Laws, 0 build errors).
+  - Added Community Agent Skill contribution issue template (`.github/ISSUE_TEMPLATE/skill_contribution.md`).
+  - Updated `CONTRIBUTING.md` with explicit 4-step Fork & PR guide for outside contributors.
+- **TopBar Quick Actions & Canonical Port Governance (`TopBar.tsx`, `OverviewPanel.tsx`, `App.tsx`)**:
+  - Added 1-Click `🌐 Share (Tunnel)` and `🩺 100% Health` buttons directly to the TopBar for instant Cloudflare HTTPS ingress sharing and DocAgent Conformance Doctor access.
+  - Corrected runtime service ports in `OverviewPanel.tsx` to canonical BotDigit specifications (`:1420` Local Dev IDE, `:41700` Staging Fleet, `:41001` Protected Production Cluster, and Cloudflare Ingress Tunnels).
 - **Interactive 1-Click Skill Execution Runner Modal (`DocAgentPanel.tsx`)**:
   - Added interactive `▶ Run Skill` execution trigger to all 16 skills in the Agent Blueprint Registry.
   - Implemented real-time execution modal dialog showing live analysis logs, inspection findings, and generated markdown reports.

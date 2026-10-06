@@ -29,8 +29,8 @@ AIPanel is an open-core, unified platform merging the **Modern AI Development ID
 * **Rust**: 1.80+ (optional, only needed for compiling native desktop or Tauri binaries)
 
 ```bash
-# 1. Clone the repository
-git clone git@github.com:botdigit-official/aipanel.git
+# 1. Fork the repo on GitHub, then clone your fork:
+git clone git@github.com:<your-username>/aipanel.git
 cd aipanel
 
 # 2. Check out develop branch
@@ -50,6 +50,13 @@ npm run tauri dev
 ```
 
 The application runs locally on `http://localhost:1420`.
+
+### 🌐 No Collaborator Invite Needed: The Fork & PR Model
+External contributors do **not** need to be manually invited as collaborators to contribute:
+1. **Fork** `botdigit-official/aipanel` to your GitHub account.
+2. Push your feature branch to **your own fork**.
+3. Open a **Pull Request (PR)** against `botdigit-official/aipanel` targeting the `develop` branch.
+4. Our automated GitHub Actions CI runs `npm test` and `npm run build` on your PR automatically, and maintainers merge it upon review!
 
 ---
 

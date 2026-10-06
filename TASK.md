@@ -1,3 +1,14 @@
+- [x] Open-Source Fork & PR Contribution Architecture & CI Workflow:
+  - [x] Solved external contribution barrier by implementing standard GitHub Fork & Pull Request model (no manual repo collaborator invitation needed)
+  - [x] Created `.github/workflows/ci.yml` running automated typechecking (`npm test`) and production builds (`npm run build`) on every push/PR
+  - [x] Added PR template (`.github/PULL_REQUEST_TEMPLATE.md`) with automated YAGNI & test checklist
+  - [x] Added Issue template (`.github/ISSUE_TEMPLATE/skill_contribution.md`) for community agent skills
+  - [x] Documented step-by-step Fork & PR instructions in `CONTRIBUTING.md`
+- [x] TopBar 1-Click Share & Conformance Quick Actions (`TopBar.tsx`, `App.tsx`):
+  - [x] Added `🌐 Share (Tunnel)` button for instant Cloudflare HTTPS ingress sharing
+  - [x] Added `🩺 100% Health` button for 1-click Agent Blueprint Conformance Doctor inspection
+- [x] Canonical Port & Service Governance (`OverviewPanel.tsx`):
+  - [x] Aligned local dev IDE to `:1420`, staging ingress to `:41700`, production to `:41001`, PostgreSQL `:5432`, Redis `:6379`
 - [x] Autonomous Auto-Save & Debounced Disk Synchronization (`src/stores/editor.ts`, `src/components/editor/EditorPanel.tsx`):
   - [x] Automatically saves files to disk (`writeFile`) upon AI generation or user typing (debounced 800ms)
   - [x] Enabled by default (`localStorage: aipanel_autosave`), matching Gemini, Cursor, and modern IDE behavior

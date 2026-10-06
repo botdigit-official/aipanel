@@ -130,26 +130,28 @@ export default function OverviewPanel({
             {/* Frontend */}
             <div className="p-2.5 rounded-xl bg-zinc-950/60 border border-zinc-800/80 space-y-1">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-zinc-200">Web App</span>
+                <span className="text-[11px] font-semibold text-zinc-200">Local Dev IDE</span>
                 <span className="w-2 h-2 rounded-full bg-emerald-400" />
               </div>
               <div className="text-[10px] font-mono text-zinc-400 flex items-center justify-between">
-                <span>:3000</span>
-                <a href="http://localhost:3000" target="_blank" rel="noreferrer" className="text-indigo-400 hover:text-indigo-300">
+                <span>:1420</span>
+                <a href="http://localhost:1420" target="_blank" rel="noreferrer" className="text-indigo-400 hover:text-indigo-300">
                   <ExternalLink size={10} />
                 </a>
               </div>
             </div>
 
-            {/* API */}
+            {/* Staging Fleet */}
             <div className="p-2.5 rounded-xl bg-zinc-950/60 border border-zinc-800/80 space-y-1">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-zinc-200">API Gateway</span>
-                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                <span className="text-[11px] font-semibold text-zinc-200">Staging Fleet</span>
+                <span className="w-2 h-2 rounded-full bg-amber-400" />
               </div>
               <div className="text-[10px] font-mono text-zinc-400 flex items-center justify-between">
-                <span>:8080</span>
-                <span className="text-zinc-500">JSON</span>
+                <span>:41700</span>
+                <button onClick={() => onNavigate("releases")} className="text-amber-400 hover:text-amber-300 text-[10px]">
+                  Staging
+                </button>
               </div>
             </div>
 
@@ -179,31 +181,29 @@ export default function OverviewPanel({
               </div>
             </div>
 
-            {/* Worker */}
+            {/* Production Fleet */}
             <div className="p-2.5 rounded-xl bg-zinc-950/60 border border-zinc-800/80 space-y-1">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-zinc-200">Workers</span>
-                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                <span className="text-[11px] font-semibold text-zinc-200">Prod Cluster</span>
+                <span className="w-2 h-2 rounded-full bg-purple-400" />
               </div>
               <div className="text-[10px] font-mono text-zinc-400 flex items-center justify-between">
-                <span>2 Active</span>
-                <button onClick={() => onNavigate("workers")} className="text-indigo-400 hover:text-indigo-300 text-[10px]">
-                  Queue
-                </button>
+                <span>:41001</span>
+                <span className="text-purple-400">Protected</span>
               </div>
             </div>
 
             {/* Ingress Tunnel */}
             <div className="p-2.5 rounded-xl bg-zinc-950/60 border border-zinc-800/80 space-y-1">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-zinc-200">Live Tunnel</span>
+                <span className="text-[11px] font-semibold text-zinc-200">Public Ingress</span>
                 <span className="w-2 h-2 rounded-full bg-emerald-400" />
               </div>
               <div className="text-[10px] font-mono text-zinc-400 flex items-center justify-between">
                 <span>Cloudflare</span>
-                <a href={`https://${cleanName}-dev.botdigit.site`} target="_blank" rel="noreferrer" className="text-indigo-400 hover:text-indigo-300">
-                  <ExternalLink size={10} />
-                </a>
+                <button onClick={() => onNavigate("domains")} className="text-indigo-400 hover:text-indigo-300 text-[10px]">
+                  Tunnels
+                </button>
               </div>
             </div>
           </div>

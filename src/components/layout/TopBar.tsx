@@ -15,6 +15,8 @@ import {
   Server,
   HelpCircle,
   Settings2,
+  Globe,
+  ShieldCheck,
 } from "lucide-react";
 import type { OperatingMode } from "../../lib/types";
 import { Button, IconButton } from "../../design-system";
@@ -94,7 +96,7 @@ export default function TopBar({
   onCloseProject,
   onOpenCommandPalette,
   onOpenChanges: _onOpenChanges,
-  onOpenDoctor: _onOpenDoctor,
+  onOpenDoctor,
   focusMode: _focusMode,
   onToggleFocusMode: _onToggleFocusMode,
   showAI,
@@ -104,6 +106,7 @@ export default function TopBar({
   onOpenLocalServerConverter,
   onOpenGuide,
   onOpenSetup,
+  onOpenDomains,
 }: TopBarProps) {
   const [showEnvDropdown, setShowEnvDropdown] = useState(false);
   const [showDeployDropdown, setShowDeployDropdown] = useState(false);
@@ -252,6 +255,32 @@ export default function TopBar({
 
         {/* ── Right Actions: AI, Control Center, Deploy Dropdown ── */}
         <div className="flex items-center gap-2 shrink-0">
+          {/* Instant Public Ingress Tunnel */}
+          {onOpenDomains && (
+            <button
+              type="button"
+              onClick={onOpenDomains}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-indigo-500/10 border border-indigo-500/25 text-indigo-300 hover:bg-indigo-500/20 transition-colors cursor-pointer font-sans"
+              title="1-Click HTTPS Public Tunnel & Custom Domains"
+            >
+              <Globe className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">Share (Tunnel)</span>
+            </button>
+          )}
+
+          {/* Workspace Conformance & Health Doctor */}
+          {onOpenDoctor && (
+            <button
+              type="button"
+              onClick={onOpenDoctor}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 hover:bg-emerald-500/20 transition-colors cursor-pointer font-sans"
+              title="Agent Blueprint 7-Point Conformance Doctor & Health Radar"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="hidden lg:inline">100% Health</span>
+            </button>
+          )}
+
           {/* Free AI Models Setup */}
           {onOpenFreeAI && (
             <button
