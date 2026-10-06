@@ -1,0 +1,26 @@
+cd ./ProjectSkillsOS && git init && git add -A && git commit -m "$(cat <<'COMMIT_EOF'
+Initialize Project Skills OS v1.0
+
+Core philosophy, architecture, and 10 foundational skills:
+- 00-orchestrator (triage, detect, select)
+- 01-discovery (locate project)
+- 02-project-context (detect stack)
+- 03-business-architecture (domain, actors, rules, flows)
+- 04-architecture (review, ADR, gaps)
+- 05-documentation (living docs standard)
+- 06-codebase-audit (code inspection)
+- 07-security (security review)
+- 08-testing (test strategy)
+- 09-performance (performance review)
+- 10-audit (combined audit workflow)
+
+Stack adapters: javascript, typescript, python, php, rust, go, java, ruby, dotnet
+Framework adapters: nextjs, react, laravel, django, fastapi, axum, rails, spring
+Templates: ADR, project-brief, business-requirements, architecture, database, security, testing, deployment, runbook, changelog
+Examples: botdigit-site, saas, marketplace, ecommerce, fintech, directory, mobile-app, ai-product, internal-tool
+
+The agent must adapt to the project. The project must not be forced to adapt to the skill.
+
+Co-Authored-By: Codebuff <noreply@codebuff.com>
+COMMIT_EOF
+)"

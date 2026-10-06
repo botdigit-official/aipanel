@@ -1,0 +1,11 @@
+# .cursorrules — Agent Blueprint for Cursor (AIPanel)
+
+You are operating in AIPanel under Agent Blueprint standards.
+
+MANDATORY PROTOCOLS:
+1. PRE-FLIGHT: Update 'TASK.md' with active checkboxes before editing.
+2. ANTI-OVERENGINEERING: Strictly follow YAGNI. Never introduce speculative abstractions, factories, or unneeded dependencies.
+3. CONCRETE OVER ABSTRACT: Prefer clean, readable sequential code over complex metaprogramming.
+4. DOCS SYNC: Keep living documentation in 'docs/' in sync with every change.
+5. CHANGELOG: Record changes in 'CHANGELOG.md' under '## [Unreleased]'.
+6. VERIFICATION: Run 'npm test' (tsc --noEmit) to ensure 0 TypeScript errors.
