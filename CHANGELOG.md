@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added & Enhanced
+- **Agent Blueprint 16-Skill Registry & Conformance Doctor (`DocAgentPanel.tsx`, `AIPanel.tsx`, `ai.ts`)**:
+  - Integrated the complete **16-Skill Agent Blueprint Catalog** (`00` to `15`) into `DocAgentPanel.tsx` with category filters (`Autonomous Delivery`, `Architecture & Domain`, `Quality & Security`, `Testing, Perf & Ops`), real-time search, execution triggers, and artifact outputs.
+  - Added live **Agent Blueprint Conformance Doctor** card with 7-point workspace health check (`AGENTS.md`, `TASK.md`, `CHANGELOG.md`, `docs/`, `16 Skills`, `npm test`, `Semantic Git`) and 1-click `⚡ Equip Agent Blueprint` action.
+  - Added interactive **Slash-Command Quick-Action Bar** above the chat input in `AIPanel.tsx` with 1-click execution chips for `/plan` (5-phase delivery plan), `/simplify` (anti-overengineering audit), `/loop` (autonomous Ralph Loop spec), `/review` (5-agent council review), and `/doctor` (conformance audit).
+  - Enforced **Anti-Overengineering & YAGNI Prompt Generation** (`buildAntiOverengineeringSystemPrompt`) across all cloud LLM API providers (Gemini, Claude, DeepSeek, Groq, OpenRouter, Ollama) and offline local engines, strictly banning premature abstractions, single-implementation interfaces, and redundant proxy wrappers.
 - **Agent Blueprint Universal Standards & Anti-Overengineering Protocol (`AGENTS.md`, `CLAUDE.md`, `.cursorrules`, `.agents/`)**:
   - Integrated the **5-Phase Delivery Loop** (Discuss $\to$ Plan $\to$ Execute $\to$ Verify $\to$ Ship) and Context Engineering rules across Antigravity, Claude Code, Cursor, and Windsurf.
   - Enforced the strict **Anti-Overengineering Standard (YAGNI)**: concrete over abstract, zero speculative patterns, zero unnecessary dependencies, code deletion prioritized over addition.

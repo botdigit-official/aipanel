@@ -277,8 +277,12 @@
   - [x] Integrated `[ Guide ]` quick action button directly into TopBar and UI store
 - [x] Quality Gates Verified:
   - [x] `cargo check` succeeds (0 Rust errors in 2.6s)
-  - [x] `npx tsc --noEmit` succeeds (0 TypeScript errors)
-  - [x] `npm run build` succeeds (0 errors, 376ms build time, 52 split chunks)
-  - [x] Local dev server running healthy at `http://localhost:1420`
+  - [x] Sprint 6: Agent Blueprint Skills & Anti-Overengineering Engine Integration:
+    - [x] 6.1: Expand `DocAgentPanel.tsx` with full 16-Skill Agent Blueprint Registry with category filters, triggers, and descriptions
+    - [x] 6.2: Build 1-click "Equip Agent Blueprint into Workspace" scaffolder and live 7-point Conformance Doctor gauge
+    - [x] 6.3: Add interactive Slash-Command toolbar (`/plan`, `/simplify`, `/loop`, `/review`, `/doctor`) into `AIPanel.tsx`
+    - [x] 6.4: Enforce Anti-Overengineering (Skill 15 & YAGNI) in the AI prompt generator to eradicate code bloat
+    - [x] 6.5: Verify `npm test` (`tsc --noEmit`) passes with 0 errors
+
 
 

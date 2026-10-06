@@ -1052,6 +1052,30 @@ export default function AIPanel({
                     prompt: "Auto-create database schema with tables, foreign keys, indexes, and initial migrations for this project to deploy.",
                   },
                   {
+                    icon: Sparkles,
+                    color: "text-purple-400",
+                    title: "📋 /plan — Strategic 5-Phase Plan",
+                    prompt: "/blueprint:plan",
+                  },
+                  {
+                    icon: RefreshCw,
+                    color: "text-amber-400",
+                    title: "🧹 /simplify — Anti-Overengineering Audit",
+                    prompt: "/blueprint:simplify",
+                  },
+                  {
+                    icon: Cpu,
+                    color: "text-emerald-400",
+                    title: "🔄 /loop — Autonomous Ralph Loop Spec",
+                    prompt: "/blueprint:loop",
+                  },
+                  {
+                    icon: Check,
+                    color: "text-blue-400",
+                    title: "🔍 /review — 5-Agent Review Council",
+                    prompt: "/blueprint:review",
+                  },
+                  {
                     icon: Scale,
                     color: "text-emerald-400",
                     title: "⚖️ Budget vs Enterprise Tech Advisor",
@@ -1218,13 +1242,57 @@ export default function AIPanel({
           </button>
         </div>
 
+        {/* ── Agent Blueprint Slash-Commands Quick Bar ── */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 text-[11px] font-mono">
+          <button
+            onClick={() => handleSend("/blueprint:plan")}
+            className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-800/80 hover:bg-zinc-750 text-purple-300 hover:text-purple-100 border border-zinc-700/60 shrink-0 transition-colors cursor-pointer"
+            title="5-Phase Discuss-Plan-Execute-Verify-Ship delivery cadence"
+          >
+            <span>📋</span>
+            <span>/plan</span>
+          </button>
+          <button
+            onClick={() => handleSend("/blueprint:simplify")}
+            className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-800/80 hover:bg-zinc-750 text-amber-300 hover:text-amber-100 border border-zinc-700/60 shrink-0 transition-colors cursor-pointer"
+            title="Anti-Overengineering & 6 Anti-Bloat Laws audit"
+          >
+            <span>🧹</span>
+            <span>/simplify</span>
+          </button>
+          <button
+            onClick={() => handleSend("/blueprint:loop")}
+            className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-800/80 hover:bg-zinc-750 text-emerald-300 hover:text-emerald-100 border border-zinc-700/60 shrink-0 transition-colors cursor-pointer"
+            title="Autonomous Ralph Loop execution spec"
+          >
+            <span>🔄</span>
+            <span>/loop</span>
+          </button>
+          <button
+            onClick={() => handleSend("/blueprint:review")}
+            className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-800/80 hover:bg-zinc-750 text-blue-300 hover:text-blue-100 border border-zinc-700/60 shrink-0 transition-colors cursor-pointer"
+            title="5-Agent Review: Quality, Impl, Test, Simplify, Docs"
+          >
+            <span>🔍</span>
+            <span>/review</span>
+          </button>
+          <button
+            onClick={() => handleSend("/blueprint:doctor")}
+            className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-800/80 hover:bg-zinc-750 text-teal-300 hover:text-teal-100 border border-zinc-700/60 shrink-0 transition-colors cursor-pointer"
+            title="7-point workspace conformance health check"
+          >
+            <span>🩺</span>
+            <span>/doctor</span>
+          </button>
+        </div>
+
         <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-750 rounded-xl px-3 py-1.5 focus-within:border-purple-500 transition-colors shadow-inner">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
-            placeholder={`Ask ${activeProviderConfig.name} or prompt: "auto build", "what to change"...`}
+            placeholder={`Ask ${activeProviderConfig.name} or /plan, /simplify, /loop, /review, /doctor...`}
             className="flex-1 bg-transparent text-xs text-zinc-100 placeholder:text-zinc-500 outline-none"
           />
           <button
